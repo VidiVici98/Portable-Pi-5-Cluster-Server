@@ -39,8 +39,30 @@ This document describes the hardware setup for the Raspberry Pi cluster that pow
 - **Purpose:** Powers the Pi cluster in the absence of power from the grid. A combination of a central AC adater and battery system is used to ensure continuous operations under any circumstances.
 - **Connection:** Battery and AC power inputs connected to the PoE switch, which in turn powers the Pi's and periphery devices.
 
+**OLED Displays**
+- **Purpose:** Each Pi will have a dedicated 0.91" OLED display that will show status of the node as well as show a "Breach Risk" warning should security events be detected.
+- **Connection:** These will attach to the GPIO pins on the Raspberry Pi's via dupont cables.
+
 ## Wiring diagram
 Below is a diagram that illustrates how all the componencts are connected. This will help you visualize the phyiscal setup and connections bewteen the nodes, network infastructure, and other devices.
 
-## Power Setup
+![Wiring Diagram](https://github.com/VidiVici98/Portable-Pi-5-Cluster-Server/blob/384e3a24f11a2ef5fdc4da2f00980558961ccbf6/docs/assets/Server_Diagram.jpg)
 
+## Power Setup
+The Raspberry Pi cluster is power via PoE using a centralized PoE switch (which is in turn battery powered). This simplifies the power management and reduces the number of cables. Each Raspberry Pi node is connected to the switch via Ethernet cables, which both supply power and handle data transfer.
+
+The cluster is equipped with a battery backup system, ensuring continued operation during power outages. The battery 30 amp-hour nattery can power the Raspberry Pi nodes for several hours, depending on the usage and can be charged via an AC power adapter that interfaces via Anderson Powerpoles.
+
+## Network Setup
+
+**IP Addressing:** All Raspberry Pi nodes are configured with static IP addresses to ensure a consistent network setup.
+
+**Wireless Access Point:** The Raspberry Pi cluster is connected to a local router for internal network communication.
+
+**Network Switch:** The switch is used to connect the Raspberry Pi nodes to each other and the local network.
+
+## Component Compatibility/Issues
+
+**GPS Receiver Compatibility:** Some GPS dongles may require additional drivers or specific configurations to work with the Raspberry Pi. Ensure that the correct drivers are installed for NTP synchronization.
+
+**SDR Dongles:** Certain SDR models may require different software configurations or additional tools for full compatibility with the Raspberry Pi. The recommended software for most SDRs is CubicSDR or SDRTrunk, but testing with each specific dongle is required.
