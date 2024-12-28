@@ -1,5 +1,16 @@
 # Portable EmComm Cluster Server
 
+![Server Diagram](assets/Server_Diagram.jpg)
+
+[Overview](#Overview)
+[Features](#Features)
+[Harware](#Hardware)
+[Software Stack](#Software)
+[Installation](#Installation)
+[Contributions](#Contributions)
+[Planned Versions](#Planned_Versions)
+
+
 ## Overview
 
 This repository contains all the configurations, scripts, and documentation needed to set up and maintain a portable Raspberry Pi cluster server. The cluster is designed to support emergency communications and networking, leveraging PXE booting, overlays, and various specialized tools.
@@ -8,7 +19,7 @@ The system integrates features like software-defined radios (SDRs), LoRa communi
 
 ## Features
 
-PXE Boot Environment: Centralized boot server using TFTP and NFS to manage operating systems across cluster nodes.
+**PXE Boot Environment:** Centralized boot server using TFTP and NFS to manage operating systems across cluster nodes.
 
 **Overlay Management:** Modular overlays for node-specific software and configurations, simplifying updates and customization.
 
@@ -19,7 +30,7 @@ PXE Boot Environment: Centralized boot server using TFTP and NFS to manage opera
 **Time Synchronization:** GPS-based and NTP time sync for improved reliability in isolated networks.
 
 
-## Hardware Requirements
+## Hardware
 
 - Raspberry Pi 5s (4 GB or 8 GB) with PoE hats.
 
@@ -30,25 +41,26 @@ PXE Boot Environment: Centralized boot server using TFTP and NFS to manage opera
 - Battery power supply with AC passthrough charging.
 
 
-## Software Stack
+## Software
 
 **Base OS:** Raspberry Pi OS with a custom overlay for each node.
 
-**Services:**
+**PXE Boot:** *dnsmask (DHCP and TFTP configuration), OverlayFS, NFS.*
 
-**PXE Boot:** isc-dhcp-server, TFTP, and NFS.
+**RF Communication Tools:** *FLdigi, Winlink, JS8Call, Direwolf, CQRLog.*
 
-**Communication Tools:** FLdigi, SDR Trunk, CubicSDR, Winlink, Dump1090.
+**Mesh Networking:** *Reticulum, Mosquitto MQTT, FreeTAKServer.*
 
-**Mesh Networking:** Reticulum, Mosquitto MQTT, FreeTAC Server.
+**Passive RF Monitoring:** *SDR Trunk, CubicSDR, Dump1090, Dump978, PyAware.*
 
-**Monitoring:** LogWatch, HTTP status dashboard.
+**Security Tools** *UFW, Fail2Ban, Security Breach Monitoring Script.*
+
+**Administrative Tools** *Rsync, SSH, Parallel, SSH, Flask Client Dashboard.*
+
+**Other Services** *NTP via GPS, Offline HTML + CSS Learning Portal, Yacy, OLED Status Display Script, PyGame.*
 
 
-**File System:** OverlayFS for modular configurations.
-
-
-## Installation and Setup
+## Installation
 
 1. Clone this repository to the PXE boot node.
 
@@ -65,7 +77,7 @@ PXE Boot Environment: Centralized boot server using TFTP and NFS to manage opera
 
 ## Contributions
 
-This repository is tailored to a specific use case, but contributions are welcome if they align with the project?s goals. Please open an issue or submit a pull request for discussion.
+This repository is tailored to a specific use case, but contributions are welcome if they align with the project's goals. Please open an issue or submit a pull request for discussion.
 
 ## Acknowledgments
 
@@ -73,9 +85,11 @@ Raspberry Pi Foundation for the hardware and OS.
 
 Open-source tools and communities behind FLdigi, SDR Trunk, Reticulum, and other software.
 
+ChatGPT for troubleshooting and brainstorming assistance.
 
 
-## Planned Major Versions
+
+## Planned_Versions
 
 **Version 0.1:** Core setup and basic functionality.
 
