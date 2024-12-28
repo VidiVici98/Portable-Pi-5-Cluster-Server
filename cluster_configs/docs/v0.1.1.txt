@@ -1,0 +1,38 @@
+	--Last Update: 06 December 2024--
+
+[X] Boot timing for nodes
+[ ] Finalize PXE boot setup
+[ ] GPS time sync
+	Installed Chrony, but failed with exit code
+[X] Imported oled_display.py <version 1.0>
+	- Needs to be adjusted for phyiscal displays 
+[X] Installed Fail2Ban <disabled by default>
+[X] Installed secutity_monitor.py <version 1.1>
+	- sudo python3 security_monitor.py (-t, -p, -a)
+	- Test mode works, passive logs current events, active not set
+	- Tracks sudo attempts
+	- Does not hash file changes
+	- Integrates with oled_monitor_script.py
+[X] Installed UFW <disabled by default>
+[X] Installed Yacy with Docker
+	- docker run -d -p 8090:8090 yacy/yacy_search_server:aarch64-latest
+	- http://192.168.1.101:8090
+[ ] Configured Yacy for local indexing
+[X] Mounted secure_drive <cryptsetup + 5 digit alpha-numeric> 
+[X] Static IP & hostname configuration
+[X] Installed git and gitg for version control
+	- [X] Setup and configured initial repo and working dir
+
+
+	--Known Bugs--
+End node SSH may not work until a valid user has been set up
+Yacy changes aren't persistent in docker
+
+
+	--Next Version--
+Cron and automation scripts
+Have boot-node share /nfs/base_os
+Secure internal and external storage
+Setup file system overlays
+Setup remaining end nodes
+Update repository documentation

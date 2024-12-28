@@ -1,0 +1,25 @@
+# Enable network booting
+program_usb_boot_mode=1
+
+# Enable SSH on boot (optional, but useful for remote access)
+enable_ssh=1
+
+# Set GPU memory (optional, adjust based on your needs)
+gpu_mem=128
+
+# Force a specific HDMI mode (optional, adjust if needed)
+# hdmi_force_hotplug=1
+# hdmi_group=1
+# hdmi_mode=16
+
+# Set overclocking options (optional, adjust for your hardware)
+# arm_freq=1500
+# over_voltage=6
+
+# Enable audio output (optional, depending on use)
+# dtoverlay=vc4-kms-v3d
+# dtparam=audio=on
+
+# Disable splash screen (optional, can help speed up boot process)
+disable_splash=1
+

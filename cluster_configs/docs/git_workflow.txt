@@ -1,0 +1,29 @@
+rsync -av --delete /path/to/file /home/pi/cluster_configs
+
+cd <path/to/working/directory>
+
+git add <path/to/file>
+
+      git add . # stage all changes in directory at once
+
+git diff --start # view staged changes
+
+git comit -m "commit message"
+
+
+
+# rsync automation
+# create sync_configs.sh file
+# make executable
+     # chmod +x sync_configs.sh
+# run manually or automate
+# crontab -e
+# 0 * * * * /path/to/sync_configs
+
+
+
+documentation
+versioning
+sync/commit checkpoints
+
+# edit gitignore
