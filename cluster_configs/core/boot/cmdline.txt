@@ -1,1 +1,0 @@
-ip=dhcp root=/dev/nfs nfsroot=192.168.1.101:/srv/nfs/base_os,tcp,vers=4.2 rw console=ttyAMA0,115200 console=tty1 rootwait

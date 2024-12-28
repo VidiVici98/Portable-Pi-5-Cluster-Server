@@ -1,1 +1,0 @@
-ip=192.168.1.102::192.168.1.1:255.255.255.0::eth0:off root=/dev/nfs nfsroot=192.168.1.101:/srv/nfs/base_os,nfsvers=3 rw console=tty1 rootwait
