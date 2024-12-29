@@ -1,11 +1,10 @@
 # Portable EmComm Cluster Server
 
-![Server Diagram](assets/Server_Diagram.jpg)
-
 [Overview](#Overview)
 [Features](#Features)
 [Harware](#Hardware)
 [Software Stack](#Software)
+[Nodes](#Nodes)
 [Installation](#Installation)
 [Contributions](#Contributions)
 [Planned Versions](#Planned_Versions)
@@ -59,6 +58,16 @@ The system integrates features like software-defined radios (SDRs), LoRa communi
 
 **Other Services** *NTP via GPS, Offline HTML + CSS Learning Portal, Yacy, OLED Status Display Script, PyGame.*
 
+
+## Nodes
+
+- **Boot Node:** Responsible for managing the cluster. It acts as the PXE boot server, incorporating DHCP, TFTP, and NFS services.
+
+- **ISR Node:** Uses software defined radios to plot ADSB transponders and monitor the RF spectrum.
+
+- **Mesh Node:** Utilizes the LoRa protocol to interface with a decentralized Reticulum-based mesh network.
+
+- **VHF/UHF Node:** Interfaces with a dual band transceiver to allow digital data communications. 
 
 ## Installation
 
