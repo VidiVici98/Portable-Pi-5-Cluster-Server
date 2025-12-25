@@ -1,0 +1,87 @@
+# SSH Hardened Configuration
+# Purpose: Secure SSH access to cluster nodes
+# Location: /etc/ssh/sshd_config
+# Apply with: sudo systemctl restart ssh
+
+# === Connection Settings ===
+Port 22                           # Change if needed for security
+AddressFamily inet                # IPv4 only (disable IPv6 if not used)
+ListenAddress 0.0.0.0
+
+# === Key-Based Authentication (REQUIRED) ===
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2
+
+# === Disable Weak Authentication ===
+PasswordAuthentication no         # MUST use SSH keys only
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+KerberosAuthentication no
+GSSAPIAuthentication no
+
+# === Root Login ===
+PermitRootLogin no                # Never allow root SSH
+
+# === User Access Control ===
+# AllowUsers pi@10.0.0.* pi@192.168.0.*  # Restrict by IP if desired
+# AllowGroups ssh-users                   # Restrict to group
+
+# === Session Settings ===
+X11Forwarding no                  # Disable X11 (unless needed)
+PrintMotd yes
+PrintLastLog yes
+TCPKeepAlive yes
+Compression no                    # Disable compression (unless WAN)
+ClientAliveInterval 300           # Timeout after 5 minutes
+ClientAliveCountMax 2             # Close after 2 timeouts
+
+# === Security Timeouts ===
+LoginGraceTime 30                 # 30 seconds to authenticate
+MaxAuthTries 3                    # Max 3 authentication attempts
+MaxSessions 10                    # Max 10 sessions per user
+
+# === Encryption & Algorithms ===
+# Modern SSH defaults are secure; specify if needed:
+# Ciphers aes128-ctr,aes192-ctr,aes256-ctr
+# MACs hmac-sha2-256,hmac-sha2-512
+# KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org
+# HostKeyAlgorithms ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521
+
+# === Logging & Monitoring ===
+SyslogFacility AUTH
+LogLevel VERBOSE                  # Verbose logging for security
+
+# === Subsystem ===
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# === File Permissions ===
+# After deployment, verify:
+# chmod 600 /etc/ssh/sshd_config
+# chmod 700 /root/.ssh
+# chmod 600 /root/.ssh/authorized_keys
+# chmod 700 /home/*/.ssh
+# chmod 600 /home/*/.ssh/authorized_keys
+
+# === Post-Deployment Tests ===
+# Test without restarting:
+# sshd -t
+
+# Restart SSH service:
+# sudo systemctl restart ssh
+
+# Test connection from remote:
+# ssh -v pi@node-hostname
+
+# Check active sessions:
+# ss -tlnp | grep ssh
+# netstat -tulnp | grep ssh
+
+# === Security Checklist ===
+# ✅ PasswordAuthentication no
+# ✅ PubkeyAuthentication yes
+# ✅ PermitRootLogin no
+# ✅ X11Forwarding no
+# ✅ All keys are 600 permissions
+# ✅ Only expected users in AllowUsers
+# ✅ SSH listening on expected port/interface
+# ✅ Firewall allows SSH from expected networks only

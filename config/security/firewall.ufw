@@ -1,0 +1,67 @@
+# UFW Firewall Configuration
+# Purpose: Restrict network access to only required services
+# Location: /etc/ufw/ufw.conf
+# Deployment: sudo ufw enable && sudo ufw reload
+
+# Use simple deny/allow approach
+DEFAULT_INPUT_POLICY="DROP"
+DEFAULT_OUTPUT_POLICY="ACCEPT"
+DEFAULT_FORWARD_POLICY="DROP"
+
+# Enable UFW and IPV6
+ENABLED="yes"
+IPV6="yes"
+
+# Logging
+LOGLEVEL="medium"
+
+# After copying to /etc/ufw/ufw.conf:
+# sudo systemctl restart ufw
+
+# ==============================================================================
+# Rules added via: sudo ufw allow/deny [rule]
+# ==============================================================================
+
+# SSH - Allow from local network only (adjust to your network)
+# ufw allow from 10.0.0.0/8 to any port 22 proto tcp
+# ufw allow from 192.168.0.0/16 to any port 22 proto tcp
+
+# DHCP/TFTP (boot node only) - Local network only
+# ufw allow from 10.0.0.0/8 to any port 67 proto udp  # DHCP
+# ufw allow from 10.0.0.0/8 to any port 68 proto udp  # DHCP client
+# ufw allow from 10.0.0.0/8 to any port 69 proto udp  # TFTP
+
+# DNS (boot node only) - Local network only
+# ufw allow from 10.0.0.0/8 to any port 53 proto tcp
+# ufw allow from 10.0.0.0/8 to any port 53 proto udp
+
+# NFS (boot node only) - Local network only
+# ufw allow from 10.0.0.0/8 to any port 111 proto tcp   # RPC
+# ufw allow from 10.0.0.0/8 to any port 111 proto udp
+# ufw allow from 10.0.0.0/8 to any port 2049 proto tcp  # NFS
+# ufw allow from 10.0.0.0/8 to any port 2049 proto udp
+
+# NTP (time sync) - Allow from boot node
+# ufw allow from 10.0.0.1 to any port 123 proto udp
+
+# GPS Service (gpsd) - Local network only
+# ufw allow from 10.0.0.0/8 to any port 2947 proto tcp
+# ufw allow from 10.0.0.0/8 to any port 2947 proto udp
+
+# Custom Monitoring (if needed)
+# ufw allow from 10.0.0.0/8 to any port 9100 proto tcp  # Node exporter
+
+# Deny everything else
+# ufw default deny incoming
+# ufw default allow outgoing
+
+# View rules:
+# ufw show added
+# sudo ufw status verbose
+
+# Common patterns to add rules:
+# sudo ufw default deny incoming
+# sudo ufw allow out 53  # Allow DNS out
+# sudo ufw allow out 123  # Allow NTP out
+# sudo ufw allow out 25/tcp  # Allow SMTP
+# sudo ufw allow out 587/tcp  # Allow SMTP

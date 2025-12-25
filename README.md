@@ -99,13 +99,49 @@ For detailed setup instructions, see [Setup Guide](docs/setup.md).
 
 Detailed installation instructions are in [docs/setup.md](docs/setup.md).
 
+## Documentation
 
-Documentation
+### Essential Guides
 
-- [Quick Start Guide](docs/quick-start.md) - First-time setup walkthrough
-- [Hardware Setup](docs/hardware.md) - Detailed hardware configuration and components
-- [Installation Guide](docs/setup.md) - Complete installation and configuration
+**Start Here:**
+- [Quick Start Guide](docs/quick-start.md) - Get up and running in 10 minutes
+- [Infrastructure Setup](INFRASTRUCTURE.md) - Complete setup and architecture guide
+
+**Operations & Maintenance:**
+- [Operations Manual](operations/OPERATIONS.md) - Daily/weekly/monthly procedures
+- [Security Baseline](SECURITY-BASELINE.md) - Security standards and hardening
+- [Git Workflow](GIT-WORKFLOW.md) - Version control standards and branching strategy
+
+**Advanced Topics:**
+- [Folder Structure](FOLDER-STRUCTURE.md) - Organization and best practices
+- [Secrets Management](config/secrets/README.md) - Secure credential handling
+- [Hardware Documentation](docs/hardware.md) - Equipment specifications
 - [Troubleshooting Guide](docs/troubleshooting.md) - Common issues and solutions
+
+**Deployment Procedures:**
+- [Pre-Deployment Checklist](deployments/PRE-DEPLOYMENT-CHECKLIST.md) - Verify readiness
+- [Post-Deployment Checklist](deployments/POST-DEPLOYMENT-CHECKLIST.md) - Verify success
+
+### Key Command Reference
+
+```bash
+# Status & Diagnostics
+make status              # Quick health check
+make status-full         # Detailed status report
+make test               # Comprehensive validation
+make clean              # Clean temporary files
+
+# Git Workflow
+git status              # Check uncommitted changes
+git log --oneline       # View commit history
+git checkout -b feature/my-feature  # Create feature branch
+
+# Operations
+sudo systemctl status dnsmasq nfs-server ssh chrony ufw
+sudo journalctl -f      # Follow system logs
+```
+
+See [GIT-WORKFLOW.md](GIT-WORKFLOW.md) for detailed commands.
 
 ## Directory Structure
 

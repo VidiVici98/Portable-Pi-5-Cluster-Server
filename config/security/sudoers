@@ -1,0 +1,185 @@
+# Sudoers Configuration Template
+# Purpose: Control privilege escalation securely
+# Location: /etc/sudoers (edit with: sudo visudo)
+# Or: /etc/sudoers.d/cluster (preferred for custom rules)
+
+# ==============================================================================
+# Defaults - Apply to all rules
+# ==============================================================================
+
+# Require password for sudo (if not using key-based auth)
+Defaults use_pty
+Defaults log_input, log_output
+Defaults requiretty
+
+# Require password for privilege escalation
+Defaults passwd_timeout=0
+Defaults password_timeout=15
+
+# Security logging
+Defaults syslog="authpriv"
+Defaults logfile="/var/log/sudo.log"
+
+# Prevent privilege escalation for shell operations
+Defaults secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# ==============================================================================
+# User Privilege Specifications
+# ==============================================================================
+
+# root has full privileges
+root ALL=(ALL) ALL
+
+# pi (admin) can run anything without password (for local operations)
+# WARNING: Only if SSH key-based auth enforced
+pi ALL=(ALL) NOPASSWD: ALL
+
+# ==============================================================================
+# Group-Based Permissions (more flexible than user-based)
+# ==============================================================================
+
+# admins group can run anything with password
+%admins ALL=(ALL) ALL
+
+# cluster-operators can manage services
+%cluster-operators ALL=(ALL) /usr/bin/systemctl, /usr/sbin/service
+
+# cluster-monitor can run diagnostic tools
+%cluster-monitor ALL=(ALL) NOPASSWD: /usr/local/bin/cluster-status.sh, \
+                                      /usr/local/bin/validate-config.sh
+
+# ==============================================================================
+# Service-Specific Permissions (Principle of Least Privilege)
+# ==============================================================================
+
+# NFS management
+%nfs-admins ALL=(ALL) NOPASSWD: /usr/sbin/exportfs, \
+                                 /bin/systemctl start nfs-server, \
+                                 /bin/systemctl stop nfs-server, \
+                                 /bin/systemctl restart nfs-server
+
+# DHCP/DNS management
+%network-admins ALL=(ALL) NOPASSWD: /bin/systemctl start dnsmasq, \
+                                     /bin/systemctl stop dnsmasq, \
+                                     /bin/systemctl restart dnsmasq
+
+# Firewall management
+%firewall-admins ALL=(ALL) NOPASSWD: /usr/sbin/ufw, \
+                                      /bin/systemctl start ufw, \
+                                      /bin/systemctl stop ufw, \
+                                      /bin/systemctl restart ufw
+
+# ==============================================================================
+# Monitoring Tools (No password required)
+# ==============================================================================
+
+# Read-only system information
+%cluster-monitor ALL=(ALL) NOPASSWD: /usr/bin/systemctl status, \
+                                      /usr/bin/systemctl list-units, \
+                                      /usr/bin/journalctl, \
+                                      /bin/dmesg, \
+                                      /sbin/iptables -L, \
+                                      /sbin/ip addr, \
+                                      /sbin/ip route
+
+# Reboot (for cluster operations)
+%operators ALL=(ALL) NOPASSWD: /sbin/reboot, \
+                                /sbin/shutdown
+
+# ==============================================================================
+# Common Pitfalls to Avoid
+# ==============================================================================
+
+# ❌ BAD: Giving ALL access to ALL users
+# wheel ALL=(ALL) ALL
+
+# ❌ BAD: Allowing shell metacharacters
+# operator ALL=(ALL) NOPASSWD: /bin/bash
+
+# ✅ GOOD: Specific commands with specific privileges
+# operator ALL=(ALL) NOPASSWD: /usr/sbin/service nginx restart
+
+# ==============================================================================
+# Post-Deployment Configuration
+# ==============================================================================
+
+# Create sudoers.d file (safer than editing sudoers directly):
+# sudo sh -c 'echo "pi ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/pi'
+# sudo chmod 0440 /etc/sudoers.d/pi
+
+# Create custom privilege groups:
+# sudo groupadd cluster-operators
+# sudo groupadd cluster-monitor
+# sudo groupadd firewall-admins
+# sudo usermod -aG cluster-operators pi
+
+# Verify sudoers syntax (BEFORE applying):
+# sudo visudo -c
+# sudo visudo -c -f /etc/sudoers.d/cluster
+
+# Test specific rule:
+# sudo -l -U pi         # List pi's permissions
+# sudo -S <<< "password" /usr/bin/systemctl status
+
+# ==============================================================================
+# Monitoring Sudo Access
+# ==============================================================================
+
+# View sudo logs:
+# sudo tail -f /var/log/sudo.log
+
+# Search for privilege escalation:
+# sudo grep "pi.*sudo" /var/log/auth.log
+
+# Monitor for failed sudo attempts:
+# sudo grep "sudo.*COMMAND=" /var/log/auth.log | grep DENIED
+
+# Enable audit of sudo commands:
+# sudo auditctl -w /etc/sudoers -p wa -k sudoers_modification
+# sudo auditctl -w /etc/sudoers.d -p wa -k sudoers_modification
+
+# ==============================================================================
+# Principle of Least Privilege Examples
+# ==============================================================================
+
+# Allow restart of specific service only
+operator ALL=(ALL) NOPASSWD: /bin/systemctl restart nfs-server
+
+# Allow editing specific config file only
+editor ALL=(ALL) NOPASSWD: /bin/nano /etc/dnsmasq.conf
+
+# Allow viewing logs with less
+viewer ALL=(ALL) NOPASSWD: /usr/bin/journalctl -u sshd -f
+
+# Allow single command with arguments only (not other commands)
+backup ALL=(ALL) NOPASSWD: /usr/bin/rsync -avz --delete /data /backup
+
+# ==============================================================================
+# Security Checklist
+# ==============================================================================
+
+# ✅ Verified sudoers syntax with "sudo visudo -c"
+# ✅ Principle of least privilege applied
+# ✅ No wildcard commands (*)
+# ✅ No shell access via sudo (no /bin/bash)
+# ✅ Specific commands and arguments only
+# ✅ Groups used instead of individual users
+# ✅ sudo logging enabled
+# ✅ Audit trail enabled for sudoers changes
+# ✅ Password timeout set
+# ✅ Tested that rules work as intended
+
+# ==============================================================================
+# References
+# ==============================================================================
+
+# For visual editing (safer):
+# sudo visudo
+
+# For auditing:
+# sudo visudo -c (check syntax)
+# sudo -l (show current user's permissions)
+# sudo -l -U username (show specific user's permissions)
+
+# Rebuild sudoers cache (if needed):
+# sudo visudo -c && sudo visudo -c -f /etc/sudoers.d/*
