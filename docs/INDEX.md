@@ -1,309 +1,209 @@
-# Repository Navigation Guide
+# Documentation Index & Navigation
 
-**Quick Index to All Documentation**
+**Complete Guide to the Portable Pi 5 Cluster Server**
 
 Last Updated: December 25, 2025
 
 ---
 
-## 🚀 Getting Started (Read First)
+## 🚀 Getting Started (Choose Your Path)
 
-1. **[SETUP-COMPLETE.md](SETUP-COMPLETE.md)** - What was built and how to use it
-2. **[INFRASTRUCTURE.md](INFRASTRUCTURE.md)** - Complete setup and architecture
-3. **[docs/quick-start.md](docs/quick-start.md)** - 10-minute quick start
+### Fast Track (30 minutes)
+→ **New to the project?** Start here:
 
----
+1. **[QUICK-START.md](quick-start.md)** - Deploy boot node with 4 automated phases
+2. **[HARDWARE.md](hardware.md)** - What physical components you need  
+3. **[SCRIPTS-REFERENCE.md](../scripts/SCRIPTS-REFERENCE.md)** - How the deployment scripts work
 
-## 📚 Essential Documentation
+### Complete Setup (2-3 hours)
+→ **Need full context?** Follow this path:
 
-### Planning & Architecture
-- [INFRASTRUCTURE.md](INFRASTRUCTURE.md) - Architecture, setup phases, deployment workflow
-- [FOLDER-STRUCTURE.md](FOLDER-STRUCTURE.md) - Directory organization and purposes
-- [docs/hardware.md](docs/hardware.md) - Hardware specifications and setup
-
-### Security & Hardening
-- [SECURITY-BASELINE.md](SECURITY-BASELINE.md) - Security standards and implementation roadmap
-- [config/secrets/README.md](config/secrets/README.md) - Secrets management and rotation
-- **Configuration templates** in `config/security/`:
-  - `firewall.ufw` - UFW firewall rules
-  - `sshd_config` - SSH hardened configuration
-  - `fail2ban.conf` - Brute force protection
-  - `sysctl.conf` - Kernel hardening
-  - `sudoers` - Privilege escalation control
+1. **[INFRASTRUCTURE.md](../INFRASTRUCTURE.md)** - Architecture, design, phases
+2. **[SETUP.md](setup.md)** - Detailed step-by-step installation guide
+3. **[HARDWARE.md](hardware.md)** - Component details and wiring
+4. **[TROUBLESHOOTING.md](troubleshooting.md)** - Fix issues as they arise
 
 ### Operations & Maintenance
-- [operations/OPERATIONS.md](operations/OPERATIONS.md) - Daily, weekly, monthly procedures
-- [deployments/PRE-DEPLOYMENT-CHECKLIST.md](deployments/PRE-DEPLOYMENT-CHECKLIST.md) - Pre-deployment verification
-- [deployments/POST-DEPLOYMENT-CHECKLIST.md](deployments/POST-DEPLOYMENT-CHECKLIST.md) - Post-deployment verification
-- [docs/troubleshooting.md](docs/troubleshooting.md) - Common issues and solutions
+→ **Cluster is running, need to keep it healthy:**
 
-### Version Control & Collaboration
-- [GIT-WORKFLOW.md](GIT-WORKFLOW.md) - Git standards, branching, and team workflow
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+1. **[OPERATIONS.md](../operations/OPERATIONS.md)** - Daily/weekly/monthly procedures
+2. **[TROUBLESHOOTING.md](troubleshooting.md)** - Common problems and solutions
+3. **[SCRIPTS-REFERENCE.md](../scripts/SCRIPTS-REFERENCE.md)** - Automated tools (backup, health-check, key rotation)
 
 ---
 
-## 📂 Directory Structure
+## 📚 Complete Documentation Map
 
-### `config/` - Configuration Files
+### Essential Setup Guides
+| Document | Purpose | Time |
+|----------|---------|------|
+| **[QUICK-START.md](quick-start.md)** | Deploy boot node in 4 phases | ~2 min read |
+| **[SETUP.md](setup.md)** | Complete installation walkthrough | ~15 min read |
+| **[HARDWARE.md](hardware.md)** | Component specs, wiring, power | ~10 min read |
 
-```
-config/
-├── boot/                    # Boot configuration files
-├── network/                 # Network configuration (DHCP, DNS)
-├── nfs/                    # NFS configuration
-├── ntp/                    # NTP/time configuration
-├── overlays/               # Node-specific customizations
-│   ├── boot-node/
-│   ├── isr-node/
-│   ├── mesh-node/
-│   └── vhf-node/
-├── secrets/                # Credentials (git-ignored)
-│   └── README.md          # Secrets management guide
-├── security/               # Security configurations
-│   ├── fail2ban.conf
-│   ├── firewall.ufw
-│   ├── sshd_config
-│   ├── sudoers
-│   └── sysctl.conf
-└── templates/              # Base templates (to be created)
-```
+### Architecture & Planning
+| Document | Purpose | Time |
+|----------|---------|------|
+| **[INFRASTRUCTURE.md](../INFRASTRUCTURE.md)** | Architecture, phases, workflow | ~20 min read |
+| **[FOLDER-STRUCTURE.md](../FOLDER-STRUCTURE.md)** | Directory organization | ~5 min read |
+| **[PROJECT-STATUS.md](PROJECT_STATUS.md)** | What's done, what's planned | ~5 min read |
 
-### `deployments/` - Deployment Procedures
+### Deployment & Operations
+| Document | Purpose | Items |
+|----------|---------|-------|
+| **[SCRIPTS-REFERENCE.md](../scripts/SCRIPTS-REFERENCE.md)** | Deployment & automation scripts | 7 scripts |
+| **[OPERATIONS.md](../operations/OPERATIONS.md)** | Daily/weekly/monthly procedures | 20+ procedures |
+| **[PRE-DEPLOYMENT-CHECKLIST.md](../deployments/PRE-DEPLOYMENT-CHECKLIST.md)** | Pre-deployment verification | 50+ items |
+| **[POST-DEPLOYMENT-CHECKLIST.md](../deployments/POST-DEPLOYMENT-CHECKLIST.md)** | Post-deployment verification | 70+ items |
 
-```
-deployments/
-├── boot-node/             # Boot node deployment
-│   ├── 01-system-setup.sh        (to be created)
-│   ├── 02-install-services.sh    (to be created)
-│   ├── 03-configure-services.sh  (to be created)
-│   └── 04-verify-setup.sh        (to be created)
-├── node-templates/        # Generic node templates
-├── PRE-DEPLOYMENT-CHECKLIST.md
-└── POST-DEPLOYMENT-CHECKLIST.md
-```
+### Security & Configuration
+| Document | Purpose | Items |
+|----------|---------|-------|
+| **[SECURITY-BASELINE.md](../SECURITY-BASELINE.md)** | Security standards & hardening | 10+ procedures |
+| **[config/secrets/README.md](../config/secrets/README.md)** | Secrets management & rotation | Key rotation guide |
+| **Security templates** in `config/security/` | Firewall, SSH, Fail2Ban, kernel hardening | 5 templates |
 
-### `operations/` - Operational Procedures
+### Development & Collaboration
+| Document | Purpose | Items |
+|----------|---------|-------|
+| **[GIT-WORKFLOW.md](../GIT-WORKFLOW.md)** | Git standards, branching, team workflow | Conventions |
+| **[CONTRIBUTING.md](../CONTRIBUTING.md)** | Contribution guidelines | How to participate |
 
-```
-operations/
-├── OPERATIONS.md           # Daily/weekly/monthly procedures
-├── backups/               # Backup storage and scripts
-├── logs/                  # System logs
-├── recovery/              # Disaster recovery procedures
-└── maintenance/           # Regular maintenance tasks
-```
+### Problem Solving
+| Document | Purpose | Coverage |
+|----------|---------|----------|
+| **[TROUBLESHOOTING.md](troubleshooting.md)** | Fix common issues | Network, NFS, Time, Storage, SSH, Deployment |
 
-### `docs/` - Documentation
+---
+
+## 📂 Directory Structure Reference
 
 ```
-docs/
-├── quick-start.md         # 10-minute quick start
-├── setup.md               # Detailed setup guide
-├── hardware.md            # Hardware documentation
-├── troubleshooting.md     # Troubleshooting guide
-├── PHASE1-GUIDE.md        # Phase 1 diagnostics guide
-├── PROJECT_STATUS.md      # Project status and roadmap
-└── QUICK-REFERENCE.md     # Command reference
-```
+config/                           # Configuration files
+├── boot/                         # PXE boot config
+├── network/                      # DNS/DHCP config
+├── nfs/                          # NFS server config
+├── ntp/                          # NTP/GPS time sync
+├── overlays/                     # Node-specific customizations
+├── secrets/                      # Credentials (git-ignored)
+└── security/                     # Security templates
 
-### Root Level Key Files
+deployments/                      # Deployment & scripts
+├── boot-node/
+│   ├── 01-system-setup.sh       # OS updates, hostname, hardening
+│   ├── 02-install-services.sh   # Install all packages
+│   ├── 03-configure-services.sh # Deploy configs, start services
+│   └── 04-verify-setup.sh       # Run 70+ verification tests
+├── PRE-DEPLOYMENT-CHECKLIST.md  
+└── POST-DEPLOYMENT-CHECKLIST.md 
 
-```
-/
-├── README.md                  # Main project overview
-├── INFRASTRUCTURE.md          # Complete setup guide
-├── SECURITY-BASELINE.md       # Security standards
-├── GIT-WORKFLOW.md            # Version control standards
-├── FOLDER-STRUCTURE.md        # Folder organization
-├── SETUP-COMPLETE.md          # Setup completion summary
-├── CONTRIBUTING.md            # Contribution guidelines
-├── LICENSE                    # MIT License
-└── Makefile                   # Build and test commands
+operations/                       # Operational scripts & docs
+├── OPERATIONS.md                # Daily/weekly/monthly procedures
+├── backups/backup-daily.sh      # Automated daily backups
+├── maintenance/health-check.sh  # System health monitoring
+├── recovery/                    # Disaster recovery procedures
+└── logs/                        # System log storage
+
+docs/                            # Documentation (this folder)
+├── QUICK-START.md               # 30-minute deployment guide
+├── SETUP.md                     # Complete setup walkthrough
+├── HARDWARE.md                  # Component specifications
+├── TROUBLESHOOTING.md           # Common issues & solutions
+└── INDEX.md                     # This file
 ```
 
 ---
 
-## 🔐 Security Files Reference
+## 🎯 Quick Task Lookup
 
-All in `config/security/`:
+### I want to...
 
-| File | Purpose | Key Config |
-|------|---------|-----------|
-| `firewall.ufw` | Firewall rules | `DEFAULT_INPUT_POLICY="DROP"` |
-| `sshd_config` | SSH hardening | `PasswordAuthentication no` |
-| `fail2ban.conf` | Brute force protection | `maxretry = 3` |
-| `sysctl.conf` | Kernel hardening | `kernel.randomize_va_space = 2` |
-| `sudoers` | Privilege escalation | Group-based permissions |
+**...deploy the cluster**
+→ [QUICK-START.md](quick-start.md) - 30 minute automated deployment
 
----
+**...understand the architecture**
+→ [INFRASTRUCTURE.md](../INFRASTRUCTURE.md) - Complete design overview
 
-## 📋 Checklists
+**...fix a problem**
+→ [TROUBLESHOOTING.md](troubleshooting.md) - Solutions for common issues
 
-### Pre-Deployment
-**[deployments/PRE-DEPLOYMENT-CHECKLIST.md](deployments/PRE-DEPLOYMENT-CHECKLIST.md)**
-- 50+ verification items
-- System readiness
-- Security baseline
-- Documentation completeness
+**...set up a specific node (ISR, Mesh, VHF)**
+→ [SETUP.md](setup.md) - Per-node configuration guide
 
-### Post-Deployment
-**[deployments/POST-DEPLOYMENT-CHECKLIST.md](deployments/POST-DEPLOYMENT-CHECKLIST.md)**
-- 70+ verification items
-- Service status
-- Performance baseline
-- Operational readiness
+**...verify hardware is correct**
+→ [HARDWARE.md](hardware.md) - Component specs and requirements
 
----
+**...configure security**
+→ [SECURITY-BASELINE.md](../SECURITY-BASELINE.md) - Security standards
 
-## 🛠️ Common Tasks
+**...manage backups and monitoring**
+→ [SCRIPTS-REFERENCE.md](../scripts/SCRIPTS-REFERENCE.md) - Automation tools
 
-### First-Time Setup
-1. Read [INFRASTRUCTURE.md](INFRASTRUCTURE.md) - Architecture overview
-2. Review [SECURITY-BASELINE.md](SECURITY-BASELINE.md) - Security requirements
-3. Complete [PRE-DEPLOYMENT-CHECKLIST.md](deployments/PRE-DEPLOYMENT-CHECKLIST.md)
-4. Follow deployment steps in [INFRASTRUCTURE.md](INFRASTRUCTURE.md)
-5. Complete [POST-DEPLOYMENT-CHECKLIST.md](deployments/POST-DEPLOYMENT-CHECKLIST.md)
+**...perform daily operations**
+→ [OPERATIONS.md](../operations/OPERATIONS.md) - Daily procedures
 
-### Daily Operations
-1. Read [operations/OPERATIONS.md](operations/OPERATIONS.md) - Section "Daily Operations"
-2. Run: `make status`
-3. Review logs: `sudo journalctl -f -p warning`
+**...know what scripts do**
+→ [SCRIPTS-REFERENCE.md](../scripts/SCRIPTS-REFERENCE.md) - All 7 scripts explained
 
-### Troubleshooting
-1. Check [docs/troubleshooting.md](docs/troubleshooting.md)
-2. Use [operations/OPERATIONS.md](operations/OPERATIONS.md) - Section "Troubleshooting"
-3. Review relevant service logs
-
-### Making Changes
-1. Read [GIT-WORKFLOW.md](GIT-WORKFLOW.md) - Version control standards
-2. Create feature branch: `git checkout -b feature/my-change`
-3. Make changes, test thoroughly
-4. Commit with clear message: `git commit -m "type: description"`
-5. Push and create pull request
-
-### Managing Secrets
-1. Read [config/secrets/README.md](config/secrets/README.md)
-2. Generate secrets: SSH keys, certificates, API keys
-3. Store in `config/secrets/`
-4. Verify `.gitignore` includes secrets
-5. Load via environment variables in scripts
+**...contribute to the project**
+→ [CONTRIBUTING.md](../CONTRIBUTING.md) - How to participate
 
 ---
 
-## 📊 File Statistics
+## 📖 Reading Guide by Role
 
-**Total Documentation:** 2,550+ lines
-- INFRASTRUCTURE.md: 650 lines
-- GIT-WORKFLOW.md: 400 lines
-- SECURITY-BASELINE.md: 400 lines
-- operations/OPERATIONS.md: 450 lines
-- FOLDER-STRUCTURE.md: 300 lines
-- config/secrets/README.md: 350 lines
+### For System Administrators
+1. [QUICK-START.md](quick-start.md) - Deploy the cluster
+2. [OPERATIONS.md](../operations/OPERATIONS.md) - Day-to-day management
+3. [TROUBLESHOOTING.md](troubleshooting.md) - Problem solving
+4. [SECURITY-BASELINE.md](../SECURITY-BASELINE.md) - Security hardening
 
-**Security Templates:** 500+ lines
-- firewall.ufw, sshd_config, fail2ban.conf, sysctl.conf, sudoers
+### For Hardware Integrators
+1. [HARDWARE.md](hardware.md) - Component specifications
+2. [INFRASTRUCTURE.md](../INFRASTRUCTURE.md) - System architecture
+3. [SETUP.md](setup.md) - Physical setup details
+4. [config/](../config/) - Configuration examples
 
-**Checklists:** 120+ items
-- PRE-DEPLOYMENT: 50+ items
-- POST-DEPLOYMENT: 70+ items
+### For Developers
+1. [INFRASTRUCTURE.md](../INFRASTRUCTURE.md) - Architecture overview
+2. [GIT-WORKFLOW.md](../GIT-WORKFLOW.md) - Development standards
+3. [CONTRIBUTING.md](../CONTRIBUTING.md) - How to contribute
+4. [FOLDER-STRUCTURE.md](../FOLDER-STRUCTURE.md) - Code organization
 
-**Directories Created:** 15
-- Templates, overlays (4), secrets, security, deployments (2), operations (3)
-
----
-
-## 🔍 Finding What You Need
-
-### By Topic
-
-**Architecture & Setup**
-- [INFRASTRUCTURE.md](INFRASTRUCTURE.md) - Complete guide
-- [FOLDER-STRUCTURE.md](FOLDER-STRUCTURE.md) - Directory organization
-- [docs/hardware.md](docs/hardware.md) - Hardware setup
-
-**Security**
-- [SECURITY-BASELINE.md](SECURITY-BASELINE.md) - Standards
-- [config/security/](config/security/) - Configuration templates
-- [config/secrets/README.md](config/secrets/README.md) - Secrets management
-
-**Operations**
-- [operations/OPERATIONS.md](operations/OPERATIONS.md) - Procedures
-- [docs/troubleshooting.md](docs/troubleshooting.md) - Problem solving
-- [deployments/PRE-DEPLOYMENT-CHECKLIST.md](deployments/PRE-DEPLOYMENT-CHECKLIST.md) - Pre-flight checks
-
-**Development & Collaboration**
-- [GIT-WORKFLOW.md](GIT-WORKFLOW.md) - Version control
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-
-**Quick Reference**
-- [docs/quick-start.md](docs/quick-start.md) - 10-minute start
-- [docs/QUICK-REFERENCE.md](docs/QUICK-REFERENCE.md) - Command reference
-- [README.md](README.md) - Project overview
-
-### By Time Needed
-
-**10 Minutes** → [docs/quick-start.md](docs/quick-start.md)
-
-**30 Minutes** → [SETUP-COMPLETE.md](SETUP-COMPLETE.md)
-
-**1-2 Hours** → [INFRASTRUCTURE.md](INFRASTRUCTURE.md)
-
-**2-4 Hours** → Full setup following [INFRASTRUCTURE.md](INFRASTRUCTURE.md) + [deployments/PRE-DEPLOYMENT-CHECKLIST.md](deployments/PRE-DEPLOYMENT-CHECKLIST.md)
-
-**4-6 Hours** → Deployment + [deployments/POST-DEPLOYMENT-CHECKLIST.md](deployments/POST-DEPLOYMENT-CHECKLIST.md)
+### For Security Officers
+1. [SECURITY-BASELINE.md](../SECURITY-BASELINE.md) - Security standards
+2. [config/security/](../config/security/) - Security templates
+3. [config/secrets/README.md](../config/secrets/README.md) - Secrets management
+4. [TROUBLESHOOTING.md](troubleshooting.md) - Security issue resolution
 
 ---
 
-## ✅ Documentation Checklist
+## 💡 Common Reference Points
 
-**Foundation Complete:**
-- ✅ INFRASTRUCTURE.md - Complete setup guide
-- ✅ SECURITY-BASELINE.md - Security standards
-- ✅ GIT-WORKFLOW.md - Version control standards
-- ✅ FOLDER-STRUCTURE.md - Directory organization
-- ✅ operations/OPERATIONS.md - Operational procedures
-- ✅ config/secrets/README.md - Secrets management
-- ✅ deployments/PRE-DEPLOYMENT-CHECKLIST.md - Pre-deployment
-- ✅ deployments/POST-DEPLOYMENT-CHECKLIST.md - Post-deployment
-- ✅ config/security/ - 5 security configuration templates
+**First Time Setup:**
+1. [QUICK-START.md](quick-start.md)
+2. Run deployment scripts
+3. [TROUBLESHOOTING.md](troubleshooting.md) if issues
+4. [OPERATIONS.md](../operations/OPERATIONS.md) for ongoing management
 
-**Ready for Deployment:**
-- ✅ Firewall rules (config/security/firewall.ufw)
-- ✅ SSH configuration (config/security/sshd_config)
-- ✅ Fail2Ban setup (config/security/fail2ban.conf)
-- ✅ Kernel hardening (config/security/sysctl.conf)
-- ✅ Sudoers rules (config/security/sudoers)
-
-**Next Phase (To Be Created):**
-- ⏳ Boot node deployment scripts (01-04)
-- ⏳ Backup procedures
-- ⏳ Recovery scripts
-- ⏳ Monitoring setup
+**Need Help?**
+1. Search [TROUBLESHOOTING.md](troubleshooting.md)
+2. Check relevant config: `config/` directory
+3. Review [INFRASTRUCTURE.md](../INFRASTRUCTURE.md) for architecture questions
+4. See [CONTRIBUTING.md](../CONTRIBUTING.md) to report issues
 
 ---
 
-## 📞 Questions?
+## 📊 Documentation Status
 
-**Architecture questions?**
-→ See [INFRASTRUCTURE.md](INFRASTRUCTURE.md)
-
-**Security questions?**
-→ See [SECURITY-BASELINE.md](SECURITY-BASELINE.md)
-
-**Operation questions?**
-→ See [operations/OPERATIONS.md](operations/OPERATIONS.md)
-
-**Troubleshooting?**
-→ See [docs/troubleshooting.md](docs/troubleshooting.md)
-
-**Git workflow?**
-→ See [GIT-WORKFLOW.md](GIT-WORKFLOW.md)
-
-**How do I get started?**
-→ See [SETUP-COMPLETE.md](SETUP-COMPLETE.md)
-
----
+**Documentation Coverage:**
+- ✅ 2,000+ lines of guides
+- ✅ 4 core setup documents
+- ✅ 4 reference/planning documents
+- ✅ 7 deployment/automation scripts
+- ✅ 5 security templates
+- ✅ 2 comprehensive checklists
 
 **Last Updated:** December 25, 2025  
-**Status:** Foundation Complete - Ready for Phase 2 Deployment
+**Status:** ✅ Complete and Current  
+**Maintained By:** Project Team

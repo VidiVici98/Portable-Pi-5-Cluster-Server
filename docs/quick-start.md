@@ -1,103 +1,108 @@
-# Quick Start Guide
+# Quick Start Guide - Automated Deployment
 
-Get your Portable Pi 5 Cluster running in 30 minutes.
+Deploy your Portable Pi 5 Cluster boot node in **4 automated phases** (~30 minutes total).
 
-## Prerequisites
+## What You Need
 
-- 4× Raspberry Pi 5 with PoE HATs
-- Managed PoE switch
-- Cat 6a Ethernet cables
-- Network with internet access (for initial setup only)
-- SSH access capability
+- Raspberry Pi 5 running Raspberry Pi OS (Lite 64-bit recommended)
+- Internet access for initial setup
+- SSH access to the Pi
+- This repository cloned to the boot node
 
-## 5-Minute Boot Node Setup
-
-Assuming your boot node is running Raspberry Pi OS:
+## 1-Minute Initial Setup
 
 ```bash
-# Clone this repository
+# Clone the repository
 git clone https://github.com/yourusername/Portable-Pi-5-Cluster-Server.git
 cd Portable-Pi-5-Cluster-Server
 
-# Install core dependencies
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y dnsmasq nfs-kernel-server git curl python3-pip
-
-# Apply boot node configuration
-sudo cp config/network/dnsmasq.conf /etc/dnsmasq.conf
-sudo cp config/nfs/exports /etc/exports
-sudo systemctl restart dnsmasq nfs-kernel-server
-
-# Verify services are running
-sudo systemctl status dnsmasq
-sudo systemctl status nfs-kernel-server
+# Make scripts executable (one-time only)
+chmod +x deployments/boot-node/*.sh
 ```
 
-## 10-Minute Other Nodes Setup
+## Deploy Boot Node (4 Automated Phases)
+
+Run these commands in order. Each phase is idempotent (safe to rerun):
+
+### Phase 1: System Setup (~5-10 minutes)
+```bash
+sudo bash deployments/boot-node/01-system-setup.sh
+```
+Sets hostname to `boot-node`, updates OS, configures timezone, applies kernel hardening.
+
+### Phase 2: Install Services (~5-10 minutes)
+```bash
+sudo bash deployments/boot-node/02-install-services.sh
+```
+Installs DHCP/DNS, TFTP, NFS, time sync, firewall, brute force protection, and monitoring tools.
+
+### Phase 3: Configure Services (~5 minutes)
+```bash
+sudo bash deployments/boot-node/03-configure-services.sh
+```
+Deploys configs, sets up firewall rules, enables services, creates TFTP boot files.
+
+### Phase 4: Verify Setup (~2-5 minutes)
+```bash
+sudo bash deployments/boot-node/04-verify-setup.sh
+```
+Runs 70+ tests across 9 categories: system health, services, network, security, ports, NFS, TFTP, NTP, firewall.
+
+**Exit code 0 = ✅ All tests passed**
+
+## Automate Operations (Optional)
+
+### Daily Backups
+```bash
+sudo crontab -e
+# Add: 0 2 * * * /home/jon/Portable-Pi-5-Cluster-Server/operations/backups/backup-daily.sh
+```
+
+### Hourly Health Monitoring
+```bash
+sudo crontab -e
+# Add: 0 * * * * /home/jon/Portable-Pi-5-Cluster-Server/operations/maintenance/health-check.sh quiet
+```
+
+View health status:
+```bash
+tail -50 operations/logs/health-check.log
+```
+
+## Deploy Other Nodes
 
 For each additional node (ISR, Mesh, VHF):
 
 ```bash
-# SSH into node
-ssh pi@192.168.1.X
-
-# Clone repository
+ssh pi@<node-ip>
 git clone https://github.com/yourusername/Portable-Pi-5-Cluster-Server.git
-cd Portable-Pi-5-Cluster-Server
 
-# Run node-specific setup (interactive)
-./scripts/setup-node.sh  # [When available]
+# Configure static IP
+sudo nano /etc/dhcpcd.conf  # See SETUP.md for details
 
-# Or manually install basic tools
-sudo apt update
-sudo apt install -y git curl python3-pip openssh-server
-```
-
-## Verify Connectivity
-
-From boot node:
-
-```bash
-# Test ping to all nodes
-ping 192.168.1.20  # ISR
-ping 192.168.1.30  # Mesh
-ping 192.168.1.40  # VHF
-
-# Test DHCP
-dnsmasq --test
-
-# Check NFS
-showmount -e localhost
+# Node-specific setup (see SETUP.md or NODE-SETUP.md)
 ```
 
 ## What's Next?
 
-1. **Hardware:** Verify all components in [Hardware Setup](hardware.md)
-2. **Full Setup:** Follow [Installation Guide](setup.md) for complete configuration
-3. **Troubleshooting:** Check [Troubleshooting](troubleshooting.md) if issues arise
-4. **RF Tools:** Configure node-specific applications (SDRs, LoRa, etc.)
+✅ **Boot node deployed**
 
-## Common Issues
+1. **Detailed setup guide:** [SETUP.md](SETUP.md) for per-node configuration
+2. **Hardware requirements:** [HARDWARE.md](HARDWARE.md)
+3. **Script reference:** [SCRIPTS-REFERENCE.md](../scripts/SCRIPTS-REFERENCE.md)
+4. **Operations guide:** [OPERATIONS.md](../operations/OPERATIONS.md)
+5. **Troubleshooting:** [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
-**Nodes can't connect to boot node:**
-- Check ethernet cables
-- Verify PoE switch is powered
-- Run `ip addr` to confirm IP assignment
-- See [Troubleshooting](troubleshooting.md)
+## Troubleshooting
 
-**NFS mount fails:**
-- Verify exports: `showmount -e <boot-node-ip>`
+**Phase fails?** Check logs and rerun same phase:
+```bash
+tail -50 /var/log/boot-node-setup.log
+sudo bash deployments/boot-node/03-configure-services.sh  # Example: rerun phase 3
+```
+
+**Phase 4 reports failures?** 
+- Read failure messages (most include fixes)
+- Check service logs: `journalctl -u dnsmasq -n 20`
 - Check firewall: `sudo ufw status`
-- Review `/etc/exports` configuration
-
-**DHCP not working:**
-- Restart dnsmasq: `sudo systemctl restart dnsmasq`
-- Check config: `sudo dnsmasq --test`
-- View logs: `sudo journalctl -u dnsmasq -f`
-
-## Need Help?
-
-- Check [Troubleshooting Guide](troubleshooting.md)
-- Review [Hardware Documentation](hardware.md)
-- See configuration examples in [config/](../config/) directory
-- Open an issue on GitHub
+- See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed help

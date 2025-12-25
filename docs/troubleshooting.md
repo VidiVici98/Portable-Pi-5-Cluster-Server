@@ -198,37 +198,127 @@ cat /tmp/security_status
 
 **Check resource usage:**
 
+## Deployment Script Issues
+
+### Script fails to execute
+
+**Verify scripts are executable:**
 ```bash
-top
-free -h
-df -h
+ls -la deployments/boot-node/*.sh
+chmod +x deployments/boot-node/*.sh
 ```
 
-## OLED Display Issues
-
-### Display not showing output
-
-**Verify display connection:**
-
+**Check for syntax errors:**
 ```bash
-i2cdetect -y 1  # Should show device at 0x3C
-ls -l /dev/i2c*
+bash -n deployments/boot-node/03-configure-services.sh
 ```
 
-**Check script execution:**
-
+**Run script with debug output:**
 ```bash
-python3 scripts/oled_display_v1.py
+bash -x deployments/boot-node/02-install-services.sh
 ```
 
-**Verify dependencies:**
+### Phase 1/2/3 fails
 
+**Check detailed error logs:**
 ```bash
-pip3 list | grep -i pygame
-pip3 list | grep -i adafruit
+tail -100 /var/log/boot-node-setup.log
 ```
 
-## SSH Access Issues
+**Rerun same phase (idempotent - safe to retry):**
+```bash
+sudo bash deployments/boot-node/03-configure-services.sh
+```
+
+**Common Phase 1 issues:**
+- **Hostname not set:** Check `/etc/hostname` and `/etc/hosts`
+- **Package updates failed:** Network issue - check connectivity
+- **Disk space:** Run `df -h` - ensure >1GB free
+
+**Common Phase 2 issues:**
+- **Package already exists:** Safe to ignore, script handles this
+- **Network timeout:** Internet required - check connection
+- **Permission denied:** Must run with sudo
+
+**Common Phase 3 issues:**
+- **Config file not found:** Clone repository to `/home/jon/Portable-Pi-5-Cluster-Server` 
+- **Service won't start:** Check config validity with `dnsmasq --test`
+- **Firewall rules fail:** Check UFW syntax with `sudo ufw show added`
+
+### Phase 4 reports failures
+
+**Read failure messages carefully** - most include specific remediation:
+
+```bash
+# Example output shows specific issues:
+✗ FAIL: dnsmasq service not running
+  → Fix: sudo systemctl restart dnsmasq
+  
+✗ FAIL: NFS exports not loaded
+  → Fix: sudo exportfs -a
+```
+
+**Re-run tests after fixing:**
+```bash
+sudo bash deployments/boot-node/04-verify-setup.sh
+```
+
+**Individual service checks:**
+```bash
+# DHCP/DNS issues
+sudo dnsmasq --test
+sudo journalctl -u dnsmasq -n 20
+
+# NFS issues
+sudo exportfs -r
+sudo journalctl -u nfs-server -n 20
+
+# SSH issues
+sudo sshd -t
+sudo journalctl -u ssh -n 20
+
+# Firewall issues
+sudo ufw status
+sudo ufw show added
+
+# Time sync issues
+timedatectl
+chronyc sources
+```
+
+---
+
+## Common System Issues
+
+### General troubleshooting checklist
+
+```bash
+# 1. Check basic connectivity
+ping 8.8.8.8          # Internet connectivity
+ping boot-node        # Local network
+
+# 2. Check service status
+sudo systemctl status dnsmasq
+sudo systemctl status nfs-server
+sudo systemctl status ssh
+
+# 3. Check logs for errors
+journalctl --since "1 hour ago" --priority err
+
+# 4. Check system resources
+df -h                 # Disk space
+free -h               # Memory
+ps aux | wc -l        # Process count
+
+# 5. Check network configuration
+ip addr
+ip route
+cat /etc/resolv.conf
+```
+
+---
+
+
 
 ### Cannot SSH to nodes
 

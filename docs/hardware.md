@@ -86,4 +86,42 @@ Below is a diagram that illustrates how all the componencts are connected. This 
 
 
 ## Additional Considerations
-This setup is being designed with portability in mind, so careful consideration went into the overal weight and dimensions of the components. Furthermore, the entire assembly will be fitted into a Pelican type case. The size and model of this case are still being determined.
+
+This setup is being designed with portability in mind, so careful consideration went into the overall weight and dimensions of the components. The entire assembly is fitted into a Pelican-type case for robust field deployment.
+
+## Getting Started with This Hardware
+
+1. **Physical Assembly:** Follow the wiring diagram above to connect all components
+2. **Initial Setup:** See [QUICK-START.md](quick-start.md) for 30-minute boot node deployment
+3. **Complete Guide:** [SETUP.md](setup.md) has step-by-step installation walkthrough
+4. **Troubleshooting:** [TROUBLESHOOTING.md](troubleshooting.md) for hardware-related issues
+
+## Network Default Configuration
+
+The cluster uses this IP addressing scheme (configurable in `config/network/dnsmasq.conf`):
+
+```
+Boot Node:    192.168.1.10   (DHCP server)
+ISR Node:     192.168.1.20   (RF monitoring)
+Mesh Node:    192.168.1.30   (LoRa networking)
+VHF Node:     192.168.1.40   (Transceiver)
+DHCP Range:   192.168.1.100-200
+```
+
+## Power Consumption
+
+Typical power draw per Pi 5 with PoE HAT and SSD:
+- Idle: ~8-10W per node
+- Peak load: ~25W per node
+- 4-node cluster idle: ~40W
+- 4-node cluster peak: ~100W
+
+Battery capacity: 30 Ah @ 12V = 360 Wh total
+Expected runtime: 3-4 hours at full load, 8+ hours at idle
+
+## See Also
+
+- [QUICK-START.md](quick-start.md) - Get running in 30 minutes
+- [SETUP.md](setup.md) - Complete installation guide
+- [INFRASTRUCTURE.md](../INFRASTRUCTURE.md) - Architecture overview
+- [TROUBLESHOOTING.md](troubleshooting.md) - Hardware troubleshooting
