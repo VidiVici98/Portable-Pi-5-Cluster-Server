@@ -1,313 +1,500 @@
 # Portable Pi 5 Cluster Server
+![License](https://img.shields.io/badge/license-MIT-green)
 
-A complete emergency communications cluster built on Raspberry Pi 5 nodes, featuring PXE booting, mesh networking, RF monitoring, and GPS time synchronization.
 
-## Table of Contents
+A portable, field-deployable emergency communications cluster built on Raspberry Pi 5 nodes, featuring PXE booting, modular overlays, mesh networking, RF monitoring, and GPS-based time synchronization.
 
-- [Overview](#overview)
-- [Features](#features)
-- [Hardware](#hardware)
-- [Software Stack](#software-stack)
-- [Node Types](#node-types)
-- [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
+This project is in active early development. Some architectural decisions are still evolving, but all current functionality, tooling, and documentation are represented here without omission.
 
+## 📌 Project Status
+
+Development Stage: Early / Iterative
+
+Focus: Emergency communications, rapid deployment, portability
+
+Philosophy: Document everything that exists, even if it may change
+
+No design decisions have been artificially “locked in” yet. This README represents the current reality, not a finalized specification.
+
+## 📚 Table of Contents
+
+- Overview
+
+- Core Features
+
+- Hardware Overview
+
+- Software Stack
+
+- Node Types
+
+- Quick Start
+
+- Installation & Deployment
+
+- Documentation Center
+
+- Operations & Maintenance
+
+- Directory Structure
+
+- Planned Versions
+
+- Contributing
+
+- License
+
+- Acknowledgments
 
 ## Overview
 
-This repository contains all the configurations, scripts, and documentation needed to set up and maintain a portable Raspberry Pi cluster server. The cluster is designed to support emergency communications and networking, leveraging PXE booting, overlays, and various specialized tools.
+This repository contains all configurations, scripts, and documentation required to build, deploy, and operate a portable Raspberry Pi 5 cluster server intended for emergency communications and isolated-network scenarios.
 
-The system integrates features like software-defined radios (SDRs), LoRa communication, Reticulum-based mesh networking, and more, enabling the cluster to behave like a cohesive, multifunctional unit for diverse tasks.
+The cluster is designed to function as a cohesive, multi-role system, supporting:
 
-## Features
+- PXE-booted diskless nodes
 
-**PXE Boot Environment:** Centralized boot server using TFTP and NFS to manage operating systems across cluster nodes.
+- Modular, node-specific overlays
 
-**Overlay Management:** Modular overlays for node-specific software and configurations, simplifying updates and customization.
+- RF monitoring and digital communications
 
-**Emergency Communication Tools:** Support for ham radio software (FLdigi, Winlink), SDR applications (CubicSDR, SDR Trunk, Dump1090), and LoRa communication.
+- Mesh networking via Reticulum and LoRa
 
-**Mesh Networking:** Reticulum-powered peer-to-peer networking with Mosquitto MQTT broker and FreeTAC Server integration.
+- GPS-based time synchronization
 
-**Time Synchronization:** GPS-based and NTP time sync for improved reliability in isolated networks.
+- Automated deployment, monitoring, and recovery
 
+The system is suitable for field operations, experimentation, and learning, with an emphasis on reliability over elegance.
 
-## Hardware
+## Core Features
+### PXE Boot Environment
 
-- Raspberry Pi 5s (4 GB or 8 GB) with PoE hats.
+- Centralized boot server
 
-- Peripheral equipment: USB SDRs, GPS receiver, SSD, LoRa hats/dongles.
+- DHCP, DNS, TFTP, and NFS services
 
-- Managed PoE switch with VLAN and QoS capabilities.
+- Diskless or semi-diskless node operation
 
-- Battery power supply with AC passthrough charging.
+- Consistent OS images across nodes
 
+### Overlay Management
 
-## Software
+- Node-type and node-specific customizations
 
-**Base OS:** Raspberry Pi OS with a custom overlay for each node.
+- Simplified updates and rollback
 
-**PXE Boot:** *dnsmask (DHCP and TFTP configuration), OverlayFS, NFS.*
+- Separation of base OS and role-specific tooling
 
-**RF Communication Tools:** *FLdigi, Winlink, JS8Call, Direwolf, CQRLog.*
+### Emergency Communications
 
-**Mesh Networking:** *Reticulum, Mosquitto MQTT, FreeTAKServer.*
+- Ham radio digital modes (FLdigi, Winlink, JS8Call)
 
-**Passive RF Monitoring:** *SDR Trunk, CubicSDR, Dump1090, Dump978, PyAware.*
+- APRS and packet radio support
 
-**Security Tools** *UFW, Fail2Ban, Security Breach Monitoring Script.*
+- VHF/UHF transceiver integration
 
-**Administrative Tools** *Rsync, SSH, Parallel, SSH, Flask Client Dashboard.*
+### Passive RF Monitoring
 
-**Other Services** *NTP via GPS, Offline HTML + CSS Learning Portal, Yacy, OLED Status Display Script, PyGame.*
+- SDR Trunk
 
+- CubicSDR
+
+- Dump1090 / Dump978
+
+- PyAware (ADS-B)
+
+### Mesh Networking
+
+- Reticulum-based peer-to-peer mesh
+
+- LoRa integration
+
+- Mosquitto MQTT broker
+
+- FreeTAKServer integration
+
+### Time Synchronization
+
+- GPS-based reference time
+
+- NTP / Chrony services
+
+- Improved correlation across RF and log data
+
+### Security & Administration
+
+- UFW firewall
+
+- Fail2Ban
+
+- SSH key-only access
+
+- Security monitoring scripts
+
+- Automated SSH key rotation
+
+## Hardware Overview
+
+- 4x Raspberry Pi 5 (4 GB or 8 GB)
+
+- PoE HATs
+
+- Managed PoE switch (VLAN/QoS capable)
+
+- Battery power supply with AC passthrough
+
+- USB SDRs
+
+- GPS receiver
+
+- LoRa HATs or dongles
+
+- SSD storage where applicable
+
+See `docs/HARDWARE.md`
+ for wiring, power design, and component specifications.
+
+### Architecture Overview
+
+The Portable Pi 5 Cluster Server is designed as a modular, field-deployable emergency communications cluster. It combines PXE booting, mesh networking, RF monitoring, and GPS-based time synchronization in a unified, portable system.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Portable Pi 5 Cluster                     │
+├─────────────────────────────────────────────────────────────┤
+│  ┌───────────────────────┐   ┌─────────────┐   ┌─────────────┐
+│  │ Boot Node (Primary)   │──▶│ ISR Node    │   │ Mesh Node   │
+│  │ DHCP/TFTP/DNS/NFS/GPS │   │ (RF Monitor)│   │ (LoRa Mesh) │
+│  └───────────────────────┘   └─────────────┘   └─────────────┘
+│                         │
+│                         ▼
+│                    VHF Node (Radio Interface)
+└─────────────────────────────────────────────────────────────┘
+```
+
+Network: 10.0.0.0/8 primary, 192.168.0.0/16 secondary
+
+- Services: DHCP (67/68)
+- TFTP (69), DNS (53) 
+- NFS (2049), SSH (22) 
+- NTP (123)
+
+### Node Roles & Responsibilities
+| Node	| Primary Functions | Notes |
+|-------|-------------------|-------|
+| Boot Node | PXE booting, DHCP, DNS, NFS, Time sync (chrony + GPS), Cluster monitoring | Centralized management, overlay deployment
+| ISR Node | RF spectrum monitoring, ADS-B decoding, SDR data collection | Passive monitoring and logging
+| Mesh Node | LoRa-based Reticulum mesh networking | |Decentralized messaging and communication routing
+| VHF Node | Digital VHF/UHF transceiver interface | Supports ham radio protocols and emergency comms
+
+### Workflow & Relationships
+
+1. **Boot Node** provides OS images and configuration overlays to all other nodes via PXE/NFS.
+
+2. **ISR Node** collects spectrum data and communicates relevant alerts over the mesh.
+
+3. **Mesh Node** forms a peer-to-peer decentralized network, relaying messages between ISR, VHF, and other field nodes.
+
+4. **VHF Node** interfaces with analog/digital radios, bridging the cluster to external comms networks.
+
+5. **All nodes** synchronize time via GPS/NTP, ensuring coordinated logging and event tracking.
+
+6. **Monitoring & Dashboard** The Boot Node hosts a Flask-based dashboard for real-time cluster monitoring, node health, and system alerts.
+
+## Software Stack
+**Base System**
+
+- Raspberry Pi OS
+
+- OverlayFS
+
+- PXE boot via dnsmasq
+
+- NFS root filesystem
+
+**RF & Communications**
+
+- FLdigi
+
+- Winlink
+
+- JS8Call
+
+- Direwolf
+
+- CQRLog
+
+**Mesh & Networking**
+
+- Reticulum
+
+- Mosquitto MQTT
+
+- FreeTAKServer
+
+**Monitoring & Visualization**
+
+- SDR Trunk
+
+- CubicSDR
+
+- Dump1090 / Dump978
+
+- PyAware
+
+- OLED status display
+
+- Flask-based dashboard (planned)
+
+- System Services
+
+- Chrony (GPS/NTP)
+
+- UFW
+
+- Fail2Ban
+
+- Rsync
+
+- SSH
+
+- GNU Parallel
+
+## Cluster Dashboard
+
+The Tactical Operations Web Interface provides real-time monitoring, control, and tool integration for the Portable Pi 5 Cluster.
+
+### Features
+
+- **Cluster Overview:** Node statuses, deployment state, and purpose-driven roles
+
+- **Health Metrics:** CPU, memory, disk, temperature, uptime, auto-refresh
+
+- **Control Operations:** Deploy boot node, update all nodes, reboot/shutdown individually or cluster-wide
+
+- **Performance Analysis:** Node and cluster-wide resource metrics
+
+- **Backup & Recovery:** Create, restore, verify backups
+
+- **Tool Integration:** Manage node-specific tools (ADSB, Mesh, SDR) with status indicators
+
+### Modes
+
+- **Demo Mode:** Local testing with simulated data, no cluster required
+
+- **Production Mode:** Connects via SSH to real nodes, full operational control
+
+### Dashboard Quick Start
+``` 
+cd web && ./run.sh
+```
+
+Access locally: http://127.0.0.1:5000
+
+Connect to cluster: set `DEMO_MODE=False` and `HOST=0.0.0.0`
+
+### API & Tool Integration
+
+The dashboard exposes REST API endpoints for:
+
+- Cluster & node status
+
+- Health checks and validation
+
+- Node operations (reboot, shutdown, update)
+
+- Backup management
+
+- Tool-specific control (starting/stopping integrated apps)
 
 ## Node Types
 
-- **Boot Node:** Manages the cluster and provides PXE boot services (DHCP, TFTP, NFS).
+| Node Type | IP Address | Primary Role |
+|-----------|------------|--------------|
+| Boot Node | 192.168.1.10 | PXE, DHCP, DNS, NFS, Time |
+| ISR Node | 192.168.1.20 | Passive RF monitoring |
+| Mesh Node | 192.168.1.30 | LoRa mesh networking |
+| VHF Node | 192.168.1.40 | Digital VHF/UHF communications |
 
-- **ISR Node:** Passive RF monitoring using software-defined radios for ADS-B and spectrum analysis.
 
-- **Mesh Node:** LoRa-based Reticulum mesh networking for decentralized communication.
+Node roles are logical, not rigid. Responsibilities may shift as development progresses.
 
-- **VHF/UHF Node:** Digital data communications via dual-band transceiver interface. 
+## Quick Start
 
-## Getting Started
+Want to deploy in ~30 minutes?
 
-**Start Here - Understand Your Current System:**
-
-```bash
-# Check cluster status and diagnostics
-make status              # Quick health check
-make validate            # Validate configurations
-make diagnose            # Full diagnostics (both above)
+```
+cd ~/Portable-Pi-5-Cluster-Server && sudo ./scripts/deployment-coordinator.sh
 ```
 
-For detailed setup instructions, see [Setup Guide](docs/setup.md).
+This interactive deployment covers:
 
-**Full Quick Start:**
-1. Run `make diagnose` to understand current state
-2. Review [Hardware Documentation](docs/hardware.md) for your setup
-3. Follow [Installation Guide](docs/setup.md) for PXE boot configuration
-4. Check [Troubleshooting Guide](docs/troubleshooting.md) if issues arise
+Pre-flight system checks
 
-## Installation
+- [ ]  Configuration validation
 
-Detailed installation instructions are in [docs/setup.md](docs/setup.md).
+- [ ] Boot node setup (DHCP, DNS, TFTP, NFS, NTP)
 
-## Documentation
+- [ ] Worker node provisioning
 
-### Essential Guides
+- [ ] Performance tuning
 
-**Start Here:**
-- [Quick Start Guide](docs/quick-start.md) - Get up and running in 10 minutes
-- [Infrastructure Setup](INFRASTRUCTURE.md) - Complete setup and architecture guide
+- [ ] Security hardening
 
-**Operations & Maintenance:**
-- [Operations Manual](operations/OPERATIONS.md) - Daily/weekly/monthly procedures
-- [Security Baseline](SECURITY-BASELINE.md) - Security standards and hardening
-- [Git Workflow](GIT-WORKFLOW.md) - Version control standards and branching strategy
+- [ ] Initial backup creation
 
-**Advanced Topics:**
-- [Folder Structure](FOLDER-STRUCTURE.md) - Organization and best practices
-- [Secrets Management](config/secrets/README.md) - Secure credential handling
-- [Hardware Documentation](docs/hardware.md) - Equipment specifications
-- [Troubleshooting Guide](docs/troubleshooting.md) - Common issues and solutions
+## Installation & Deployment
+Four Deployment Phases
 
-**Deployment Procedures:**
-- [Pre-Deployment Checklist](deployments/PRE-DEPLOYMENT-CHECKLIST.md) - Verify readiness
-- [Post-Deployment Checklist](deployments/POST-DEPLOYMENT-CHECKLIST.md) - Verify success
+1. System Setup
 
-### Key Command Reference
+   - OS updates
 
-```bash
-# Status & Diagnostics
-make status              # Quick health check
-make status-full         # Detailed status report
-make test               # Comprehensive validation
-make clean              # Clean temporary files
+   - Hostname
 
-# Git Workflow
-git status              # Check uncommitted changes
-git log --oneline       # View commit history
-git checkout -b feature/my-feature  # Create feature branch
+   - Initial security hardening
 
-# Operations
-sudo systemctl status dnsmasq nfs-server ssh chrony ufw
-sudo journalctl -f      # Follow system logs
+2. Install Services
+
+   - All required packages
+
+3. Configure Services
+
+   - Deploy configuration files
+
+   - Enable services
+
+4. Verify Setup
+
+   - 70+ automated tests
+
+See `docs/SETUP.md`
+ and `docs/QUICK-START.md`
+
+
+## Documentation Center
+
+The project includes a fully structured documentation system.
+
+### Start Here
+
+- `docs/QUICK-START.md`
+ – Rapid deployment
+
+- `docs/SETUP.md`
+ – Full installation guide
+
+- `docs/TROUBLESHOOTING.md`
+ – Problem resolution
+
+- `docs/INDEX.md`
+ – Complete documentation map
+
+### Architecture & Standards
+
+- `INFRASTRUCTURE.md` – System architecture
+
+- `SECURITY-BASELINE.md` – Security standards
+
+- `GIT-WORKFLOW.md` – Version control practices
+
+- `FOLDER-STRUCTURE.md` – Repository organization
+
+### Operations
+
+- `operations/OPERATIONS.md` – Daily / weekly / monthly tasks
+
+- `deployments/` – Pre/Post deployment checklists
+
+- `scripts/SCRIPTS-REFERENCE.md` – Script documentation
+
+### Operations & Maintenance
+#### Common Commands
+```
+make status
+make diagnose
+sudo systemctl status dnsmasq nfs-server chrony ufw
+sudo journalctl -f
 ```
 
-See [GIT-WORKFLOW.md](GIT-WORKFLOW.md) for detailed commands.
+#### Backups
+```
+./operations/backups/backup-restore-manager.sh create
+```
+
+```
+./operations/backups/backup-restore-manager.sh restore
+```
 
 ## Directory Structure
+```
+Portable-Pi-5-Cluster-Server/
+├── docs/
+├── scripts/
+├── deployments/
+├── operations/
+├── config/
+├── INFRASTRUCTURE.md
+├── SECURITY-BASELINE.md
+├── README.md
+└── ...
+```
 
-```
-├── config/              # Configuration files for all services
-├── docs/                # Documentation and guides
-├── scripts/             # Python scripts for monitoring and management
-└── README.md            # This file
-```
+## Planned Versions
+### v0.1
+
+-PXE boot operational
+
+- NFS, SSH, VNC
+
+- Basic overlays
+
+### v0.2
+
+- Full overlay implementation
+
+- SDR, LoRa, Reticulum
+
+- GPS time sync
+
+### v0.3
+
+- Mesh networking finalized
+
+- MQTT broker
+
+- HTTP dashboard
+
+- LogWatch reporting
+
+### v0.4
+
+- Power optimization
+
+- Thermal monitoring
+
+- Finalized casing
+
+### v1.0
+
+- Fully documented
+
+- Tested
+
+- Replicable deployment
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome, especially those aligned with:
 
-This project is tailored to emergency communications, but improvements that align with the project's goals are encouraged.
+- Emergency communications
+
+- Reliability
+
+- Documentation clarity
+
+See CONTRIBUTING.md.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## Acknowledgments
-
-- Raspberry Pi Foundation for hardware and OS
-- Open-source communities: FLdigi, SDR Trunk, Reticulum, Mosquitto, and others
-- Emergency communications practitioners and mesh networking enthusiasts
-ChatGPT for troubleshooting and brainstorming assistance.
-
-
-
-## Planned_Versions
-
-**Version 0.1:** Core setup and basic functionality.
-
-        PXE boot environment operational.
-
-        NFS, SSH, and VNC working across nodes.
-
-        Basic overlays for node-specific configurations.
-
-
-**Version 0.2:** Full overlay implementation and tool integration.
-
-        Node-specific functionalities enabled (e.g., SDR tools, LoRa communication, Reticulum).
-
-        GPS-based time synchronization introduced.
-
-        Initial power management tools.
-
-
-**Version 0.3:** Enhanced networking and monitoring.
-
-        Mesh networking with Reticulum and MQTT broker fully implemented.
-
-        HTTP dashboard for cluster status.
-
-        LogWatch integration for automated reporting.
-
-
-**Version 0.4:** Optimization and portability.
-
-        Improved power management for extended battery use.
-
-        Hardware monitoring tools for thermal and power usage.
-
-        Finalized cluster casing and cable management.
-
-
-**Version 1.0:** Stable release.
-
-        Fully documented and tested cluster server.
-
-        Streamlined deployment process for replication by other users.
-
----
-
-## 🚀 Quick Start to Production
-
-### One Command Deployment
-
-```bash
-cd ~/Portable-Pi-5-Cluster-Server
-sudo ./scripts/deployment-coordinator.sh
-```
-
-This runs an interactive guided setup covering all 8 stages:
-- Pre-flight system checks
-- Configuration validation
-- Boot node setup (DHCP, DNS, TFTP, NFS, NTP)
-- Worker node deployment (ISR, Mesh, VHF)
-- Performance optimization
-- Security hardening
-- Initial backup creation
-
-**Duration:** 30-60 minutes depending on internet speed
-
-### Verification & Monitoring
-
-After deployment, verify everything:
-
-```bash
-# Full health check (80+ tests)
-./scripts/health-check-all.sh
-
-# Cluster status report
-./scripts/cluster-orchestrator.sh report
-
-# Performance analysis
-./scripts/performance-monitor.sh analyze
-```
-
----
-
-## 🏗️ New Capabilities (Production Ready)
-
-### Deployment & Orchestration
-- **Automated Coordinator** - End-to-end deployment in 8 stages
-- **Boot Node Setup** - Complete DHCP/DNS/NFS/NTP infrastructure
-- **Worker Nodes** - Specialized setups for ISR (RF), Mesh (LoRa), VHF (radio)
-- **Configuration Validation** - Pre-deployment testing (80+ checks)
-
-### Monitoring & Management
-- **Health Check Suite** - Comprehensive system verification
-- **Performance Monitoring** - CPU, memory, I/O, network, thermal analysis
-- **Cluster Orchestrator** - Multi-node management with parallel operations
-- **Performance Tuning** - Automatic optimization recommendations
-
-### Backup & Recovery
-- **Automated Backup** - Complete system state snapshots
-- **Disaster Recovery** - Full restore capabilities with verification
-- **Backup Management** - List, verify, and cleanup old backups
-
----
-
-## 🎯 Common Commands
-
-### Deploy
-```bash
-sudo ./scripts/deployment-coordinator.sh full    # Full cluster
-sudo ./scripts/deployment-coordinator.sh boot    # Boot node only
-```
-
-### Monitor
-```bash
-./scripts/health-check-all.sh                    # Full health check
-./scripts/performance-monitor.sh monitor 300     # Continuous monitoring
-./scripts/cluster-orchestrator.sh report         # Cluster status
-```
-
-### Backup
-```bash
-./operations/backups/backup-restore-manager.sh create     # Create backup
-./operations/backups/backup-restore-manager.sh restore    # Restore
-```
-
----
-
-## ✨ What's New (December 2025)
-
-**Complete Production-Ready Suite:**
-- ✅ Fully automated cluster deployment
-- ✅ 80+ comprehensive health checks
-- ✅ Real-time performance monitoring
-- ✅ Multi-node orchestration
-- ✅ Disaster recovery system
-- ✅ 2,000+ lines of production code
-
-**Status:** All major features implemented and ready for deployment.
-
-See [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) and [IMPLEMENTATION-SUMMARY.md](IMPLEMENTATION-SUMMARY.md) for details.
+MIT License. See LICENSE.
