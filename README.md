@@ -1,13 +1,20 @@
-# Portable EmComm Cluster Server
+# Portable Pi 5 Cluster Server
 
-[Overview](#Overview)
-[Features](#Features)
-[Harware](#Hardware)
-[Software Stack](#Software)
-[Nodes](#Nodes)
-[Installation](#Installation)
-[Contributions](#Contributions)
-[Planned Versions](#Planned_Versions)
+A complete emergency communications cluster built on Raspberry Pi 5 nodes, featuring PXE booting, mesh networking, RF monitoring, and GPS time synchronization.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Hardware](#hardware)
+- [Software Stack](#software-stack)
+- [Node Types](#node-types)
+- [Getting Started](#getting-started)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
 
 
 ## Overview
@@ -59,41 +66,71 @@ The system integrates features like software-defined radios (SDRs), LoRa communi
 **Other Services** *NTP via GPS, Offline HTML + CSS Learning Portal, Yacy, OLED Status Display Script, PyGame.*
 
 
-## Nodes
+## Node Types
 
-- **Boot Node:** Responsible for managing the cluster. It acts as the PXE boot server, incorporating DHCP, TFTP, and NFS services.
+- **Boot Node:** Manages the cluster and provides PXE boot services (DHCP, TFTP, NFS).
 
-- **ISR Node:** Uses software defined radios to plot ADSB transponders and monitor the RF spectrum.
+- **ISR Node:** Passive RF monitoring using software-defined radios for ADS-B and spectrum analysis.
 
-- **Mesh Node:** Utilizes the LoRa protocol to interface with a decentralized Reticulum-based mesh network.
+- **Mesh Node:** LoRa-based Reticulum mesh networking for decentralized communication.
 
-- **VHF/UHF Node:** Interfaces with a dual band transceiver to allow digital data communications. 
+- **VHF/UHF Node:** Digital data communications via dual-band transceiver interface. 
+
+## Getting Started
+
+**Start Here - Understand Your Current System:**
+
+```bash
+# Check cluster status and diagnostics
+make status              # Quick health check
+make validate            # Validate configurations
+make diagnose            # Full diagnostics (both above)
+```
+
+For detailed setup instructions, see [Setup Guide](docs/setup.md).
+
+**Full Quick Start:**
+1. Run `make diagnose` to understand current state
+2. Review [Hardware Documentation](docs/hardware.md) for your setup
+3. Follow [Installation Guide](docs/setup.md) for PXE boot configuration
+4. Check [Troubleshooting Guide](docs/troubleshooting.md) if issues arise
 
 ## Installation
 
-1. Clone this repository to the PXE boot node.
+Detailed installation instructions are in [docs/setup.md](docs/setup.md).
 
 
-2. Follow the instructions in docs/setup.md for installing dependencies and configuring PXE boot.
+Documentation
 
+- [Quick Start Guide](docs/quick-start.md) - First-time setup walkthrough
+- [Hardware Setup](docs/hardware.md) - Detailed hardware configuration and components
+- [Installation Guide](docs/setup.md) - Complete installation and configuration
+- [Troubleshooting Guide](docs/troubleshooting.md) - Common issues and solutions
 
-3. Apply overlays for each node using the scripts provided in overlays/.
+## Directory Structure
 
+```
+├── config/              # Configuration files for all services
+├── docs/                # Documentation and guides
+├── scripts/             # Python scripts for monitoring and management
+└── README.md            # This file
+```
 
-4. Test and verify functionality node by node.
+## Contributing
 
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
+This project is tailored to emergency communications, but improvements that align with the project's goals are encouraged.
 
-## Contributions
+## License
 
-This repository is tailored to a specific use case, but contributions are welcome if they align with the project's goals. Please open an issue or submit a pull request for discussion.
+This project is licensed under the [MIT License](LICENSE).
 
 ## Acknowledgments
 
-Raspberry Pi Foundation for the hardware and OS.
-
-Open-source tools and communities behind FLdigi, SDR Trunk, Reticulum, and other software.
-
+- Raspberry Pi Foundation for hardware and OS
+- Open-source communities: FLdigi, SDR Trunk, Reticulum, Mosquitto, and others
+- Emergency communications practitioners and mesh networking enthusiasts
 ChatGPT for troubleshooting and brainstorming assistance.
 
 
