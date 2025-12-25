@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup - Cluster Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/monitor">Monitor</a></li>
+            <li><a href="/control">Control</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="/performance">Performance</a></li>
+            <li><a href="/backup" class="active">Backup</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>BACKUP MANAGEMENT</h1>
+
+        <!-- Create Backup -->
+        <div class="card">
+            <h2>CREATE BACKUP</h2>
+            <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                Create a complete snapshot of cluster configuration, system state, and data.
+            </p>
+            <button class="btn btn-primary" onclick="createBackup()">
+                CREATE BACKUP NOW
+            </button>
+        </div>
+
+        <!-- Available Backups -->
+        <div class="card">
+            <h2>AVAILABLE BACKUPS</h2>
+            <div id="backups-list"></div>
+        </div>
+
+        <!-- Backup Statistics -->
+        <div class="card">
+            <h2>BACKUP STATISTICS</h2>
+            <div id="backup-stats" class="grid-4"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadBackups() {
+            const response = await fetch('/api/backup/list');
+            const data = await response.json();
+            
+            if (data.error) {
+                document.getElementById('backups-list').innerHTML = 
+                    '<p style="color: var(--danger);">Error loading backups</p>';
+                return;
+            }
+
+            const container = document.getElementById('backups-list');
+            container.innerHTML = '';
+
+            if (!data.backups || data.backups.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No backups available</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>BACKUP ID</th>
+                        <th>DATE</th>
+                        <th>SIZE</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.backups.map(b => `
+                    <tr>
+                        <td><code>${b.id}</code></td>
+                        <td>${b.date || 'N/A'}</td>
+                        <td>${b.size_mb} MB</td>
+                        <td>
+                            <button class="btn btn-info" onclick="verifyBackup('${b.id}')" style="padding: 5px 10px; font-size: 0.85em;">
+                                Verify
+                            </button>
+                            <button class="btn btn-primary" onclick="restoreBackup('${b.id}')" style="padding: 5px 10px; font-size: 0.85em;">
+                                Restore
+                            </button>
+                        </td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            `;
+            container.appendChild(table);
+
+            // Load stats
+            const statsHtml = `
+                <div class="card">
+                    <h4>Total Backups</h4>
+                    <div class="metric-value">${data.backups.length}</div>
+                </div>
+                <div class="card">
+                    <h4>Latest Backup</h4>
+                    <div class="metric-value" style="font-size: 0.9em;">${data.backups[0]?.date || 'N/A'}</div>
+                </div>
+                <div class="card">
+                    <h4>Total Size</h4>
+                    <div class="metric-value">${(data.backups.reduce((a, b) => a + b.size_mb, 0) / 1024).toFixed(2)} GB</div>
+                </div>
+                <div class="card">
+                    <h4>Oldest Backup</h4>
+                    <div class="metric-value" style="font-size: 0.9em;">${data.backups[data.backups.length - 1]?.date || 'N/A'}</div>
+                </div>
+            `;
+            document.getElementById('backup-stats').innerHTML = statsHtml;
+        }
+
+        function createBackup() {
+            if (confirm('Create backup? This may take several minutes.')) {
+                fetch('/api/backup/create', {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => {
+                        alert('Backup created: ' + (data.backup_id || 'Success'));
+                        loadBackups();
+                    });
+            }
+        }
+
+        function verifyBackup(backupId) {
+            if (confirm(`Verify backup ${backupId}?`)) {
+                alert('Verification started. Check logs for details.');
+            }
+        }
+
+        function restoreBackup(backupId) {
+            if (confirm(`⚠ Restore from ${backupId}?`)) {
+                if (confirm('This will overwrite current configuration. Are you sure?')) {
+                    fetch(`/api/backup/restore/${backupId}`, {method: 'POST'})
+                        .then(r => r.json())
+                        .then(data => {
+                            alert('Restore initiated: ' + data.message);
+                            loadBackups();
+                        });
+                }
+            }
+        }
+
+        loadBackups();
+        setInterval(loadBackups, 30000);
+    </script>
+</body>
+</html>

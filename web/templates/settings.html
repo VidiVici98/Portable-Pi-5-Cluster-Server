@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Cluster Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/monitor">Monitor</a></li>
+            <li><a href="/control">Control</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="/performance">Performance</a></li>
+            <li><a href="/backup">Backup</a></li>
+            <li><a href="/settings" class="active">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>SETTINGS & CONFIGURATION</h1>
+
+        <!-- Dashboard Settings -->
+        <div class="card">
+            <h2>DASHBOARD SETTINGS</h2>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 10px;">
+                    <input type="checkbox" checked>
+                    Auto-refresh status (every 5 seconds)
+                </label>
+                <label style="display: block; margin-bottom: 10px;">
+                    <input type="checkbox" checked>
+                    Show all alerts
+                </label>
+                <label style="display: block; margin-bottom: 10px;">
+                    <input type="checkbox">
+                    Enable sound notifications
+                </label>
+            </div>
+        </div>
+
+        <!-- Cluster Configuration -->
+        <div class="card">
+            <h2>CLUSTER CONFIGURATION</h2>
+            <table style="width: 100%; margin-bottom: 15px;">
+                <tr>
+                    <td style="padding: 8px 0;">Boot Node IP:</td>
+                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.10</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">ISR Node IP:</td>
+                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.20</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">Mesh Node IP:</td>
+                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.30</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0;">VHF Node IP:</td>
+                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.40</code></td>
+                </tr>
+            </table>
+            <button class="btn btn-info" onclick="editConfiguration()">
+                Edit Configuration
+            </button>
+        </div>
+
+        <!-- System Information -->
+        <div class="card">
+            <h2>SYSTEM INFORMATION</h2>
+            <table style="width: 100%; margin-bottom: 15px;">
+                <tr>
+                    <td style="padding: 8px 0; color: var(--text-muted);">Dashboard Version:</td>
+                    <td style="padding: 8px 0;">1.0.0</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: var(--text-muted);">Python Version:</td>
+                    <td style="padding: 8px 0;">3.9+</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: var(--text-muted);">Flask Version:</td>
+                    <td style="padding: 8px 0;">2.0+</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: var(--text-muted);">Last Updated:</td>
+                    <td style="padding: 8px 0;">December 25, 2025</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Documentation -->
+        <div class="card">
+            <h2>DOCUMENTATION</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                For detailed information about cluster operations and dashboard usage, please refer to:
+            </p>
+            <ul style="margin-left: 20px; margin-bottom: 15px;">
+                <li><a href="#">Deployment Guide</a></li>
+                <li><a href="#">API Reference</a></li>
+                <li><a href="#">Troubleshooting</a></li>
+                <li><a href="#">Configuration</a></li>
+            </ul>
+        </div>
+
+        <!-- About -->
+        <div class="card">
+            <h2>ABOUT</h2>
+            <p style="color: var(--text-secondary);">
+                <strong>Cluster Command & Control Dashboard</strong><br>
+                Tactical Operations Interface for Portable Pi 5 Cluster<br>
+                <br>
+                A comprehensive web-based management system for monitoring, controlling, and maintaining 
+                a 4-node Raspberry Pi cluster with specialized capabilities for RF monitoring (ISR), 
+                mesh networking, and amateur radio operations.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function editConfiguration() {
+            alert('Configuration editing (Advanced feature - coming soon)');
+        }
+    </script>
+</body>
+</html>

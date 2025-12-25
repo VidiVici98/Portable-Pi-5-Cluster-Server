@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Command & Control - Tactical Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% if demo_mode %}
+    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    {% endif %}
+
+    <nav>
+        <ul>
+            <li><a href="/" class="active">Dashboard</a></li>
+            <li><a href="/monitor">Monitor</a></li>
+            <li><a href="/control">Control</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="/performance">Performance</a></li>
+            <li><a href="/backup">Backup</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>CLUSTER COMMAND & CONTROL</h1>
+        
+        <!-- Node Overview with Purposes -->
+        <div class="card">
+            <h2>📡 CLUSTER COMPOSITION</h2>
+            <div id="node-purposes" class="grid-4" style="margin-bottom: 15px;">
+                <!-- Populated by JavaScript -->
+            </div>
+            <p style="color: #AAA; font-size: 12px; margin: 0;">Each node serves a specific tactical purpose. Click any node to view available tools and integrations.</p>
+        </div>
+        
+        <!-- Status Overview -->
+        <div class="card">
+            <h2>OPERATIONAL STATUS</h2>
+            <div id="cluster-status" class="grid-4">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <h2>QUICK ACTIONS</h2>
+            <div class="grid-4">
+                <button class="btn btn-primary" onclick="validateConfig()">
+                    Validate Config
+                </button>
+                <button class="btn btn-info" onclick="runHealthCheck()">
+                    Health Check
+                </button>
+                <button class="btn btn-warning" onclick="showPerformance()">
+                    Performance
+                </button>
+                <button class="btn btn-danger" onclick="confirmRebootAll()">
+                    Reboot All
+                </button>
+            </div>
+        </div>
+
+        <!-- Deployment Status -->
+        <div class="card">
+            <h2>DEPLOYMENT STATUS</h2>
+            <div id="deployment-status">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <h2>ACTIVITY LOG</h2>
+            <div id="activity-log">
+                <p style="color: var(--text-muted);">No recent activity</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const nodeDetails = {
+            'boot': { icon: '🖥️', color: '#00FF00' },
+            'isr': { icon: '📡', color: '#FF1744' },
+            'mesh': { icon: '🔗', color: '#FF8800' },
+            'vhf': { icon: '📻', color: '#2196F3' }
+        };
+
+        // Load node purposes overview
+        async function loadNodePurposes() {
+            try {
+                const response = await fetch('/api/cluster/node-summary');
+                const nodes = await response.json();
+                
+                const purposesDiv = document.getElementById('node-purposes');
+                purposesDiv.innerHTML = '';
+                
+                for (const node of nodes) {
+                    const details = nodeDetails[node.id];
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.cssText = `cursor: pointer; border: 2px solid ${details.color}; transition: all 0.2s;`;
+                    card.onmouseover = (e) => e.currentTarget.style.boxShadow = `0 0 15px ${details.color}`;
+                    card.onmouseout = (e) => e.currentTarget.style.boxShadow = 'none';
+                    card.onclick = () => window.location.href = '/tools';
+                    
+                    card.innerHTML = `
+                        <div style="font-size: 24px; margin-bottom: 8px;">${details.icon}</div>
+                        <h4 style="margin: 0 0 5px 0; color: ${details.color};">${node.name}</h4>
+                        <p style="font-size: 11px; color: #AAA; margin: 0 0 5px 0;">${node.purpose}</p>
+                        <p style="font-size: 10px; color: #666; margin: 0;">${node.tools.total} tools available</p>
+                    `;
+                    purposesDiv.appendChild(card);
+                }
+            } catch (error) {
+                console.error('Error loading node purposes:', error);
+            }
+        }
+
+        // Reload status every 5 seconds
+        function updateClusterStatus() {
+            fetch('/api/cluster/status')
+                .then(r => r.json())
+                .then(data => {
+                    const statusDiv = document.getElementById('cluster-status');
+                    statusDiv.innerHTML = '';
+                    
+                    let onlineCount = 0;
+                    for (const [nodeId, nodeData] of Object.entries(data.nodes)) {
+                        const online = nodeData.online;
+                        if (online) onlineCount++;
+                        
+                        const nodeEl = document.createElement('div');
+                        nodeEl.className = online ? 'card success' : 'card critical';
+                        nodeEl.innerHTML = `
+                            <h4><span class="status ${online ? 'online' : 'offline'}"></span>${nodeData.name}</h4>
+                            <p style="font-size: 0.9em; color: var(--text-muted);">${nodeData.ip}</p>
+                            <p>${online ? 'ONLINE' : 'OFFLINE'}</p>
+                        `;
+                        statusDiv.appendChild(nodeEl);
+                    }
+                    
+                    // Update title
+                    const title = document.querySelector('h1');
+                    title.style.color = onlineCount === data.total_count ? 'var(--success)' : 'var(--warning)';
+                });
+        }
+
+        function validateConfig() {
+            if (confirm('Run configuration validation?')) {
+                fetch('/api/validate-config', {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Configuration validated successfully');
+                            logActivity('Configuration validated');
+                        } else {
+                            alert('Configuration validation failed: ' + (data.error || 'Unknown error'));
+                        }
+                    });
+            }
+        }
+
+        function runHealthCheck() {
+            if (confirm('Run full health check? This may take a few minutes.')) {
+                fetch('/api/health-check', {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            const msg = `Health check complete: ${data.checks_passed} passed, ${data.checks_warned} warnings, ${data.checks_failed} failed`;
+                            alert(msg);
+                            logActivity(msg);
+                        }
+                    });
+            }
+        }
+
+        function showPerformance() {
+            window.location.href = '/performance';
+        }
+
+        function confirmRebootAll() {
+            if (confirm('⚠ REBOOT ALL NODES? This will interrupt all operations.')) {
+                if (confirm('This is a destructive operation. Are you absolutely sure?')) {
+                    fetch('/api/cluster/reboot-all', {method: 'POST'})
+                        .then(r => r.json())
+                        .then(data => {
+                            alert('Cluster reboot initiated');
+                            logActivity('REBOOT ALL NODES INITIATED');
+                        });
+                }
+            }
+        }
+
+        function logActivity(message) {
+            const log = document.getElementById('activity-log');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.style.cssText = 'padding: 5px 0; border-bottom: 1px solid var(--border-color-dim);';
+            entry.innerHTML = `<span style="color: var(--text-muted);">[${time}]</span> ${message}`;
+            log.insertBefore(entry, log.firstChild);
+        }
+
+        // Initial load and refresh
+        loadNodePurposes();
+        updateClusterStatus();
+        setInterval(updateClusterStatus, 5000);
+        logActivity('Dashboard initialized');
+    </script>
+</body>
+</html>

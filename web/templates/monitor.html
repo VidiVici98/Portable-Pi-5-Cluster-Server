@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor - Cluster Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/monitor" class="active">Monitor</a></li>
+            <li><a href="/control">Control</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="/performance">Performance</a></li>
+            <li><a href="/backup">Backup</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>NODE MONITORING</h1>
+        <div id="nodes-container" class="grid-2"></div>
+    </div>
+
+    <script>
+        async function loadNodes() {
+            const response = await fetch('/api/nodes/list');
+            const nodes = await response.json();
+            const container = document.getElementById('nodes-container');
+            container.innerHTML = '';
+
+            for (const node of nodes) {
+                const health = await fetch(`/api/nodes/${node.id}/health`).then(r => r.json());
+                
+                const nodeEl = document.createElement('div');
+                nodeEl.className = node.online ? 'card success' : 'card critical';
+                nodeEl.innerHTML = `
+                    <h3><span class="status ${node.online ? 'online' : 'offline'}"></span>${node.name}</h3>
+                    <span class="node-type">${node.type.toUpperCase()}</span>
+                    <div class="metric">
+                        <span class="metric-label">IP Address</span>
+                        <span class="metric-value">${node.ip}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Status</span>
+                        <span class="metric-value">${node.status.toUpperCase()}</span>
+                    </div>
+                    ${node.online ? `
+                    <div class="metric">
+                        <span class="metric-label">Uptime</span>
+                        <span class="metric-value">${health.uptime || 'N/A'}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Memory</span>
+                        <span class="metric-value">${health.memory?.used || 0} / ${health.memory?.total || 0} MB</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: ${health.memory?.percent || 0}%">
+                            ${health.memory?.percent || 0}%
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Disk</span>
+                        <span class="metric-value">${health.disk?.percent || 0}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar ${health.disk?.percent > 85 ? 'danger' : ''}" style="width: ${health.disk?.percent || 0}%">
+                            ${health.disk?.percent || 0}%
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Temperature</span>
+                        <span class="metric-value">${health.temperature || 'N/A'}°C</span>
+                    </div>
+                    ` : '<p style="color: var(--danger);">Node is offline</p>'}
+                `;
+                container.appendChild(nodeEl);
+            }
+        }
+
+        loadNodes();
+        setInterval(loadNodes, 10000);
+    </script>
+</body>
+</html>

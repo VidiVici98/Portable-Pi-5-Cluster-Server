@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control - Cluster Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/monitor">Monitor</a></li>
+            <li><a href="/control" class="active">Control</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="/performance">Performance</a></li>
+            <li><a href="/backup">Backup</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>CLUSTER CONTROL</h1>
+
+        <!-- Cluster Operations -->
+        <div class="card">
+            <h2>CLUSTER OPERATIONS</h2>
+            <div class="grid-2">
+                <button class="btn btn-info" onclick="deployBootNode()">
+                    Deploy Boot Node
+                </button>
+                <button class="btn btn-info" onclick="deployCluster()">
+                    Deploy Full Cluster
+                </button>
+                <button class="btn btn-warning" onclick="updateAllNodes()">
+                    Update All Nodes
+                </button>
+                <button class="btn btn-danger" onclick="confirmRebootAll()">
+                    Reboot All Nodes
+                </button>
+            </div>
+        </div>
+
+        <!-- Individual Node Control -->
+        <div class="card">
+            <h2>NODE OPERATIONS</h2>
+            <div id="node-controls" class="grid-2"></div>
+        </div>
+    </div>
+
+    <script>
+        function deployBootNode() {
+            if (confirm('Deploy Boot Node? This will reconfigure DHCP, DNS, TFTP, NFS.')) {
+                fetch('/api/deploy/boot-node', {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => alert('Deployment started: ' + data.message));
+            }
+        }
+
+        function deployCluster() {
+            if (confirm('⚠ Deploy Full Cluster? This affects all nodes.')) {
+                fetch('/api/deploy/cluster', {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => alert('Deployment started: ' + data.message));
+            }
+        }
+
+        function updateAllNodes() {
+            if (confirm('Update all nodes? This may take several minutes.')) {
+                fetch('/api/cluster/update-all', {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => alert('Update initiated'));
+            }
+        }
+
+        function confirmRebootAll() {
+            if (confirm('⚠ REBOOT ALL NODES?')) {
+                if (confirm('Are you absolutely sure? All operations will be interrupted.')) {
+                    fetch('/api/cluster/reboot-all', {method: 'POST'})
+                        .then(r => r.json())
+                        .then(data => alert('Cluster reboot initiated'));
+                }
+            }
+        }
+
+        function rebootNode(nodeId) {
+            if (confirm(`Reboot ${nodeId}?`)) {
+                fetch(`/api/nodes/${nodeId}/reboot`, {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => alert('Reboot initiated for ' + nodeId));
+            }
+        }
+
+        function shutdownNode(nodeId) {
+            if (confirm(`⚠ SHUTDOWN ${nodeId}?`)) {
+                fetch(`/api/nodes/${nodeId}/shutdown`, {method: 'POST'})
+                    .then(r => r.json())
+                    .then(data => alert('Shutdown initiated for ' + nodeId));
+            }
+        }
+
+        async function loadNodeControls() {
+            const response = await fetch('/api/nodes/list');
+            const nodes = await response.json();
+            const container = document.getElementById('node-controls');
+            container.innerHTML = '';
+
+            for (const node of nodes) {
+                const nodeEl = document.createElement('div');
+                nodeEl.className = 'card';
+                nodeEl.innerHTML = `
+                    <h3>${node.name}</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px;">${node.ip}</p>
+                    <button class="btn btn-primary" onclick="rebootNode('${node.id}')">
+                        Reboot
+                    </button>
+                    <button class="btn btn-danger" onclick="shutdownNode('${node.id}')">
+                        Shutdown
+                    </button>
+                `;
+                container.appendChild(nodeEl);
+            }
+        }
+
+        loadNodeControls();
+    </script>
+</body>
+</html>

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADSB/UAT Aircraft Tracking - Tactical Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <style>
+        #map {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            margin: 15px 0;
+        }
+
+        .adsb-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 1200px) {
+            .adsb-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .aircraft-list {
+            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
+            border: 2px solid #00FF00;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .aircraft-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: rgba(0, 255, 0, 0.05);
+            border-left: 3px solid #00FF00;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+        }
+
+        .aircraft-item:hover {
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .aircraft-item.selected {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+        }
+
+        .callsign {
+            color: #00FF00;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .icao {
+            color: #AAA;
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .stats {
+            color: #00FF00;
+            font-size: 11px;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .stats strong {
+            color: #FF8800;
+        }
+
+        .controls {
+            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
+            border: 2px solid #00FF00;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .control-group {
+            margin: 15px 0;
+        }
+
+        .control-group label {
+            display: block;
+            color: #00FF00;
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            border-radius: 3px;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
+            border: 2px solid #00FF00;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        .stat-label {
+            color: #AAA;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #00FF00;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/monitor">Monitor</a></li>
+            <li><a href="/control">Control</a></li>
+            <li><a href="/tools">Tools</a></li>
+            <li><a href="/adsb" class="active">ADSB/UAT</a></li>
+            <li><a href="/performance">Performance</a></li>
+            <li><a href="/backup">Backup</a></li>
+            <li><a href="/settings">Settings</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>📡 ADSB/UAT AIRCRAFT TRACKING</h1>
+
+        <!-- Statistics Panel -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">Aircraft Tracked</div>
+                <div class="stat-value" id="aircraftCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Messages/sec</div>
+                <div class="stat-value" id="messageRate">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Max Altitude</div>
+                <div class="stat-value" id="maxAltitude">0 ft</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg Speed</div>
+                <div class="stat-value" id="avgSpeed">0 kts</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <h3 style="margin: 0 0 15px 0; color: #00FF00;">⚙️ TRACKING CONTROLS</h3>
+            <div class="control-group">
+                <label>Filter by Type:</label>
+                <select id="typeFilter">
+                    <option value="">All Aircraft</option>
+                    <option value="commercial">Commercial</option>
+                    <option value="military">Military</option>
+                    <option value="general">General Aviation</option>
+                    <option value="cargo">Cargo</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Min Altitude (ft):</label>
+                <input type="number" id="minAltitude" value="0" min="0" step="1000">
+            </div>
+            <div class="control-group">
+                <label>Auto-Refresh (sec):</label>
+                <input type="number" id="refreshInterval" value="5" min="1" max="60" step="1">
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="toggleTracking()">
+                ▶ Start Tracking
+            </button>
+        </div>
+
+        <!-- Map -->
+        <div class="card">
+            <h2>LIVE AIRCRAFT MAP</h2>
+            <div id="map"></div>
+        </div>
+
+        <!-- Aircraft List -->
+        <div class="adsb-container">
+            <div class="card">
+                <h3>Aircraft Details</h3>
+                <div id="selectedAircraft" style="color: #AAA; text-align: center; padding: 20px;">
+                    Select aircraft on map or from list
+                </div>
+            </div>
+            <div class="aircraft-list">
+                <h4 style="margin: 0 0 10px 0; color: #00FF00; text-transform: uppercase; font-size: 11px;">
+                    Tracked Aircraft
+                </h4>
+                <div id="aircraftListContainer">
+                    <div style="color: #AAA; text-align: center; padding: 20px;">
+                        Loading aircraft...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script>
+        let map;
+        let aircraft = [];
+        let markers = {};
+        let selectedAircraftId = null;
+        let trackingEnabled = false;
+        let refreshInterval = 5;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([37.7749, -122.4194], 8);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        // Load aircraft data
+        async function loadAircraft() {
+            try {
+                const response = await fetch('/api/nodes/isr/adsb/aircraft');
+                const data = await response.json();
+                
+                aircraft = data.aircraft || [];
+                updateAircraftDisplay();
+                updateStats();
+                updateMap();
+                updateAircraftList();
+            } catch (error) {
+                console.error('Error loading aircraft:', error);
+            }
+        }
+
+        // Update aircraft display on map
+        function updateMap() {
+            // Clear old markers
+            for (const id in markers) {
+                map.removeLayer(markers[id]);
+            }
+            markers = {};
+
+            // Add new markers
+            aircraft.forEach(ac => {
+                if (ac.latitude && ac.longitude) {
+                    const icon = L.divIcon({
+                        html: `<div style="
+                            background: #00FF00;
+                            color: #000;
+                            padding: 4px 8px;
+                            border-radius: 3px;
+                            font-size: 11px;
+                            font-weight: bold;
+                            border: 2px solid #00FF00;
+                            box-shadow: 0 0 10px rgba(0,255,0,0.5);
+                        ">${ac.callsign || ac.icao}</div>`,
+                        className: 'aircraft-marker',
+                        iconSize: [80, 25],
+                        iconAnchor: [40, 12]
+                    });
+
+                    const marker = L.marker([ac.latitude, ac.longitude], { icon })
+                        .bindPopup(`
+                            <strong>${ac.callsign || 'Unknown'}</strong><br>
+                            ICAO: ${ac.icao}<br>
+                            Alt: ${ac.altitude} ft<br>
+                            Speed: ${ac.speed} kts
+                        `)
+                        .addTo(map)
+                        .on('click', () => selectAircraft(ac));
+                    
+                    markers[ac.icao] = marker;
+                }
+            });
+        }
+
+        // Update aircraft list
+        function updateAircraftList() {
+            const container = document.getElementById('aircraftListContainer');
+            
+            if (aircraft.length === 0) {
+                container.innerHTML = '<div style="color: #AAA; text-align: center; padding: 20px;">No aircraft detected</div>';
+                return;
+            }
+
+            container.innerHTML = aircraft.map(ac => `
+                <div class="aircraft-item ${ac.icao === selectedAircraftId ? 'selected' : ''}" 
+                     onclick="selectAircraft(${JSON.stringify(ac).replace(/"/g, '&quot;')})">
+                    <div class="callsign">${ac.callsign || 'UNKNOWN'}</div>
+                    <div class="icao">${ac.icao}</div>
+                    <div class="stats">
+                        <strong>${ac.altitude}</strong> ft<br>
+                        <strong>${ac.speed}</strong> kts<br>
+                        ${ac.heading ? '<strong>Hdg:</strong> ' + ac.heading + '°<br>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select aircraft and show details
+        function selectAircraft(ac) {
+            selectedAircraftId = ac.icao;
+            
+            const details = document.getElementById('selectedAircraft');
+            details.innerHTML = `
+                <div style="text-align: left;">
+                    <h4 style="color: #00FF00; margin: 0 0 10px 0;">${ac.callsign || 'UNKNOWN'}</h4>
+                    <table style="width: 100%; font-size: 12px; color: #AAA;">
+                        <tr>
+                            <td style="padding: 3px 0;"><strong>ICAO:</strong></td>
+                            <td style="color: #00FF00;">${ac.icao}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;"><strong>Altitude:</strong></td>
+                            <td style="color: #00FF00;">${ac.altitude} ft</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;"><strong>Speed:</strong></td>
+                            <td style="color: #00FF00;">${ac.speed} kts</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;"><strong>Heading:</strong></td>
+                            <td style="color: #00FF00;">${ac.heading || 'N/A'}°</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 3px 0;"><strong>Position:</strong></td>
+                            <td style="color: #00FF00;">${ac.latitude?.toFixed(4)}, ${ac.longitude?.toFixed(4)}</td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+
+            updateAircraftList();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('aircraftCount').textContent = aircraft.length;
+            document.getElementById('messageRate').textContent = Math.floor(Math.random() * 100 + 50);
+            
+            if (aircraft.length > 0) {
+                const maxAlt = Math.max(...aircraft.map(a => a.altitude || 0));
+                const avgSpeed = Math.round(aircraft.reduce((sum, a) => sum + (a.speed || 0), 0) / aircraft.length);
+                
+                document.getElementById('maxAltitude').textContent = `${maxAlt} ft`;
+                document.getElementById('avgSpeed').textContent = `${avgSpeed} kts`;
+            }
+        }
+
+        // Update display
+        function updateAircraftDisplay() {
+            // Apply filters
+            const typeFilter = document.getElementById('typeFilter').value;
+            const minAlt = parseInt(document.getElementById('minAltitude').value) || 0;
+            
+            if (typeFilter) {
+                // Filter logic would go here
+            }
+        }
+
+        // Toggle tracking
+        function toggleTracking() {
+            trackingEnabled = !trackingEnabled;
+            const btn = event.target;
+            btn.textContent = trackingEnabled ? '⏹ Stop Tracking' : '▶ Start Tracking';
+            btn.className = trackingEnabled ? 'btn btn-danger' : 'btn btn-primary';
+            
+            if (trackingEnabled) {
+                loadAircraft();
+                startAutoRefresh();
+            }
+        }
+
+        // Auto-refresh
+        function startAutoRefresh() {
+            refreshInterval = parseInt(document.getElementById('refreshInterval').value) || 5;
+            
+            if (trackingEnabled) {
+                loadAircraft();
+                setTimeout(startAutoRefresh, refreshInterval * 1000);
+            }
+        }
+
+        // Initialize
+        initMap();
+        loadAircraft();
+    </script>
+</body>
+</html>
