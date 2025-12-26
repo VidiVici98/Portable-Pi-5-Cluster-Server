@@ -7,33 +7,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/monitor">Monitor</a></li>
-            <li><a href="/control">Control</a></li>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="/performance" class="active">Performance</a></li>
-            <li><a href="/backup">Backup</a></li>
-            <li><a href="/settings">Settings</a></li>
-        </ul>
+    {% if demo_mode %}
+    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    {% endif %}
+    <nav class="navbar">
+        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/monitor">Monitor</a>
+            <a href="/control">Control</a>
+            <a href="/tools">Tools</a>
+            <a href="/adsb">ADSB/UAT</a>
+            <a href="/mesh">Mesh</a>
+            <a href="/vhf">VHF/SDR</a>
+            <a href="/performance" class="active">Performance</a>
+            <a href="/backup">Backup</a>
+            <a href="/settings">Settings</a>
+        </div>
+        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
-
     <div class="container">
         <h1>PERFORMANCE ANALYSIS</h1>
-
         <!-- Cluster Performance Summary -->
         <div class="card">
             <h2>CLUSTER METRICS</h2>
             <div id="performance-summary" class="grid-4"></div>
         </div>
-
         <!-- Per-Node Performance -->
         <div class="card">
             <h2>NODE PERFORMANCE</h2>
             <div id="node-performance" class="grid-2"></div>
         </div>
-
         <!-- Analysis Tools -->
         <div class="card">
             <h2>ANALYSIS TOOLS</h2>
@@ -47,14 +51,11 @@
             </div>
         </div>
     </div>
-
     <script>
         async function loadPerformance() {
             const response = await fetch('/api/performance/summary');
             const data = await response.json();
-            
             if (data.error) return;
-            
             const summary = document.getElementById('performance-summary');
             summary.innerHTML = `
                 <div class="card">
@@ -92,16 +93,13 @@
                 </div>
             `;
         }
-
         async function loadNodePerformance() {
             const response = await fetch('/api/nodes/list');
             const nodes = await response.json();
             const container = document.getElementById('node-performance');
             container.innerHTML = '';
-
             for (const node of nodes) {
-                const perf = await fetch(`/api/performance/${node.id}`).then(r => r.json()).catch(() => ({}));
-                
+                const perf = await fetch(`/api/performance/${node.id}`).then(r => r.json()).catch(() => ({}));  
                 const nodeEl = document.createElement('div');
                 nodeEl.className = 'card';
                 nodeEl.innerHTML = `
@@ -134,15 +132,12 @@
                 container.appendChild(nodeEl);
             }
         }
-
         function runPerformanceAnalysis() {
             alert('Performance analysis initiated. Check logs for detailed results.');
         }
-
         function exportMetrics() {
             alert('Metrics exported to CSV (Feature coming soon)');
         }
-
         loadPerformance();
         loadNodePerformance();
         setInterval(loadPerformance, 10000);

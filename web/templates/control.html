@@ -7,21 +7,27 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/monitor">Monitor</a></li>
-            <li><a href="/control" class="active">Control</a></li>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="/performance">Performance</a></li>
-            <li><a href="/backup">Backup</a></li>
-            <li><a href="/settings">Settings</a></li>
-        </ul>
+    {% if demo_mode %}
+    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    {% endif %}
+    <nav class="navbar">
+        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/monitor">Monitor</a>
+            <a href="/control" class="active">Control</a>
+            <a href="/tools">Tools</a>
+            <a href="/adsb">ADSB/UAT</a>
+            <a href="/mesh">Mesh</a>
+            <a href="/vhf">VHF/SDR</a>
+            <a href="/performance">Performance</a>
+            <a href="/backup">Backup</a>
+            <a href="/settings">Settings</a>
+        </div>
+        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
-
-    <div class="container">
+    <main class="container">
         <h1>CLUSTER CONTROL</h1>
-
         <!-- Cluster Operations -->
         <div class="card">
             <h2>CLUSTER OPERATIONS</h2>
@@ -40,14 +46,12 @@
                 </button>
             </div>
         </div>
-
         <!-- Individual Node Control -->
         <div class="card">
             <h2>NODE OPERATIONS</h2>
             <div id="node-controls" class="grid-2"></div>
         </div>
-    </div>
-
+    </main>
     <script>
         function deployBootNode() {
             if (confirm('Deploy Boot Node? This will reconfigure DHCP, DNS, TFTP, NFS.')) {
@@ -56,7 +60,6 @@
                     .then(data => alert('Deployment started: ' + data.message));
             }
         }
-
         function deployCluster() {
             if (confirm('⚠ Deploy Full Cluster? This affects all nodes.')) {
                 fetch('/api/deploy/cluster', {method: 'POST'})
@@ -64,7 +67,6 @@
                     .then(data => alert('Deployment started: ' + data.message));
             }
         }
-
         function updateAllNodes() {
             if (confirm('Update all nodes? This may take several minutes.')) {
                 fetch('/api/cluster/update-all', {method: 'POST'})
@@ -72,7 +74,6 @@
                     .then(data => alert('Update initiated'));
             }
         }
-
         function confirmRebootAll() {
             if (confirm('⚠ REBOOT ALL NODES?')) {
                 if (confirm('Are you absolutely sure? All operations will be interrupted.')) {
@@ -82,7 +83,6 @@
                 }
             }
         }
-
         function rebootNode(nodeId) {
             if (confirm(`Reboot ${nodeId}?`)) {
                 fetch(`/api/nodes/${nodeId}/reboot`, {method: 'POST'})
@@ -90,7 +90,6 @@
                     .then(data => alert('Reboot initiated for ' + nodeId));
             }
         }
-
         function shutdownNode(nodeId) {
             if (confirm(`⚠ SHUTDOWN ${nodeId}?`)) {
                 fetch(`/api/nodes/${nodeId}/shutdown`, {method: 'POST'})
@@ -98,13 +97,11 @@
                     .then(data => alert('Shutdown initiated for ' + nodeId));
             }
         }
-
         async function loadNodeControls() {
             const response = await fetch('/api/nodes/list');
             const nodes = await response.json();
             const container = document.getElementById('node-controls');
             container.innerHTML = '';
-
             for (const node of nodes) {
                 const nodeEl = document.createElement('div');
                 nodeEl.className = 'card';
@@ -121,7 +118,6 @@
                 container.appendChild(nodeEl);
             }
         }
-
         loadNodeControls();
     </script>
 </body>

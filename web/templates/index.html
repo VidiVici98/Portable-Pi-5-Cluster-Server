@@ -10,22 +10,24 @@
     {% if demo_mode %}
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
-
-    <nav>
-        <ul>
-            <li><a href="/" class="active">Dashboard</a></li>
-            <li><a href="/monitor">Monitor</a></li>
-            <li><a href="/control">Control</a></li>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="/performance">Performance</a></li>
-            <li><a href="/backup">Backup</a></li>
-            <li><a href="/settings">Settings</a></li>
-        </ul>
+    <nav class="navbar">
+        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-links">
+            <a href="/" class="active">Dashboard</a>
+            <a href="/monitor">Monitor</a>
+            <a href="/control">Control</a>
+            <a href="/tools">Tools</a>
+            <a href="/adsb">ADSB/UAT</a>
+            <a href="/mesh">Mesh</a>
+            <a href="/vhf">VHF/SDR</a>
+            <a href="/performance">Performance</a>
+            <a href="/backup">Backup</a>
+            <a href="/settings">Settings</a>
+        </div>
+        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
-
-    <div class="container">
+    <main class="container">
         <h1>CLUSTER COMMAND & CONTROL</h1>
-        
         <!-- Node Overview with Purposes -->
         <div class="card">
             <h2>📡 CLUSTER COMPOSITION</h2>
@@ -34,7 +36,6 @@
             </div>
             <p style="color: #AAA; font-size: 12px; margin: 0;">Each node serves a specific tactical purpose. Click any node to view available tools and integrations.</p>
         </div>
-        
         <!-- Status Overview -->
         <div class="card">
             <h2>OPERATIONAL STATUS</h2>
@@ -42,7 +43,6 @@
                 <!-- Populated by JavaScript -->
             </div>
         </div>
-
         <!-- Quick Actions -->
         <div class="card">
             <h2>QUICK ACTIONS</h2>
@@ -61,7 +61,6 @@
                 </button>
             </div>
         </div>
-
         <!-- Deployment Status -->
         <div class="card">
             <h2>DEPLOYMENT STATUS</h2>
@@ -69,7 +68,6 @@
                 <!-- Populated by JavaScript -->
             </div>
         </div>
-
         <!-- Recent Activity -->
         <div class="card">
             <h2>ACTIVITY LOG</h2>
@@ -77,8 +75,7 @@
                 <p style="color: var(--text-muted);">No recent activity</p>
             </div>
         </div>
-    </div>
-
+    </main>
     <script>
         const nodeDetails = {
             'boot': { icon: '🖥️', color: '#00FF00' },
@@ -86,16 +83,13 @@
             'mesh': { icon: '🔗', color: '#FF8800' },
             'vhf': { icon: '📻', color: '#2196F3' }
         };
-
         // Load node purposes overview
         async function loadNodePurposes() {
             try {
                 const response = await fetch('/api/cluster/node-summary');
-                const nodes = await response.json();
-                
+                const nodes = await response.json();     
                 const purposesDiv = document.getElementById('node-purposes');
-                purposesDiv.innerHTML = '';
-                
+                purposesDiv.innerHTML = '';   
                 for (const node of nodes) {
                     const details = nodeDetails[node.id];
                     const card = document.createElement('div');
@@ -103,8 +97,7 @@
                     card.style.cssText = `cursor: pointer; border: 2px solid ${details.color}; transition: all 0.2s;`;
                     card.onmouseover = (e) => e.currentTarget.style.boxShadow = `0 0 15px ${details.color}`;
                     card.onmouseout = (e) => e.currentTarget.style.boxShadow = 'none';
-                    card.onclick = () => window.location.href = '/tools';
-                    
+                    card.onclick = () => window.location.href = '/tools';    
                     card.innerHTML = `
                         <div style="font-size: 24px; margin-bottom: 8px;">${details.icon}</div>
                         <h4 style="margin: 0 0 5px 0; color: ${details.color};">${node.name}</h4>
@@ -117,20 +110,17 @@
                 console.error('Error loading node purposes:', error);
             }
         }
-
         // Reload status every 5 seconds
         function updateClusterStatus() {
             fetch('/api/cluster/status')
                 .then(r => r.json())
                 .then(data => {
                     const statusDiv = document.getElementById('cluster-status');
-                    statusDiv.innerHTML = '';
-                    
+                    statusDiv.innerHTML = '';     
                     let onlineCount = 0;
                     for (const [nodeId, nodeData] of Object.entries(data.nodes)) {
                         const online = nodeData.online;
-                        if (online) onlineCount++;
-                        
+                        if (online) onlineCount++;   
                         const nodeEl = document.createElement('div');
                         nodeEl.className = online ? 'card success' : 'card critical';
                         nodeEl.innerHTML = `
@@ -140,13 +130,11 @@
                         `;
                         statusDiv.appendChild(nodeEl);
                     }
-                    
                     // Update title
                     const title = document.querySelector('h1');
                     title.style.color = onlineCount === data.total_count ? 'var(--success)' : 'var(--warning)';
                 });
         }
-
         function validateConfig() {
             if (confirm('Run configuration validation?')) {
                 fetch('/api/validate-config', {method: 'POST'})
@@ -161,7 +149,6 @@
                     });
             }
         }
-
         function runHealthCheck() {
             if (confirm('Run full health check? This may take a few minutes.')) {
                 fetch('/api/health-check', {method: 'POST'})
@@ -175,11 +162,9 @@
                     });
             }
         }
-
         function showPerformance() {
             window.location.href = '/performance';
         }
-
         function confirmRebootAll() {
             if (confirm('⚠ REBOOT ALL NODES? This will interrupt all operations.')) {
                 if (confirm('This is a destructive operation. Are you absolutely sure?')) {
@@ -192,7 +177,6 @@
                 }
             }
         }
-
         function logActivity(message) {
             const log = document.getElementById('activity-log');
             const time = new Date().toLocaleTimeString();
@@ -201,7 +185,6 @@
             entry.innerHTML = `<span style="color: var(--text-muted);">[${time}]</span> ${message}`;
             log.insertBefore(entry, log.firstChild);
         }
-
         // Initial load and refresh
         loadNodePurposes();
         updateClusterStatus();

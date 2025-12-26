@@ -7,33 +7,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/monitor" class="active">Monitor</a></li>
-            <li><a href="/control">Control</a></li>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="/performance">Performance</a></li>
-            <li><a href="/backup">Backup</a></li>
-            <li><a href="/settings">Settings</a></li>
-        </ul>
+    {% if demo_mode %}
+    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    {% endif %}
+    <nav class="navbar">
+        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/monitor" class="active">Monitor</a>
+            <a href="/control">Control</a>
+            <a href="/tools">Tools</a>
+            <a href="/adsb">ADSB/UAT</a>
+            <a href="/mesh">Mesh</a>
+            <a href="/vhf">VHF/SDR</a>
+            <a href="/performance">Performance</a>
+            <a href="/backup">Backup</a>
+            <a href="/settings">Settings</a>
+        </div>
+        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
-
-    <div class="container">
+    <main class="container">
         <h1>NODE MONITORING</h1>
         <div id="nodes-container" class="grid-2"></div>
-    </div>
-
+    </main>
     <script>
         async function loadNodes() {
             const response = await fetch('/api/nodes/list');
             const nodes = await response.json();
             const container = document.getElementById('nodes-container');
             container.innerHTML = '';
-
             for (const node of nodes) {
                 const health = await fetch(`/api/nodes/${node.id}/health`).then(r => r.json());
-                
                 const nodeEl = document.createElement('div');
                 nodeEl.className = node.online ? 'card success' : 'card critical';
                 nodeEl.innerHTML = `
@@ -79,7 +83,6 @@
                 container.appendChild(nodeEl);
             }
         }
-
         loadNodes();
         setInterval(loadNodes, 10000);
     </script>

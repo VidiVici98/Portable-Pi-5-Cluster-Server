@@ -14,20 +14,17 @@
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
             margin: 15px 0;
         }
-
         .mesh-container {
             display: grid;
             grid-template-columns: 1fr 300px;
             gap: 20px;
             margin: 20px 0;
         }
-
         @media (max-width: 1200px) {
             .mesh-container {
                 grid-template-columns: 1fr;
             }
         }
-
         .node-list {
             background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
             border: 2px solid #00FF00;
@@ -37,7 +34,6 @@
             overflow-y: auto;
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
         }
-
         .node-item {
             padding: 10px;
             margin: 8px 0;
@@ -47,30 +43,25 @@
             transition: all 0.2s;
             font-size: 12px;
         }
-
         .node-item:hover {
             background: rgba(0, 255, 0, 0.1);
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
             transform: translateX(5px);
         }
-
         .node-item.selected {
             background: rgba(0, 255, 0, 0.2);
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
         }
-
         .node-name {
             color: #00FF00;
             font-weight: bold;
             font-family: 'Courier New', monospace;
         }
-
         .node-status {
             color: #AAA;
             font-size: 10px;
             margin-top: 3px;
         }
-
         .status-indicator {
             width: 8px;
             height: 8px;
@@ -78,16 +69,13 @@
             display: inline-block;
             margin-right: 5px;
         }
-
         .status-indicator.online {
             background: #00FF00;
             box-shadow: 0 0 5px #00FF00;
         }
-
         .status-indicator.offline {
             background: #666;
         }
-
         .controls {
             background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
             border: 2px solid #00FF00;
@@ -95,11 +83,9 @@
             padding: 15px;
             margin: 20px 0;
         }
-
         .control-group {
             margin: 15px 0;
         }
-
         .control-group label {
             display: block;
             color: #00FF00;
@@ -108,7 +94,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-
         .control-group input,
         .control-group select {
             width: 100%;
@@ -119,14 +104,12 @@
             font-family: 'Courier New', monospace;
             border-radius: 3px;
         }
-
         .metrics-panel {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
             margin: 20px 0;
         }
-
         .metric-card {
             background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
             border: 2px solid #00FF00;
@@ -134,21 +117,18 @@
             padding: 15px;
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
         }
-
         .metric-label {
             color: #AAA;
             font-size: 11px;
             text-transform: uppercase;
             margin-bottom: 8px;
         }
-
         .metric-value {
             color: #00FF00;
             font-size: 20px;
             font-weight: bold;
             font-family: 'Courier New', monospace;
         }
-
         .link-info {
             color: #AAA;
             font-size: 11px;
@@ -157,23 +137,27 @@
     </style>
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/monitor">Monitor</a></li>
-            <li><a href="/control">Control</a></li>
-            <li><a href="/tools">Tools</a></li>
-            <li><a href="/adsb">ADSB/UAT</a></li>
-            <li><a href="/mesh" class="active">Mesh</a></li>
-            <li><a href="/performance">Performance</a></li>
-            <li><a href="/backup">Backup</a></li>
-            <li><a href="/settings">Settings</a></li>
-        </ul>
+    {% if demo_mode %}
+    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    {% endif %}
+    <nav class="navbar">
+        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/monitor">Monitor</a>
+            <a href="/control">Control</a>
+            <a href="/tools">Tools</a>
+            <a href="/adsb">ADSB/UAT</a>
+            <a href="/mesh" class="active">Mesh</a>
+            <a href="/vhf">VHF/SDR</a>
+            <a href="/performance">Performance</a>
+            <a href="/backup">Backup</a>
+            <a href="/settings">Settings</a>
+        </div>
+        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
-
-    <div class="container">
+    <main class="container">
         <h1>🔗 MESH NETWORK TOPOLOGY</h1>
-
         <!-- Metrics Panel -->
         <div class="metrics-panel">
             <div class="metric-card">
@@ -193,7 +177,6 @@
                 <div class="metric-value" id="networkHealth">95%</div>
             </div>
         </div>
-
         <!-- Controls -->
         <div class="controls">
             <h3 style="margin: 0 0 15px 0; color: #00FF00;">⚙️ TOPOLOGY CONTROLS</h3>
@@ -213,13 +196,11 @@
                 🔄 Optimize Routes
             </button>
         </div>
-
         <!-- Topology Canvas -->
         <div class="card">
             <h2>NETWORK TOPOLOGY GRAPH</h2>
             <canvas id="topologyCanvas"></canvas>
         </div>
-
         <!-- Node Details -->
         <div class="mesh-container">
             <div class="card">
@@ -237,7 +218,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Link Quality Table -->
         <div class="card">
             <h2>LINK QUALITY MATRIX</h2>
@@ -258,8 +238,7 @@
                 </table>
             </div>
         </div>
-    </div>
-
+    </main>
     <script>
         const nodeColors = {
             'boot': '#00FF00',
@@ -267,21 +246,18 @@
             'mesh': '#FF8800',
             'vhf': '#2196F3'
         };
-
         const nodeIcons = {
             'boot': '🖥️',
             'isr': '📡',
             'mesh': '🔗',
             'vhf': '📻'
         };
-
         let nodes = [
             { id: 'boot', name: 'Boot Node', x: 50, y: 50, status: 'online' },
             { id: 'isr', name: 'ISR Node', x: 250, y: 100, status: 'online' },
             { id: 'mesh', name: 'Mesh Node', x: 150, y: 250, status: 'online' },
             { id: 'vhf', name: 'VHF Node', x: 300, y: 250, status: 'online' }
         ];
-
         let links = [
             { from: 'boot', to: 'isr', quality: 95, latency: 5 },
             { from: 'boot', to: 'mesh', quality: 98, latency: 3 },
@@ -290,33 +266,25 @@
             { from: 'isr', to: 'vhf', quality: 88, latency: 10 },
             { from: 'mesh', to: 'vhf', quality: 96, latency: 4 }
         ];
-
         let selectedNode = null;
-
         function drawTopology() {
             const canvas = document.getElementById('topologyCanvas');
             const ctx = canvas.getContext('2d');
-            
             // Scale to canvas size
             const scale = canvas.width / 400;
-            
             // Clear canvas
             ctx.fillStyle = '#0A0E27';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
             // Draw links
             ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
             ctx.lineWidth = 2;
-            
             links.forEach(link => {
                 const fromNode = nodes.find(n => n.id === link.from);
-                const toNode = nodes.find(n => n.id === link.to);
-                
+                const toNode = nodes.find(n => n.id === link.to); 
                 ctx.beginPath();
                 ctx.moveTo(fromNode.x * scale, fromNode.y * scale);
                 ctx.lineTo(toNode.x * scale, toNode.y * scale);
                 ctx.stroke();
-                
                 // Draw quality indicator
                 const midX = (fromNode.x + toNode.x) / 2 * scale;
                 const midY = (fromNode.y + toNode.y) / 2 * scale;
@@ -324,44 +292,37 @@
                 ctx.font = 'bold 11px Courier New';
                 ctx.fillText(link.quality + '%', midX, midY - 5);
             });
-            
             // Draw nodes
             nodes.forEach(node => {
                 const x = node.x * scale;
                 const y = node.y * scale;
-                
                 // Node circle
                 ctx.fillStyle = nodeColors[node.id];
                 ctx.beginPath();
                 ctx.arc(x, y, 30, 0, Math.PI * 2);
                 ctx.fill();
-                
                 // Glow
                 ctx.strokeStyle = nodeColors[node.id];
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.arc(x, y, 35, 0, Math.PI * 2);
                 ctx.stroke();
-                
                 // Icon
                 ctx.fillStyle = '#000';
                 ctx.font = 'bold 20px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(nodeIcons[node.id], x, y);
-                
                 // Label
                 ctx.fillStyle = nodeColors[node.id];
                 ctx.font = 'bold 12px Courier New';
                 ctx.fillText(node.name, x, y + 50);
-                
                 // Status
                 ctx.fillStyle = node.status === 'online' ? '#00FF00' : '#FF1744';
                 ctx.font = '10px Courier New';
                 ctx.fillText(node.status.toUpperCase(), x, y + 65);
             });
         }
-
         function updateNodeList() {
             const container = document.getElementById('nodeListContainer');
             container.innerHTML = nodes.map(node => `
@@ -375,13 +336,10 @@
                 </div>
             `).join('');
         }
-
         function selectNode(nodeId) {
             selectedNode = nodes.find(n => n.id === nodeId);
-            
             const details = document.getElementById('nodeDetails');
             const nodeLinks = links.filter(l => l.from === nodeId || l.to === nodeId);
-            
             details.innerHTML = `
                 <div style="text-align: left;">
                     <h4 style="color: ${nodeColors[nodeId]}; margin: 0 0 10px 0;">
@@ -419,14 +377,11 @@
                     </table>
                 </div>
             `;
-            
             updateNodeList();
             drawTopology();
         }
-
         function updateLinkQualityTable() {
             const body = document.getElementById('linkQualityBody');
-            
             body.innerHTML = nodes.map(fromNode => `
                 <tr style="border-bottom: 1px solid rgba(0,255,0,0.1);">
                     <td style="padding: 10px; color: ${nodeColors[fromNode.id]}; font-weight: bold;">
@@ -436,16 +391,13 @@
                         if (fromNode.id === toNode.id) {
                             return `<td style="padding: 10px; text-align: center; color: #AAA;">—</td>`;
                         }
-                        
                         const link = links.find(l => 
                             (l.from === fromNode.id && l.to === toNode.id) ||
                             (l.from === toNode.id && l.to === fromNode.id)
                         );
-                        
                         if (!link) {
                             return `<td style="padding: 10px; text-align: center; color: #FF1744;">✗</td>`;
                         }
-                        
                         const qualityColor = link.quality > 90 ? '#00FF00' : link.quality > 80 ? '#FF8800' : '#FF1744';
                         return `
                             <td style="padding: 10px; text-align: center; color: ${qualityColor}; font-weight: bold;">
@@ -456,32 +408,26 @@
                 </tr>
             `).join('');
         }
-
         function changeDisplayMode() {
             // Would switch between different visualization modes
             const mode = document.getElementById('displayMode').value;
             console.log('Changed to mode:', mode);
         }
-
         function optimizeRoutes() {
             alert('🔄 Route optimization initiated. Analyzing topology and link quality...');
             // Would trigger actual optimization
         }
-
         // Initialize
         function init() {
             const canvas = document.getElementById('topologyCanvas');
             canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
-            
+            canvas.height = canvas.offsetHeight; 
             drawTopology();
             updateNodeList();
             updateLinkQualityTable();
-            
             // Select first node
             selectNode('boot');
         }
-
         init();
     </script>
 </body>
