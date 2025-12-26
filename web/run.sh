@@ -48,8 +48,9 @@ export FLASK_APP="$SCRIPT_DIR/app.py"
 export FLASK_ENV="${FLASK_ENV:-development}"
 export DEBUG="${DEBUG:-True}"
 export DEMO_MODE="${DEMO_MODE:-True}"
-export HOST="${HOST:-127.0.0.1}"
-export PORT="${PORT:-5000}"
+export HOST="${HOST:-0.0.0.0}"
+export PORT="${PORT:-8080}"
+export DEMO_MODE="${DEMO_MODE:-False}"
 
 # Show configuration
 echo ""
