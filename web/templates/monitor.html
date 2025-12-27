@@ -26,12 +26,11 @@
                         <a href="/vhf">VHF / SDR</a>
                     </div>
                 </div>
-                <a href="/performance">Performance</a>
                 <a href="/backup">Backup</a>
                 <a href="/settings">Settings</a>
                 <!-- Tactical alert icon -->
                 <div class="nav-alert">
-                    <a href="#" class="alert-icon" title="Notifications">
+                    <button href="#" class="alert-icon" title="Notifications">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
                             <line x1="12" y1="9" x2="12" y2="13"/>
@@ -64,7 +63,7 @@
                                 <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
                             </div>
                         </div>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -110,7 +109,124 @@
             <p style="color: #AAA; margin: 0;"></p>
         </section>
         <div id="nodes-container" class="grid-2"></div>
-    </main>
+
+
+    <div class="container">
+        <!-- Cluster Performance Summary -->
+        <div class="card">
+            <h2>CLUSTER METRICS</h2>
+            <div id="performance-summary" class="grid-4"></div>
+        </div>
+        <!-- Per-Node Performance -->
+        <div class="card">
+            <h2>NODE PERFORMANCE</h2>
+            <div id="node-performance" class="grid-2"></div>
+        </div>
+        <!-- Analysis Tools -->
+        <div class="card">
+            <h2>ANALYSIS TOOLS</h2>
+            <div class="grid-2">
+                <button class="btn btn-info" onclick="runPerformanceAnalysis()">
+                    Run Analysis
+                </button>
+                <button class="btn btn-info" onclick="exportMetrics()">
+                    Export Metrics
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function loadPerformance() {
+            const response = await fetch('/api/performance/summary');
+            const data = await response.json();
+            if (data.error) return;
+            const summary = document.getElementById('performance-summary');
+            summary.innerHTML = `
+                <div class="card">
+                    <h4>CPU Average</h4>
+                    <div class="metric">
+                        <span class="metric-value">${data.cpu_avg}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: ${data.cpu_avg}%"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Memory Average</h4>
+                    <div class="metric">
+                        <span class="metric-value">${data.memory_avg}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: ${data.memory_avg}%"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Disk Usage</h4>
+                    <div class="metric">
+                        <span class="metric-value">${data.disk_usage}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar ${data.disk_usage > 85 ? 'danger' : ''}" style="width: ${data.disk_usage}%"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Network</h4>
+                    <div class="metric">
+                        <span class="metric-value">${data.network_throughput_mbps}Mbps</span>
+                    </div>
+                </div>
+            `;
+        }
+        async function loadNodePerformance() {
+            const response = await fetch('/api/nodes/list');
+            const nodes = await response.json();
+            const container = document.getElementById('node-performance');
+            container.innerHTML = '';
+            for (const node of nodes) {
+                const perf = await fetch(`/api/performance/${node.id}`).then(r => r.json()).catch(() => ({}));  
+                const nodeEl = document.createElement('div');
+                nodeEl.className = 'card';
+                nodeEl.innerHTML = `
+                    <h3>${node.name}</h3>
+                    ${perf.error ? '<p style="color: var(--text-muted);">Performance data unavailable</p>' : `
+                    <div class="metric">
+                        <span class="metric-label">CPU</span>
+                        <span class="metric-value">${perf.cpu || 'N/A'}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: ${perf.cpu || 0}%"></div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Memory</span>
+                        <span class="metric-value">${perf.memory || 'N/A'}%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: ${perf.memory || 0}%"></div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Disk</span>
+                        <span class="metric-value">${perf.disk || 'N/A'}%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Temperature</span>
+                        <span class="metric-value">${perf.temperature || 'N/A'}°C</span>
+                    </div>
+                    `}
+                `;
+                container.appendChild(nodeEl);
+            }
+        }
+        function runPerformanceAnalysis() {
+            alert('Performance analysis initiated. Check logs for detailed results.');
+        }
+        function exportMetrics() {
+            alert('Metrics exported to CSV (Feature coming soon)');
+        }
+        loadPerformance();
+        loadNodePerformance();
+        setInterval(loadPerformance, 10000);
+        setInterval(loadNodePerformance, 10000);
+    </script>
     <script>
         async function loadNodes() {
             const response = await fetch('/api/nodes/list');
@@ -167,5 +283,34 @@
         loadNodes();
         setInterval(loadNodes, 10000);
     </script>
+    <script>
+const modal = document.getElementById('node-modal');
+const modalNodeName = document.getElementById('modal-node-name');
+let currentNode = '';
+function openNodeModal(nodeName){
+  currentNode = nodeName;
+  modalNodeName.textContent = nodeName + " Node Actions";
+  modal.style.display = "block";
+}
+function closeNodeModal(){
+  modal.style.display = "none";
+}
+function rebootNode(){
+  alert(currentNode + " node reboot triggered!");
+}
+function runDiagnostics(){
+  alert("Running diagnostics on " + currentNode + " node.");
+}
+window.onclick = function(event){
+  if(event.target == modal){ closeNodeModal(); }
+}
+// Toggle alerts
+document.querySelectorAll('.alert-icon').forEach(icon => {
+  icon.addEventListener('click', e => {
+    e.preventDefault();
+    icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
+  });
+});
+</script>
 </body>
 </html>

@@ -1,205 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Cluster Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - Cluster Dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    {% if demo_mode %}
-    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
-    {% endif %}
-    <nav class="navbar">
-        <!-- Left column: brand + nav links -->
-        <div class="nav-left">
-            <div class="nav-brand">⌘ Modern Warrior Systems</div>
-            <div class="nav-links">
-                <a href="/">Dashboard</a>
-                <a href="/monitor">Monitor</a>
-                <a href="/control">Control</a>
-                <div class="nav-dropdown">
-                    <a href="/tools" class="nav-parent">Tools</a>
-                    <div class="dropdown-menu">
-                        <a href="/adsb">ADSB / UAT</a>
-                        <a href="/mesh">Mesh</a>
-                        <a href="/vhf">VHF / SDR</a>
-                    </div>
-                </div>
-                <a href="/performance">Performance</a>
-                <a href="/backup">Backup</a>
-                <a href="/settings">Settings</a>
-                <!-- Tactical alert icon -->
-                <div class="nav-alert">
-                    <a href="#" class="alert-icon" title="Notifications">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        <span class="alert-badge">3</span>
-                        <div class="alert-panel">
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    ADS-B Node high temp <span class="alert-meta">71°C</span>
-                                </div>
-                            </div>
-                            <div class="alert-item alert-down">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Tx/Rx Node offline
-                                </div>
-                            </div>
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Mesh Node CPU high <span class="alert-meta">88%</span>
-                                </div>
-                            </div>
-                            <!-- Optional: scrollable logs -->
-                            <div class="alert-logs">
-                                <div class="alert-log">[12:02] ADS-B Node temp spike detected</div>
-                                <div class="alert-log">[12:01] Tx/Rx Node lost connectivity</div>
-                                <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
+{% if demo_mode %}
+<div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+{% endif %}
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-brand">⌘ Modern Warrior Systems</div>
+    <div class="nav-links">
+      <a href="/">Dashboard</a>
+      <a href="/monitor">Monitor</a>
+      <a href="/control">Control</a>
+      <div class="nav-dropdown">
+        <a href="/tools" class="nav-parent">Tools</a>
+        <div class="dropdown-menu">
+          <a href="/adsb">ADSB / UAT</a>
+          <a href="/mesh">Mesh</a>
+          <a href="/vhf">VHF / SDR</a>
         </div>
-        <!-- Right column: vertical node status -->
-        <div class="nav-status">
-            <div class="node-status ok">
-                <button class="node-btn" title="Reboot Boot Node">⭮</button>
-                Boot
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:45%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status warn">
-                <button class="node-btn" title="Reboot ADS-B Node">⭮</button>
-                ADS-B
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:78%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:71%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status ok">
-                <button class="node-btn" title="Reboot Mesh Node">⭮</button>
-                Mesh
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status down">
-                <button class="node-btn" title="Reboot Tx/Rx Node">⭮</button>
-                Tx/Rx
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                </div>
-            </div>
+      </div>
+      <a href="/backup">Backup</a>
+      <a href="/settings">Settings</a>
+      <div class="nav-alert">
+        <button class="alert-icon" title="Notifications">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span class="alert-badge">3</span>
+        </button>
+        <div class="alert-panel">
+          <div class="alert-item alert-warn">
+            <div class="alert-dot"></div>
+            <div class="alert-text">ADS-B Node high temp <span class="alert-meta">71°C</span></div>
+          </div>
+          <div class="alert-item alert-down">
+            <div class="alert-dot"></div>
+            <div class="alert-text">Tx/Rx Node offline</div>
+          </div>
+          <div class="alert-item alert-warn">
+            <div class="alert-dot"></div>
+            <div class="alert-text">Mesh Node CPU high <span class="alert-meta">88%</span></div>
+          </div>
+          <div class="alert-logs">
+            <div class="alert-log">[12:02] ADS-B Node temp spike detected</div>
+            <div class="alert-log">[12:01] Tx/Rx Node lost connectivity</div>
+            <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
+          </div>
         </div>
-    </nav>
-    <main class="container">
-        <!-- Dashboard Settings -->
-        <div class="card">
-            <h2>DASHBOARD SETTINGS</h2>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 10px;">
-                    <input type="checkbox" checked>
-                    Auto-refresh status (every 5 seconds)
-                </label>
-                <label style="display: block; margin-bottom: 10px;">
-                    <input type="checkbox" checked>
-                    Show all alerts
-                </label>
-                <label style="display: block; margin-bottom: 10px;">
-                    <input type="checkbox">
-                    Enable sound notifications
-                </label>
-            </div>
-        </div>
-        <!-- Cluster Configuration -->
-        <div class="card">
-            <h2>CLUSTER CONFIGURATION</h2>
-            <table style="width: 100%; margin-bottom: 15px;">
-                <tr>
-                    <td style="padding: 8px 0;">Boot Node IP:</td>
-                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.10</code></td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 0;">ISR Node IP:</td>
-                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.20</code></td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 0;">Mesh Node IP:</td>
-                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.30</code></td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 0;">VHF Node IP:</td>
-                    <td style="padding: 8px 0;"><code style="color: var(--primary);">192.168.1.40</code></td>
-                </tr>
-            </table>
-            <button class="btn btn-info" onclick="editConfiguration()">
-                Edit Configuration
-            </button>
-        </div>
-        <!-- System Information -->
-        <div class="card">
-            <h2>SYSTEM INFORMATION</h2>
-            <table style="width: 100%; margin-bottom: 15px;">
-                <tr>
-                    <td style="padding: 8px 0; color: var(--text-muted);">Dashboard Version:</td>
-                    <td style="padding: 8px 0;">1.0.0</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 0; color: var(--text-muted);">Python Version:</td>
-                    <td style="padding: 8px 0;">3.9+</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 0; color: var(--text-muted);">Flask Version:</td>
-                    <td style="padding: 8px 0;">2.0+</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px 0; color: var(--text-muted);">Last Updated:</td>
-                    <td style="padding: 8px 0;">December 25, 2025</td>
-                </tr>
-            </table>
-        </div>
-        <!-- Documentation -->
-        <div class="card">
-            <h2>DOCUMENTATION</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 15px;">
-                For detailed information about cluster operations and dashboard usage, please refer to:
-            </p>
-            <ul style="margin-left: 20px; margin-bottom: 15px;">
-                <li><a href="#">Deployment Guide</a></li>
-                <li><a href="#">API Reference</a></li>
-                <li><a href="#">Troubleshooting</a></li>
-                <li><a href="#">Configuration</a></li>
-            </ul>
-        </div>
-        <!-- About -->
-        <div class="card">
-            <h2>ABOUT</h2>
-            <p style="color: var(--text-secondary);">
-                <strong>Cluster Command & Control Dashboard</strong><br>
-                Tactical Operations Interface for Portable Pi 5 Cluster<br>
-                <br>
-                A comprehensive web-based management system for monitoring, controlling, and maintaining 
-                a 4-node Raspberry Pi cluster with specialized capabilities for RF monitoring (ISR), 
-                mesh networking, and amateur radio operations.
-            </p>
-        </div>
-    </main>
-    <script>
-        function editConfiguration() {
-            alert('Configuration editing (Advanced feature - coming soon)');
-        }
-    </script>
+      </div>
+    </div>
+  </div>
+  <div class="nav-status">
+    <div class="node-status ok" data-node="Boot">
+      <button class="node-btn" title="Reboot Boot Node" onclick="openNodeModal('Boot')">⭮</button>
+      Boot
+      <div class="node-tooltip">
+        <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
+        <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:45%;"></div></div></div>
+      </div>
+    </div>
+    <div class="node-status warn" data-node="ADS-B">
+      <button class="node-btn" title="Reboot ADS-B Node" onclick="openNodeModal('ADS-B')">⭮</button>
+      ADS-B
+      <div class="node-tooltip">
+        <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:78%;"></div></div></div>
+        <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:71%;"></div></div></div>
+      </div>
+    </div>
+    <div class="node-status ok" data-node="Mesh">
+      <button class="node-btn" title="Reboot Mesh Node" onclick="openNodeModal('Mesh')">⭮</button>
+      Mesh
+      <div class="node-tooltip">
+        <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
+        <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
+      </div>
+    </div>
+    <div class="node-status down" data-node="Tx/Rx">
+      <button class="node-btn" title="Reboot Tx/Rx Node" onclick="openNodeModal('Tx/Rx')">⭮</button>
+      Tx/Rx
+      <div class="node-tooltip">
+        <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
+        <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
+      </div>
+    </div>
+  </div>
+</nav>
+<main class="container settings">
+  <!-- FULL SETTINGS SECTIONS -->
+  <!-- DEPLOYMENT PROFILE -->
+  <section class="card settings-section">
+    <h2>DEPLOYMENT PROFILE</h2>
+    <p class="section-desc">Defines global behavior assumptions for this cluster deployment.</p>
+    <div class="settings-grid">
+      <label>Deployment Mode
+          <span class="tooltip-icon" title="Select the cluster's operating mode: Training, Operational, Contested RF, or Stealth.">?</span>
+        <select>
+          <option>Training</option>
+          <option selected>Operational</option>
+          <option>Contested RF</option>
+          <option>Stealth / Low Emissions</option>
+        </select>
+      </label>
+      <label>Power Environment
+          <span class="tooltip-icon" title="Select the cluster's power source: Stable Grid, Generator, DC Power.">?</span>
+        <select>
+          <option>Stable Grid</option>
+          <option>Generator</option>
+          <option selected>DC Power</option>
+        </select>
+      </label>
+      <label>Ambient Temperature Expectation
+          <span class="tooltip-icon" title="Select the operating tempurature range: Below 25°C, 25-40°C, or Over 40°C.">?</span>
+        <select>
+          <option>&lt; 25°C</option>
+          <option selected>25–40°C</option>
+          <option>40–55°C</option>
+        </select>
+      </label>
+      <label>Operator Density
+          <span class="tooltip-icon" title="Select whether you are the sole console operator.">?</span>
+        <select>
+          <option>Single Operator</option>
+          <option selected>Team / Shared Console</option>
+        </select>
+      </label>
+    </div>
+  </section>
+  <!-- POWER & HARDWARE POLICY -->
+  <section class="card settings-section">
+    <h2>POWER & HARDWARE POLICY</h2>
+    <div class="settings-grid">
+      <label>Node Power Budget Enforcement
+          <span class="tooltip-icon" title="How do you want power budgeted for the node cluster: Per Node Power Budgets or Global Power Budget.">?</span>
+        <select>
+          <option disabled>Per-Node Caps (Future)</option>
+          <option selected>Enabled (Global)</option>
+        </select>
+      </label>
+      <label>Thermal Throttling Policy
+          <span class="tooltip-icon" title="How should thermal throttling be handles: Soft Throttling, Aggressive Throttling, or Hard Shutdown.">?</span>
+        <select>
+          <option>Soft Throttle</option>
+          <option selected>Aggressive Throttle</option>
+          <option>Hard Shutdown</option>
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" checked>Allow automatic reboot on brownout</label>
+      <label class="checkbox"><input type="checkbox">Permit sacrificial node shutdown</label>
+    </div>
+  </section>
+  <!-- FAILOVER & AUTONOMY -->
+  <section class="card settings-section">
+    <h2>FAILOVER & AUTONOMY</h2>
+    <div class="settings-grid">
+      <label>Autonomy Level
+          <span class="tooltip-icon" title="Select the cluster's operational autonomy: Manual, Assisted Recovery, Fully Autonomous.">?</span>
+        <select>
+          <option>Manual Only</option>
+          <option selected>Assisted Recovery</option>
+          <option>Fully Autonomous</option>
+        </select>
+      </label>
+      <label>Service Restart Policy
+          <span class="tooltip-icon" title="When should the cluster auto-restart: Never, On Crash, or On Threshold Breach.">?</span>
+        <select>
+          <option>Never</option>
+          <option selected>On Crash</option>
+          <option>On Threshold Breach</option>
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" checked>Promote secondary node if boot node unavailable</label>
+      <label class="checkbox"><input type="checkbox">Isolate failing nodes automatically</label>
+    </div>
+  </section>
+  <!-- NETWORK & MESH BEHAVIOR -->
+  <section class="card settings-section">
+    <h2>NETWORK & MESH BEHAVIOR</h2>
+    <div class="settings-grid">
+      <label>Preferred Backhaul Order
+          <span class="tooltip-icon" title="Select the cluster's preferred backhaul order: PoE → Cluster Mesh → External Mesh, or Cluster Mesh First.">?</span>
+        <select>
+          <option selected>PoE → Cluster Mesh → External Mesh</option>
+          <option>Cluster Mesh First</option>
+        </select>
+      </label>
+      <label>Discovery Visibility
+          <span class="tooltip-icon" title="Should the cluster be discoverable by remote nodes?">?</span>
+        <select>
+          <option>Silent</option>
+          <option selected>Passive</option>
+          <option>Active Beaconing</option>
+        </select>
+      </label>
+      <label>Mesh Trust Model
+          <span class="tooltip-icon" title="Enable a warning modal before trusting remote nodes?">?</span>
+        <select>
+          <option selected>Known Clusters Only</option>
+          <option>Known + Provisional</option>
+          <option>Opportunistic</option>
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" checked>Enforce heartbeat sanity checks</label>
+    </div>
+  </section>
+  <!-- SECURITY & ACCESS CONTROL -->
+  <section class="card settings-section">
+    <h2>SECURITY & ACCESS CONTROL</h2>
+    <div class="settings-grid">
+      <label>Authentication Mode
+          <span class="tooltip-icon" title="How should nodes & operators be authenticated?">?</span>
+        <select>
+          <option selected>Local Credentials</option>
+          <option>Local + Keyfile</option>
+        </select>
+      </label>
+      <label>Session Timeout
+          <span class="tooltip-icon" title="When should credentials need to be re-verified?">?</span>
+        <select>
+          <option>15 minutes</option>
+          <option selected>30 minutes</option>
+          <option>60 minutes</option>
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" checked>Enable lockdown mode</label>
+      <label class="checkbox"><input type="checkbox">Disable physical USB interfaces</label>
+    </div>
+  </section>
+  <!-- DATA HANDLING & OPSEC -->
+  <section class="card settings-section">
+    <h2>DATA HANDLING & OPSEC</h2>
+    <div class="settings-grid">
+      <label>Data Classification
+          <span class="tooltip-icon" title="What type of data will be stored on or routed through the cluster and network?">?</span>
+        <select>
+          <option>Unclassified</option>
+          <option selected>Sensitive</option>
+          <option>Restricted</option>
+        </select>
+      </label>
+      <label>Retention Policy
+          <span class="tooltip-icon" title="How long should data be retained on the device?">?</span>
+        <select>
+          <option>24 hours</option>
+          <option selected>72 hours</option>
+          <option>Manual Only</option>
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" checked>Encrypt captured data at rest</label>
+      <label class="checkbox"><input type="checkbox">Allow export to removable media</label>
+    </div>
+  </section>
+  <!-- ALERTING & NOTIFICATIONS -->
+  <section class="card settings-section">
+    <h2>ALERTING & NOTIFICATIONS</h2>
+    <div class="settings-grid">
+      <label class="checkbox"><input type="checkbox" checked>Enable alert aggregation</label>
+      <label class="checkbox"><input type="checkbox" checked>Suppress repeated alerts</label>
+      <label class="checkbox"><input type="checkbox">Require operator acknowledgment</label>
+    </div>
+  </section>
+  <!-- MAINTENANCE & UPDATE POLICY -->
+  <section class="card settings-section">
+    <h2>MAINTENANCE & UPDATE POLICY</h2>
+    <div class="settings-grid">
+      <label>Update Channel
+          <span class="tooltip-icon" title="Which updates would you like to recieve?">?</span>
+        <select>
+          <option selected>Stable</option>
+          <option>Ops-Tested</option>
+          <option>Development</option>
+        </select>
+      </label>
+      <label>Auto-Update Policy
+          <span class="tooltip-icon" title="How often would you like to scan for and auto-install updates? Note: This may increase power usage or create brief maintence downtime.">?</span>
+        <select>
+          <option>Never</option>
+          <option selected>When Idle</option>
+          <option>Scheduled Window</option>
+        </select>
+      </label>
+      <label class="checkbox"><input type="checkbox" checked>Allow automatic rollback</label>
+      <label class="checkbox"><input type="checkbox">Enable field service diagnostics mode</label>
+    </div>
+  </section>
+  <!-- AUDIT & FORENSICS -->
+  <section class="card settings-section">
+    <h2>AUDIT & FORENSICS</h2>
+    <div class="settings-grid">
+      <label class="checkbox"><input type="checkbox" checked>Log all operator actions</label>
+      <label class="checkbox"><input type="checkbox" checked>Track configuration changes</label>
+      <label>Time Sync Source
+          <span class="tooltip-icon" title="How should time be syncronized across the network?">?</span>
+        <select>
+          <option selected>Boot Node</option>
+          <option>External NTP</option>
+        </select>
+      </label>
+      <button class="btn btn-warning" onclick="alert('Exporting forensic bundle...')">Export forensic bundle</button>
+    </div>
+  </section>
+</main>
+<!-- Node Modal -->
+<div id="node-modal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeNodeModal()">&times;</span>
+    <h3 id="modal-node-name">Node Actions</h3>
+    <button onclick="rebootNode()">Reboot Node</button>
+    <button onclick="runDiagnostics()">Run Diagnostics</button>
+  </div>
+</div>
+<script>
+const modal = document.getElementById('node-modal');
+const modalNodeName = document.getElementById('modal-node-name');
+let currentNode = '';
+function openNodeModal(nodeName){
+  currentNode = nodeName;
+  modalNodeName.textContent = nodeName + " Node Actions";
+  modal.style.display = "block";
+}
+function closeNodeModal(){
+  modal.style.display = "none";
+}
+function rebootNode(){
+  alert(currentNode + " node reboot triggered!");
+}
+function runDiagnostics(){
+  alert("Running diagnostics on " + currentNode + " node.");
+}
+window.onclick = function(event){
+  if(event.target == modal){ closeNodeModal(); }
+}
+// Toggle alerts
+document.querySelectorAll('.alert-icon').forEach(icon => {
+  icon.addEventListener('click', e => {
+    e.preventDefault();
+    icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
+  });
+});
+</script>
 </body>
 </html>

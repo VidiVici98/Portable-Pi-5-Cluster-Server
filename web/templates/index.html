@@ -26,12 +26,11 @@
                         <a href="/vhf">VHF / SDR</a>
                     </div>
                 </div>
-                <a href="/performance">Performance</a>
                 <a href="/backup">Backup</a>
                 <a href="/settings">Settings</a>
                 <!-- Tactical alert icon -->
                 <div class="nav-alert">
-                    <a href="#" class="alert-icon" title="Notifications">
+                    <button href="#" class="alert-icon" title="Notifications">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
                             <line x1="12" y1="9" x2="12" y2="13"/>
@@ -64,7 +63,7 @@
                                 <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
                             </div>
                         </div>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -268,5 +267,34 @@
         setInterval(updateClusterStatus, 5000);
         logActivity('Dashboard initialized');
     </script>
+    <script>
+const modal = document.getElementById('node-modal');
+const modalNodeName = document.getElementById('modal-node-name');
+let currentNode = '';
+function openNodeModal(nodeName){
+  currentNode = nodeName;
+  modalNodeName.textContent = nodeName + " Node Actions";
+  modal.style.display = "block";
+}
+function closeNodeModal(){
+  modal.style.display = "none";
+}
+function rebootNode(){
+  alert(currentNode + " node reboot triggered!");
+}
+function runDiagnostics(){
+  alert("Running diagnostics on " + currentNode + " node.");
+}
+window.onclick = function(event){
+  if(event.target == modal){ closeNodeModal(); }
+}
+// Toggle alerts
+document.querySelectorAll('.alert-icon').forEach(icon => {
+  icon.addEventListener('click', e => {
+    e.preventDefault();
+    icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
+  });
+});
+</script>
 </body>
 </html>
