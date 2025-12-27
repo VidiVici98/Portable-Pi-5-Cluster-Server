@@ -18,15 +18,15 @@
             }
         }
         .frequency-panel {
-            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
-            border: 2px solid #2196F3;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 20px;
             box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
         }
         .frequency-display {
             background: #000;
-            border: 2px solid #2196F3;
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 20px;
             text-align: center;
@@ -63,7 +63,7 @@
             width: 100%;
             padding: 10px;
             background: rgba(33, 150, 243, 0.1);
-            border: 2px solid #2196F3;
+            border: 2px solid #333;
             color: #2196F3;
             font-family: 'Courier New', monospace;
             font-size: 16px;
@@ -83,7 +83,7 @@
         .freq-btn {
             padding: 10px;
             background: rgba(33, 150, 243, 0.2);
-            border: 1px solid #2196F3;
+            border: 1px solid #333;
             color: #2196F3;
             font-size: 12px;
             font-weight: bold;
@@ -104,7 +104,7 @@
         .mode-btn {
             padding: 10px;
             background: rgba(33, 150, 243, 0.1);
-            border: 2px solid #2196F3;
+            border: 2px solid #333;
             color: #2196F3;
             font-size: 12px;
             font-weight: bold;
@@ -121,8 +121,8 @@
             box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
         }
         .spectrum-display {
-            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
-            border: 2px solid #2196F3;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 20px;
             margin: 20px 0;
@@ -131,7 +131,7 @@
             width: 100%;
             height: 300px;
             background: #000;
-            border: 1px solid #2196F3;
+            border: 1px solid #333;
             border-radius: 3px;
             margin: 10px 0;
         }
@@ -148,7 +148,7 @@
             width: 100%;
             height: 30px;
             background: #000;
-            border: 1px solid #2196F3;
+            border: 1px solid #333;
             border-radius: 3px;
             overflow: hidden;
             position: relative;
@@ -167,8 +167,8 @@
             font-size: 12px;
         }
         .recording-panel {
-            background: linear-gradient(135deg, #1A1A00 0%, #2A2A00 100%);
-            border: 2px solid #FF8800;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 15px;
             margin: 20px 0;
@@ -225,7 +225,7 @@
         .preset-btn {
             padding: 12px;
             background: rgba(33, 150, 243, 0.15);
-            border: 1px solid #2196F3;
+            border: 1px solid #333;
             color: #2196F3;
             font-size: 11px;
             font-weight: bold;
@@ -247,7 +247,7 @@
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
     <nav class="navbar">
-        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-brand">⌘ Modern Warrior Systems</div>
         <div class="nav-links">
             <a href="/">Dashboard</a>
             <a href="/monitor">Monitor</a>
@@ -263,7 +263,10 @@
         <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
     <main class="container">
-        <h1>📻 VHF/SDR FREQUENCY CONTROL</h1>
+        <section class="panel">
+            <h2>📻 VHF/SDR FREQUENCY CONTROL</h2>
+            <p style="color: #AAA; margin: 0;">SDR Spectrum Monitoring & RF Transciever Tools</p>
+        </section>
         <div class="sdr-container">
             <!-- Frequency Control Panel -->
             <div class="frequency-panel">

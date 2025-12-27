@@ -11,7 +11,7 @@
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
     <nav class="navbar">
-        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-brand">⌘ Modern Warrior Systems</div>
         <div class="nav-links">
             <a href="/">Dashboard</a>
             <a href="/monitor">Monitor</a>
@@ -26,10 +26,7 @@
         </div>
         <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
-
     <div class="container">
-        <h1>BACKUP MANAGEMENT</h1>
-
         <!-- Create Backup -->
         <div class="card">
             <h2>CREATE BACKUP</h2>
@@ -40,39 +37,32 @@
                 CREATE BACKUP NOW
             </button>
         </div>
-
         <!-- Available Backups -->
         <div class="card">
             <h2>AVAILABLE BACKUPS</h2>
             <div id="backups-list"></div>
         </div>
-
         <!-- Backup Statistics -->
         <div class="card">
             <h2>BACKUP STATISTICS</h2>
             <div id="backup-stats" class="grid-4"></div>
         </div>
     </div>
-
     <script>
         async function loadBackups() {
             const response = await fetch('/api/backup/list');
             const data = await response.json();
-            
             if (data.error) {
                 document.getElementById('backups-list').innerHTML = 
                     '<p style="color: var(--danger);">Error loading backups</p>';
                 return;
             }
-
             const container = document.getElementById('backups-list');
             container.innerHTML = '';
-
             if (!data.backups || data.backups.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-muted);">No backups available</p>';
                 return;
             }
-
             const table = document.createElement('table');
             table.innerHTML = `
                 <thead>
@@ -102,7 +92,6 @@
                 </tbody>
             `;
             container.appendChild(table);
-
             // Load stats
             const statsHtml = `
                 <div class="card">
@@ -124,7 +113,6 @@
             `;
             document.getElementById('backup-stats').innerHTML = statsHtml;
         }
-
         function createBackup() {
             if (confirm('Create backup? This may take several minutes.')) {
                 fetch('/api/backup/create', {method: 'POST'})
@@ -135,13 +123,11 @@
                     });
             }
         }
-
         function verifyBackup(backupId) {
             if (confirm(`Verify backup ${backupId}?`)) {
                 alert('Verification started. Check logs for details.');
             }
         }
-
         function restoreBackup(backupId) {
             if (confirm(`⚠ Restore from ${backupId}?`)) {
                 if (confirm('This will overwrite current configuration. Are you sure?')) {
@@ -154,7 +140,6 @@
                 }
             }
         }
-
         loadBackups();
         setInterval(loadBackups, 30000);
     </script>

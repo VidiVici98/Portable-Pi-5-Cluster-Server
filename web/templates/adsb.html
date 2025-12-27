@@ -13,6 +13,7 @@
             border: 2px solid #00FF00;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
             margin: 15px 0;
+            filter: brightness(.75);
         }
         .adsb-container {
             display: grid;
@@ -26,8 +27,8 @@
             }
         }
         .aircraft-list {
-            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
-            border: 2px solid #00FF00;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 15px;
             max-height: 600px;
@@ -72,8 +73,8 @@
             color: #FF8800;
         }
         .controls {
-            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
-            border: 2px solid #00FF00;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 15px;
             margin: 20px 0;
@@ -93,8 +94,8 @@
         .control-group select {
             width: 100%;
             padding: 8px;
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #00FF00;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 1px solid #333;
             color: #00FF00;
             font-family: 'Courier New', monospace;
             border-radius: 3px;
@@ -111,8 +112,8 @@
             margin: 20px 0;
         }
         .stat-card {
-            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
-            border: 2px solid #00FF00;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 15px;
             text-align: center;
@@ -137,7 +138,7 @@
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
     <nav class="navbar">
-        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-brand">⌘ Modern Warrior Systems</div>
         <div class="nav-links">
             <a href="/">Dashboard</a>
             <a href="/monitor">Monitor</a>
@@ -153,7 +154,10 @@
         <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
     </nav>
     <main class="container">
-        <h1>📡 ADSB/UAT AIRCRAFT TRACKING</h1>
+        <section class="panel">
+            <h2>📡 ADSB/UAT AIRCRAFT TRACKING</h2>
+            <p style="color: #AAA; margin: 0;">Airspace Monitoring Tools</p>
+        </section>
         <!-- Statistics Panel -->
         <div class="stats-panel">
             <div class="stat-card">

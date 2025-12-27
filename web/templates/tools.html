@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
         .tool-card {
-            background: linear-gradient(135deg, #111633 0%, #1A1F3A 100%);
-            border: 2px solid #00FF00;
+            background: linear-gradient(135deg, #151515 0%, #252525 100%);
+            border: 2px solid #333;
             border-radius: 4px;
             padding: 15px;
             margin: 10px 0;
@@ -109,7 +109,7 @@
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
     <nav class="navbar">
-        <div class="nav-brand">⌘ TACTICAL OPS</div>
+        <div class="nav-brand">⌘ Modern Warrior Systems</div>
         <div class="nav-links">
             <a href="/">Dashboard</a>
             <a href="/monitor">Monitor</a>
@@ -132,35 +132,6 @@
         <div id="nodeTools" class="node-grid">
             <!-- Populated by JavaScript -->
         </div>
-        <section class="panel" style="margin-top: 30px;">
-            <h3>🔧 INTEGRATION ROADMAP</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
-                <div style="padding: 10px; border-left: 3px solid #FF1744;">
-                    <div style="color: #FF1744; font-weight: bold;">ISR Node</div>
-                    <div style="color: #AAA; font-size: 12px; margin-top: 5px;">
-                        • dump1090 (ADSB receiver)<br>
-                        • dump978 (UAT decoder)<br>
-                        • Custom alert system
-                    </div>
-                </div>
-                <div style="padding: 10px; border-left: 3px solid #FF8800;">
-                    <div style="color: #FF8800; font-weight: bold;">Mesh Node</div>
-                    <div style="color: #AAA; font-size: 12px; margin-top: 5px;">
-                        • Batman-adv routing<br>
-                        • OLSR optimization<br>
-                        • Custom mesh protocol
-                    </div>
-                </div>
-                <div style="padding: 10px; border-left: 3px solid #2196F3;">
-                    <div style="color: #2196F3; font-weight: bold;">VHF Node</div>
-                    <div style="color: #AAA; font-size: 12px; margin-top: 5px;">
-                        • GQRX SDR control<br>
-                        • RTL-SDR tools<br>
-                        • Custom SDR apps
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
     <script>
         const NODES = {
