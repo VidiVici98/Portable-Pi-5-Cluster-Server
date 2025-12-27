@@ -34,7 +34,7 @@
 }
 html, body {
     width: 100%;
-    height: 200%;
+    height: 100%;
     font-family: var(--font-mono);
     background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
     background-attachment: fixed;
@@ -47,6 +47,7 @@ html, body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    padding-left: 48px;
 }
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
@@ -81,11 +82,11 @@ a:hover {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: rgba(25, 25, 25, 0.85);
+    background: rgba(25, 25, 25, 0.95);
+    backdrop-filter: blur(4px);
     border-bottom: 2px solid #111;
     border-right: 2px solid #111;
     padding: 10px 30px;
-    margin-bottom: 30px;
     box-shadow: inset 0 1px 0 rgba(0, 255, 0, 0.1);
     width: 100%;
     box-sizing: border-box;
@@ -188,9 +189,10 @@ nav a.active {
     color: rgba(255, 179, 0, 0.3);
     cursor: pointer;
     transition: all 0.3s ease;
+    background: transparent;
 }
 .nav-alert .alert-icon svg {
-    transform: translateX(-2px);
+    transform: translate(-2px, -2px);
 }
 .nav-alert .alert-icon:hover {
     border: 1px solid rgba(0, 255, 0, 0.5);
@@ -199,11 +201,14 @@ nav a.active {
 }
 .nav-alert .alert-badge {
     position: absolute;
-    top: 0px;
+    top: -8px;
     right: 4px;
-    background: rgba(175, 10, 10, 0.9);
-    color: #fff;
-    font-size: 0.6rem;
+    background: #111111cc;
+    color: #ddd;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+    text-shadow: 1px 2px 2px #111,
+                 2px 3px 3px #333;
+    font-size: 0.85rem;
     font-weight: bold;
     padding: 3px 6px;
     border-radius: 50%;
@@ -267,11 +272,12 @@ nav a.active {
 }
 /* ================= NODE STATUS ================= */
 .nav-status {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(2, auto);
     gap: 6px;
-    align-items: flex-end;
-    align-self: flex-start;
+    justify-content: flex-end;
+    margin-top: 54px;
 }
 .node-status {
     position: relative;
@@ -737,16 +743,37 @@ tbody tr:hover {
     h1 { font-size: 1.8em; }
     h2 { font-size: 1.4em; }
 }
-        #map {
-            width: 70vw;
-            height: 80vh;
-            border: 2px solid #00FF00;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            margin: 15px 0;
-            filter: brightness(.75);
-            justify-self: center;
-            align-self: center;
-        }
+#map {
+    width: 70vw;
+    height: 80vh;
+    border: 2px solid #00FF00;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    margin: 15px 0;
+    filter: brightness(.75);
+    justify-self: center;
+    align-self: center;
+}
+.map-guard {
+    position: relative;
+    width:70vw;
+    height: 80vh; /* or whatever your map height is */
+}
+.map-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(1px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 120ms ease;
+    z-index: 500;
+}
+
+/* Active (blocking) state */
+.map-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
         .adsb-container {
             display: grid;
             grid-template-columns: 1fr 300px;
@@ -1336,19 +1363,19 @@ tbody tr:hover {
    =============================== */
 .quick-sidebar {
     position: fixed;
-    top: 60px; /* below navbar */
+    top: 130px; /* below navbar */
     left: 0;
     height: calc(100vh - 60px);
-    width: 220px;
-    background: #0b0f0b;
+    width: 360px;
+    background: linear-gradient(35deg, #151515, #252525, #111);
     border-right: 1px solid #003300;
     box-shadow: 4px 0 12px rgba(0,0,0,0.6);
-    transform: translateX(-180px);
+    transform: translateX(-360px);
     transition: transform 0.25s ease;
     z-index: 1000;
 }
 .quick-sidebar.collapsed {
-    transform: translateX(-220px);
+    transform: translateX(-360px);
 }
 .quick-sidebar.expanded {
     transform: translateX(0);
@@ -1356,12 +1383,12 @@ tbody tr:hover {
 /* Toggle tab */
 .sidebar-toggle {
     position: absolute;
-    top: 40%;
+    top: 20%;
     right: -36px;
     width: 36px;
-    height: 160px;
+    height: fit-content;
     background: linear-gradient(35deg, #151515, #252525, #111);
-    color: #00ff00;
+    color: rgba(255, 179, 0, 0.4);
     border: 1px solid #004400;
     border-left: none;
     border-radius: 4px;
@@ -1387,6 +1414,8 @@ tbody tr:hover {
     letter-spacing: 2px;
     font-weight: 600;
     font-family: Georgia, 'Times New Roman', Times, serif;
+    text-shadow: 1px 2px 2px #111,
+                 2px 3px 3px #333;
 }
 .vertical-label:hover {
     font-size: .9rem;
@@ -1397,33 +1426,40 @@ tbody tr:hover {
     font-size: 12px;
 }
 .sidebar-content h4 {
-    color: #00ff00;
-    font-size: 11px;
-    margin-bottom: 12px;
+    color: rgba(255, 179, 0, 0.4);
+    font-size: 1.25rem;
+    margin-top: 12px;
+    margin-bottom: 16px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    text-align: center;
+    text-shadow: 1px 2px 2px #111,
+                 2px 3px 3px #222;
 }
 .sidebar-content a {
     display: block;
     padding: 8px 6px;
-    color: #aaa;
+    color: #666;
     text-decoration: none;
     border-left: 2px solid transparent;
+    border: none;
+    margin-left: .5rem;
+    font-size: 1rem;
 }
 .sidebar-content a:hover {
     color: #00ff00;
     background: rgba(0,255,0,0.05);
+    border:none;
     border-left: 2px solid #00ff00;
+    transform: translateX(12px);
 }
 /* ================= COLLAPSING HEADER EXTENSION ================= */
-
 .nav-collapse-anchor {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     width: 100%;
 }
-
 /* Smooth transitions */
 .navbar,
 .nav-brand,
@@ -1431,7 +1467,6 @@ tbody tr:hover {
 .nav-status {
     transition: all 0.25s ease;
 }
-
 /* Sticky only when collapsed */
 .navbar.collapsed {
     z-index: 1200;
@@ -1449,25 +1484,24 @@ tbody tr:hover {
     overflow: hidden;
     pointer-events: none;
 }
-
 /* Remove vertical gap left by brand */
 .navbar.collapsed .nav-left {
     gap: 0;
 }
-
 /* Reflow node status horizontally */
 .navbar.collapsed .nav-status {
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(2, auto);
+    gap: 6px;
     align-items: center;
-    gap: 8px;
+    justify-content: flex-end;
 }
-
 /* Slightly compress node width when collapsed */
 .navbar.collapsed .node-status {
     width: auto;
     padding: 0 6px;
 }
-
 /* COLLAPSE NAVBAR HEIGHT */
 .navbar.collapsed {
     position: sticky;
@@ -1478,17 +1512,14 @@ tbody tr:hover {
     top: 0;
     z-index: 1200;
 }
-
-
-/* STATUS INDICATORS: wrap into 3 rows */
+/* COLLAPSED: 2x2 GRID */
 .navbar.collapsed .nav-status {
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
-    max-height: 80px; /* allow wrapping to determine row height */
-    width: auto; /* adjust based on number of nodes */
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(2, auto);
     gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
 }
 /* NODE HEIGHT */
 .navbar.collapsed .node-status {
