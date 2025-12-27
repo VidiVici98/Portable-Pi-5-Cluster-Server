@@ -183,10 +183,10 @@ def tools():
     """Node tools and integration page"""
     return render_template('tools.html', nodes=NODES, demo_mode=DEMO_MODE)
 
-@app.route('/adsb')
+@app.route('/isr')
 def adsb():
     """ADSB/UAT aircraft tracking page"""
-    return render_template('adsb.html', nodes=NODES, demo_mode=DEMO_MODE)
+    return render_template('isr.html', nodes=NODES, demo_mode=DEMO_MODE)
 
 @app.route('/mesh')
 def mesh():
