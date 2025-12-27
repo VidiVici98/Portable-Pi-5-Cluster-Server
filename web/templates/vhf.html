@@ -247,20 +247,98 @@
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
     <nav class="navbar">
-        <div class="nav-brand">⌘ Modern Warrior Systems</div>
-        <div class="nav-links">
-            <a href="/">Dashboard</a>
-            <a href="/monitor">Monitor</a>
-            <a href="/control">Control</a>
-            <a href="/tools">Tools</a>
-            <a href="/adsb">ADSB/UAT</a>
-            <a href="/mesh">Mesh</a>
-            <a href="/vhf" class="active">VHF/SDR</a>
-            <a href="/performance">Performance</a>
-            <a href="/backup">Backup</a>
-            <a href="/settings">Settings</a>
+        <!-- Left column: brand + nav links -->
+        <div class="nav-left">
+            <div class="nav-brand">⌘ Modern Warrior Systems</div>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/monitor">Monitor</a>
+                <a href="/control">Control</a>
+                <div class="nav-dropdown">
+                    <a href="/tools" class="nav-parent">Tools</a>
+                    <div class="dropdown-menu">
+                        <a href="/adsb">ADSB / UAT</a>
+                        <a href="/mesh">Mesh</a>
+                        <a href="/vhf">VHF / SDR</a>
+                    </div>
+                </div>
+                <a href="/performance">Performance</a>
+                <a href="/backup">Backup</a>
+                <a href="/settings">Settings</a>
+                <!-- Tactical alert icon -->
+                <div class="nav-alert">
+                    <a href="#" class="alert-icon" title="Notifications">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <span class="alert-badge">3</span>
+                        <div class="alert-panel">
+                            <div class="alert-item alert-warn">
+                                <div class="alert-dot"></div>
+                                <div class="alert-text">
+                                    ADS-B Node high temp <span class="alert-meta">71°C</span>
+                                </div>
+                            </div>
+                            <div class="alert-item alert-down">
+                                <div class="alert-dot"></div>
+                                <div class="alert-text">
+                                    Tx/Rx Node offline
+                                </div>
+                            </div>
+                            <div class="alert-item alert-warn">
+                                <div class="alert-dot"></div>
+                                <div class="alert-text">
+                                    Mesh Node CPU high <span class="alert-meta">88%</span>
+                                </div>
+                            </div>
+                            <!-- Optional: scrollable logs -->
+                            <div class="alert-logs">
+                                <div class="alert-log">[12:02] ADS-B Node temp spike detected</div>
+                                <div class="alert-log">[12:01] Tx/Rx Node lost connectivity</div>
+                                <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="demo-badge" id="demoBadge" style="display:none;">DEMO MODE</div>
+        <!-- Right column: vertical node status -->
+        <div class="nav-status">
+            <div class="node-status ok">
+                <button class="node-btn" title="Reboot Boot Node">⭮</button>
+                Boot
+                <div class="node-tooltip">
+                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:45%;"></div></div></div>
+                </div>
+            </div>
+            <div class="node-status warn">
+                <button class="node-btn" title="Reboot ADS-B Node">⭮</button>
+                ADS-B
+                <div class="node-tooltip">
+                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:78%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:71%;"></div></div></div>
+                </div>
+            </div>
+            <div class="node-status ok">
+                <button class="node-btn" title="Reboot Mesh Node">⭮</button>
+                Mesh
+                <div class="node-tooltip">
+                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
+                </div>
+            </div>
+            <div class="node-status down">
+                <button class="node-btn" title="Reboot Tx/Rx Node">⭮</button>
+                Tx/Rx
+                <div class="node-tooltip">
+                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
+                </div>
+            </div>
+        </div>
     </nav>
     <main class="container">
         <section class="panel">
