@@ -23,7 +23,10 @@
         <a href="#controls-section">Tracking Controls</a>
         <a href="#map-section">Live Map</a>
         <a href="#aircraft-section">Aircraft List</a>
-        <a href="#vhf-section">VHF / SDR</a>
+        <a href="#">SDR Frequency Control</a>
+        <a href="#">Signal Analysis</a>
+        <a href="#">Reciever Status</a>
+        <a href="#">Inbound Signals Triangulation</a>
     </nav>
 </aside>
 <nav class="navbar" id="main-navbar">
@@ -147,7 +150,15 @@
                 <div class="stat-value" id="avgSpeed">0 kts</div>
             </div>
         </div>
-        <!-- Controls -->
+        <!-- Map -->
+        <div class="card">
+            <h2>LIVE AIRCRAFT MAP</h2>
+            <div class="map-card">
+            <div class="map-guard">
+                <div id="map"></div>
+                <div class="map-overlay" aria-hidden="true"></div>
+            </div>
+                    <!-- Controls -->
         <div class="controls">
             <h3 style="margin: 0 0 15px 0; color: #00FF00;">⚙️ TRACKING CONTROLS</h3>
             <div class="control-group">
@@ -171,13 +182,7 @@
             <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="toggleTracking()">
                 ▶ Start Tracking
             </button>
-        </div>
-        <!-- Map -->
-        <div class="card">
-            <h2>LIVE AIRCRAFT MAP</h2>
-            <div class="map-guard">
-                <div id="map"></div>
-                <div class="map-overlay" aria-hidden="true"></div>
+            </div>
             </div>
         </div>
         <!-- Aircraft List -->
@@ -332,7 +337,170 @@
                 </div>
             </div>
         </div>
+    <!-- SIGNAL TRIANGULATION / DIRECTION FINDING -->
+<section class="panel" id="triangulation-section">
+    <h2>📐 SIGNAL TRIANGULATION & ORIGIN ESTIMATION</h2>
+    <p style="color:#AAA;margin:0;">
+        Direction-of-arrival analysis, multi-receiver bearing correlation, and estimated emitter location
+    </p>
+</section>
+
+<div class="triangulation-grid">
+    <!-- Compass / Bearing Visualization -->
+    <div class="tri-card">
+        <h3>BEARING / CARDINAL ORIENTATION</h3>
+        <canvas id="bearingCompass" width="300" height="300"></canvas>
+
+        <div class="bearing-readout">
+            <div><span>Primary Bearing:</span> <strong id="primaryBearing">072° (ENE)</strong></div>
+            <div><span>Confidence:</span> <strong id="bearingConfidence">±6°</strong></div>
+            <div><span>Signal Class:</span> <strong>VHF FM</strong></div>
+        </div>
+    </div>
+
+    <!-- Receiver Bearings -->
+    <div class="tri-card">
+        <h3>RECEIVER BEARINGS</h3>
+        <table class="info-table">
+            <tr>
+                <th>Receiver</th>
+                <th>Bearing</th>
+                <th>RSSI</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td>ADS-B Node</td>
+                <td>068°</td>
+                <td>-61 dBm</td>
+                <td style="color:#00FF00;">● LOCK</td>
+            </tr>
+            <tr>
+                <td>Tx/Rx Node</td>
+                <td>081°</td>
+                <td>-67 dBm</td>
+                <td style="color:#FFB300;">● DEGRADED</td>
+            </tr>
+            <tr>
+                <td>Mesh Node</td>
+                <td>074°</td>
+                <td>-64 dBm</td>
+                <td style="color:#00FF00;">● LOCK</td>
+            </tr>
+        </table>
+    </div>
+    <!-- Triangulation Map -->
+    <div class="tri-card tri-map-card">
+        <h3>ESTIMATED SIGNAL ORIGIN</h3>
+        <div class="map-guard tri">
+            <div id="triangulationMap"></div>
+            <div class="map-overlay" aria-hidden="true"></div>
+        </div>
+        <div class="tri-meta">
+            <div><span>Estimated Error Radius:</span> <strong>±420 m</strong></div>
+            <div><span>Solution Quality:</span> <strong style="color:#00FF00;">HIGH</strong></div>
+            <div><span>Last Update:</span> <strong id="triUpdate">0.0s ago</strong></div>
+        </div>
+    </div>
+</div>
     </main>
+<!-- SIGNALS TRIANGULATION VISUALS -->
+<script>
+let triMap;
+let emitterMarker;
+let bearingLines = [];
+function initTriangulationMap() {
+    const mapEl = document.getElementById('triangulationMap');
+    if (!mapEl) {
+        console.error('Triangulation map container not found');
+        return;
+    }
+    triMap = L.map(mapEl, {
+        zoomControl: false,
+        attributionControl: false
+    }).setView([37.78, -122.42], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(triMap);
+    const receivers = [
+        { name: 'ADS-B', lat: 37.80, lon: -122.45, bearing: 68 },
+        { name: 'Tx/Rx', lat: 37.72, lon: -122.48, bearing: 81 },
+        { name: 'Mesh',  lat: 37.75, lon: -122.38, bearing: 74 }
+    ];
+    receivers.forEach(r => {
+        L.circleMarker([r.lat, r.lon], {
+            radius: 6,
+            color: '#00FF00',
+            fillOpacity: 1
+        }).addTo(triMap)
+          .bindTooltip(r.name);
+        drawBearing(r.lat, r.lon, r.bearing);
+    });
+    emitterMarker = L.circleMarker([37.77, -122.41], {
+        radius: 8,
+        color: '#FF1744',
+        fillOpacity: 0.85
+    }).addTo(triMap)
+      .bindPopup('Estimated Signal Origin');
+    setTimeout(() => triMap.invalidateSize(), 200);
+}
+function drawBearing(lat, lon, bearing) {
+    const distance = 0.35;
+    const rad = bearing * Math.PI / 180;
+    const endLat = lat + distance * Math.cos(rad);
+    const endLon = lon + distance * Math.sin(rad);
+    const line = L.polyline(
+        [[lat, lon], [endLat, endLon]],
+        {
+            color: '#FFB300',
+            weight: 2,
+            dashArray: '6,6'
+        }
+    ).addTo(triMap);
+    bearingLines.push(line);
+}
+/* === COMPASS === */
+function drawCompass(bearing) {
+    const canvas = document.getElementById('bearingCompass');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const c = canvas.width / 2;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle = '#00FF00';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(c, c, c - 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#00FF00';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('N', c, 16);
+    ctx.fillText('S', c, canvas.height - 6);
+    ctx.fillText('E', canvas.width - 10, c + 4);
+    ctx.fillText('W', 10, c + 4);
+    const rad = (bearing - 90) * Math.PI / 180;
+    ctx.strokeStyle = '#FF1744';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(c, c);
+    ctx.lineTo(
+        c + Math.cos(rad) * (c - 20),
+        c + Math.sin(rad) * (c - 20)
+    );
+    ctx.stroke();
+}
+function updateTriangulationDemo() {
+    const bearing = 70 + Math.random() * 10;
+    document.getElementById('primaryBearing').textContent =
+        `${bearing.toFixed(0)}°`;
+    drawCompass(bearing);
+}
+document.addEventListener('DOMContentLoaded', () => {
+    initTriangulationMap();
+    drawCompass(74);
+    setInterval(updateTriangulationDemo, 4000);
+});
+</script>
+<!--ADS-B / UAT Map Logic-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
         let map;
@@ -498,6 +666,7 @@
         initMap();
         loadAircraft();
     </script>
+    <!--Node Actions Modal-->
     <script>
 const modal = document.getElementById('node-modal');
 const modalNodeName = document.getElementById('modal-node-name');
@@ -527,6 +696,7 @@ document.querySelectorAll('.alert-icon').forEach(icon => {
   });
 });
 </script>
+<!--Toggle Sidebar Logic-->
 <script>
 function toggleSidebar() {
     const sidebar = document.getElementById('quick-sidebar');
@@ -534,49 +704,41 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
 }
 </script>
+<!--Collapse Sticky Top Nav On Scroll-->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const navbar = document.querySelector('.navbar');
     if (!navbar) return;
-
     let isCollapsed = false;
     const COLLAPSE_THRESHOLD = 10;
-
     function checkCollapse() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
         const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
-
         if (shouldCollapse !== isCollapsed) {
             navbar.classList.toggle('collapsed', shouldCollapse);
             isCollapsed = shouldCollapse;
         }
     }
-
     window.addEventListener('scroll', checkCollapse);
     checkCollapse(); // initial check in case page is already scrolled
 });
 </script>
+<!--Prevent Accidential Map Interactions-->
 <script>
 (() => {
     const mapGuard = document.querySelector('.map-guard');
     const overlay  = document.querySelector('.map-overlay');
-
     if (!mapGuard || !overlay) return;
-
     let blockTimer = null;
-
     mapGuard.addEventListener('mouseenter', () => {
         overlay.classList.add('active');
-
         blockTimer = setTimeout(() => {
             overlay.classList.remove('active');
             blockTimer = null;
         }, 900);
     });
-
     mapGuard.addEventListener('mouseleave', () => {
         overlay.classList.remove('active');
-
         if (blockTimer) {
             clearTimeout(blockTimer);
             blockTimer = null;

@@ -7,6 +7,20 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+  <!-- PENDING CHANGES BANNER -->
+<div id="pending-banner" class="pending-banner hidden">
+  <span>
+    ⚠ <strong id="pending-count">0</strong> unapplied configuration changes
+  </span>
+  <div class="pending-actions">
+    <button class="btn btn-warning" onclick="reviewPendingChanges()">
+      Review
+    </button>
+    <button class="btn btn-danger" onclick="applyPendingChanges()">
+      Apply
+    </button>
+  </div>
+</div>
 {% if demo_mode %}
 <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
 {% endif %}
@@ -18,11 +32,17 @@
     </button>
     <nav class="sidebar-content">
         <h4>Quick Nav Panel</h4>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
+        <a href="#">Deployment Profile</a>
+        <a href="#">Power & Hardware</a>
+        <a href="#">Failover & Autonomy</a>
+        <a href="#">Network & Mesh Behavior</a>
+        <a href="#">Security & Access Control</a>
+        <a href="#">Firewall Configuration</a>
+        <a href="#">Data Handling & OPSEC</a>
+        <a href="#">Secure Data Destruction</a>
+        <a href="#">Notifications</a>
+        <a href="#">Maintenance & Updates</a>
+        <a href="#">Auditing & Forensics</a>
     </nav>
 </aside>
 <nav class="navbar" id="main-navbar">
@@ -263,6 +283,100 @@
       <label class="checkbox"><input type="checkbox">Disable physical USB interfaces</label>
     </div>
   </section>
+<!-- NETWORK FIREWALL / UFW -->
+<section class="card settings-section danger-zone">
+  <h2>NETWORK FIREWALL (UFW)</h2>
+  <p class="section-desc">
+    Controls ingress and egress network exposure. Changes may immediately impact node reachability.
+  </p>
+  <div class="settings-grid firewall-header">
+    <label class="checkbox">
+      <input type="checkbox" checked>
+      Enable Host Firewall
+    </label>
+    <label>
+      Default Inbound Policy
+      <select>
+        <option selected>Deny</option>
+        <option>Allow</option>
+      </select>
+    </label>
+    <label>
+      Default Outbound Policy
+      <select>
+        <option selected>Allow</option>
+        <option>Deny</option>
+      </select>
+    </label>
+  </div>
+  <!-- RULE TABLE -->
+  <div class="firewall-rules">
+    <div class="rules-header">
+      <button class="btn btn-warning" onclick="openFirewallModal('add')">
+        + Add Rule
+      </button>
+    </div>
+    <table class="rules-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Port</th>
+          <th>Protocol</th>
+          <th>Source</th>
+          <th>Action</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>SSH</td>
+          <td>22</td>
+          <td>TCP</td>
+          <td>Trusted Subnet</td>
+          <td class="allow">ALLOW</td>
+          <td class="active">ACTIVE</td>
+          <td>
+            <button class="icon-btn" onclick="openFirewallModal('edit')">✎</button>
+            <button class="icon-btn danger" onclick="openFirewallModal('delete')">✕</button>
+          </td>
+        </tr>
+        <tr>
+          <td>Web UI</td>
+          <td>443</td>
+          <td>TCP</td>
+          <td>Cluster Mesh</td>
+          <td class="allow">ALLOW</td>
+          <td class="active">ACTIVE</td>
+          <td>
+            <button class="icon-btn" onclick="openFirewallModal('edit')">✎</button>
+            <button class="icon-btn danger" onclick="openFirewallModal('delete')">✕</button>
+          </td>
+        </tr>
+        <tr class="pending">
+          <td>Telemetry</td>
+          <td>5000–5010</td>
+          <td>UDP</td>
+          <td>Any</td>
+          <td class="deny">DENY</td>
+          <td class="pending">PENDING</td>
+          <td>
+            <button class="icon-btn" onclick="openFirewallModal('edit')">✎</button>
+            <button class="icon-btn danger" onclick="openFirewallModal('delete')">✕</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="rules-footer">
+      <span class="pending-warning">
+        ⚠ Pending firewall changes require confirmation
+      </span>
+      <button class="btn btn-danger" onclick="openFirewallApplyModal()">
+        Apply Firewall Changes
+      </button>
+    </div>
+  </div>
+</section>
   <!-- DATA HANDLING & OPSEC -->
   <section class="card settings-section">
     <h2>DATA HANDLING & OPSEC</h2>
@@ -287,6 +401,45 @@
       <label class="checkbox"><input type="checkbox">Allow export to removable media</label>
     </div>
   </section>
+<!-- SECURE DATA DESTRUCTION POLICY -->
+<section class="card settings-section danger-zone">
+  <h2>SECURE DATA DESTRUCTION</h2>
+  <p class="section-desc danger-text">
+    These actions permanently destroy locally stored data. They are irreversible and may
+    render the system inoperable until re-provisioned.
+  </p>
+
+  <div class="settings-grid">
+    <label>
+      Automatic Data Purge Timer
+      <span class="tooltip-icon"
+            title="Automatically purge stored data after a defined period of inactivity or mission completion.">
+        ?
+      </span>
+      <select onchange="markPendingChange()">
+        <option>Disabled</option>
+        <option>After 24 hours</option>
+        <option selected>After 72 hours</option>
+        <option>After 7 days</option>
+      </select>
+    </label>
+
+    <label class="checkbox">
+      <input type="checkbox" onchange="markPendingChange()">
+      Require operator confirmation before auto-purge
+    </label>
+  </div>
+
+  <div class="destruction-actions">
+    <button class="btn btn-warning" onclick="openDestructionModal('manual')">
+      Manual Secure Purge
+    </button>
+
+    <button class="btn btn-danger" onclick="openDestructionModal('emergency')">
+      EMERGENCY WIPE
+    </button>
+  </div>
+</section>
   <!-- ALERTING & NOTIFICATIONS -->
   <section class="card settings-section">
     <h2>ALERTING & NOTIFICATIONS</h2>
@@ -337,7 +490,7 @@
     </div>
   </section>
 </main>
-<!-- Node Modal -->
+<!-- Node Actions Modal -->
 <div id="node-modal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeNodeModal()">&times;</span>
@@ -346,6 +499,145 @@
     <button onclick="runDiagnostics()">Run Diagnostics</button>
   </div>
 </div>
+<!-- FIREWALL CONFIRM MODAL -->
+<div id="firewall-modal" class="modal">
+  <div class="modal-content wide">
+    <span class="close" onclick="closeFirewallModal()">&times;</span>
+
+    <h3>Confirm Network Security Changes</h3>
+
+    <p class="modal-warning">
+      You are about to modify firewall rules. Incorrect settings may result in
+      loss of remote access or node isolation.
+    </p>
+
+    <div class="modal-summary">
+      <h4>Pending Changes</h4>
+      <ul>
+        <li>DENY UDP 5000–5010 from Any</li>
+        <li>ALLOW TCP 22 from Trusted Subnet</li>
+      </ul>
+    </div>
+
+    <label class="checkbox modal-ack">
+      <input type="checkbox">
+      I understand these changes may disrupt connectivity
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeFirewallModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="applyFirewallChanges()">
+        Apply Changes
+      </button>
+    </div>
+  </div>
+</div>
+<!-- DATA DESTRUCTION MODAL -->
+<div id="destruction-modal" class="modal">
+  <div class="modal-content wide">
+    <span class="close" onclick="closeDestructionModal()">&times;</span>
+
+    <h3 class="danger-text">⚠ DATA DESTRUCTION CONFIRMATION</h3>
+
+    <p class="modal-warning">
+      This action will permanently destroy stored data on this system.
+      Recovery will not be possible.
+    </p>
+
+    <div class="modal-summary">
+      <ul>
+        <li>Captured data</li>
+        <li>Logs and forensic artifacts</li>
+        <li>Cached mission state</li>
+      </ul>
+    </div>
+
+    <label class="checkbox modal-ack">
+      <input type="checkbox" id="destruction-ack">
+      I understand this action is irreversible
+    </label>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeDestructionModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDestruction()">
+        Confirm Destruction
+      </button>
+    </div>
+  </div>
+</div>
+<!--Secure Desctuction Modal-->
+<script>
+let destructionMode = null;
+function openDestructionModal(mode) {
+  destructionMode = mode;
+  document.getElementById('destruction-ack').checked = false;
+  document.getElementById('destruction-modal').style.display = 'block';
+}
+function closeDestructionModal() {
+  document.getElementById('destruction-modal').style.display = 'none';
+  destructionMode = null;
+}
+function confirmDestruction() {
+  const ack = document.getElementById('destruction-ack');
+  if (!ack.checked) {
+    alert('You must acknowledge the warning before proceeding.');
+    return;
+  }
+  alert(
+    destructionMode === 'emergency'
+      ? 'Emergency wipe triggered (demo mode)'
+      : 'Manual secure purge initiated (demo mode)'
+  );
+  closeDestructionModal();
+}
+</script>
+<!--Pending Changes Banner-->
+<script>
+let pendingChanges = 0;
+function markPendingChange() {
+  pendingChanges++;
+  updatePendingBanner();
+}
+function updatePendingBanner() {
+  const banner = document.getElementById('pending-banner');
+  const count = document.getElementById('pending-count');
+  count.textContent = pendingChanges;
+  if (pendingChanges > 0) {
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
+}
+function reviewPendingChanges() {
+  alert('Reviewing pending changes (demo)');
+}
+function applyPendingChanges() {
+  alert('Applying all pending changes (demo)');
+  pendingChanges = 0;
+  updatePendingBanner();
+}
+</script>
+<!--Firewall Confirm Changes Modal-->
+<script>
+const fwModal = document.getElementById('firewall-modal');
+function openFirewallModal(mode) {
+  fwModal.style.display = 'block';
+}
+function openFirewallApplyModal() {
+  fwModal.style.display = 'block';
+}
+function closeFirewallModal() {
+  fwModal.style.display = 'none';
+}
+function applyFirewallChanges() {
+  alert('Firewall changes applied (demo)');
+  fwModal.style.display = 'none';
+}
+window.addEventListener('click', e => {
+  if (e.target === fwModal) closeFirewallModal();
+});
+</script>
+<!--Node Actions Modal Logic-->
 <script>
 const modal = document.getElementById('node-modal');
 const modalNodeName = document.getElementById('modal-node-name');
@@ -375,6 +667,7 @@ document.querySelectorAll('.alert-icon').forEach(icon => {
   });
 });
 </script>
+<!--Toggle Sidebar Logic-->
 <script>
 function toggleSidebar() {
     const sidebar = document.getElementById('quick-sidebar');
@@ -382,37 +675,32 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
 }
 </script>
+<!--Collapse Sticky Top Nav On Scroll-->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const navbar = document.querySelector('.navbar');
     if (!navbar) return;
-
     let isCollapsed = false;
     const COLLAPSE_THRESHOLD = 10;
-
     function checkCollapse() {
         const scrollTop = window.scrollY || document.documentElement.scrollTop;
         const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
-
         if (shouldCollapse !== isCollapsed) {
             navbar.classList.toggle('collapsed', shouldCollapse);
             isCollapsed = shouldCollapse;
         }
     }
-
     window.addEventListener('scroll', checkCollapse);
     checkCollapse(); // initial check in case page is already scrolled
 });
 </script>
+<!--Overlay To Prevent Accidential Map Interaction-->
 <script>
 (() => {
     const mapGuard = document.querySelector('.map-guard');
     const overlay  = document.querySelector('.map-overlay');
-
     if (!mapGuard || !overlay) return;
-
     let blockTimer = null;
-
     mapGuard.addEventListener('mouseenter', () => {
         overlay.classList.add('active');
 
@@ -421,7 +709,6 @@ document.addEventListener('DOMContentLoaded', () => {
             blockTimer = null;
         }, 900);
     });
-
     mapGuard.addEventListener('mouseleave', () => {
         overlay.classList.remove('active');
 
