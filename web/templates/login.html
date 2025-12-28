@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cluster Dashboard Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+
+        <!-- LEFT PANEL: Tactical / notification / animation -->
+        <div class="login-left">
+            <div class="login-info">
+                <h1>Modern Warrior Systems Cluster Dashboard</h1>
+                <p>Monitor, manage, and control your nodes in real time. Enterprise-grade cluster operations with tactical insights.</p>
+
+                <div class="notification-panel">
+                    <h3>System Notifications</h3>
+                    <ul>
+                        <li><span class="status online"></span> Boot node online</li>
+                        <li><span class="status warning"></span> Mesh network latency high</li>
+                        <li><span class="status offline"></span> VHF node offline</li>
+                        <li><span class="status online"></span> ISR feed active</li>
+                    </ul>
+                </div>
+
+                <div class="visual-animation">
+                    <div class="node node1"></div>
+                    <div class="node node2"></div>
+                    <div class="node node3"></div>
+                    <div class="node node4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: Login form -->
+        <div class="login-right">
+            <div class="login-card">
+                <h2>Sign in to Cluster Dashboard</h2>
+                <p>Enter your credentials to access tactical control and monitoring tools.</p>
+
+                {% if error %}
+                    <div class="login-error">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('login') }}">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+                    <button type="submit">Sign In</button>
+                </form>
+
+                <div class="login-footer">
+                    &copy; {{ current_year }} Cluster Dashboard. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -19,7 +19,7 @@ import socket
 from datetime import datetime
 from functools import wraps
 
-from flask import Flask, render_template, jsonify, request, session
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_cors import CORS
 
 # Local configuration
@@ -83,6 +83,42 @@ app.secret_key = os.getenv('SECRET_KEY', 'tactical-ops-default-key')
 CORS(app)
 
 ################################################################################
+# AUTHENTICATION AND BOOT LANDING PAGE
+################################################################################
+
+USERS = {'admin': os.getenv('ADMIN_PASSWORD', 'admin123')}
+
+def login_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if USERS.get(username) == password:
+            session['user'] = username
+            return redirect(request.args.get('next') or url_for('boot_landing'))
+        return render_template('login.html', error='Invalid credentials')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
+
+@app.route('/boot')
+@login_required
+def boot_landing():
+    """Dashboard boot landing / preloader page"""
+    return render_template('boot_landing.html')
+
+################################################################################
 # UTILITIES
 ################################################################################
 
@@ -113,7 +149,6 @@ class ClusterAPI:
     def get_node_health(node_id):
         """Get node health metrics"""
         if DEMO_MODE:
-            # Return realistic demo data
             return {
                 'status': 'online',
                 'uptime': '45 days 12:34:56',
@@ -125,7 +160,6 @@ class ClusterAPI:
             }
         
         try:
-            # Execute health check remotely
             node_ip = NODES.get(node_id, {}).get('ip')
             result = subprocess.run(
                 ['ssh', '-o', 'StrictHostKeyChecking=no', f'pi@{node_ip}',
@@ -133,8 +167,6 @@ class ClusterAPI:
                 capture_output=True,
                 timeout=10
             )
-            
-            # Parse output and return formatted data
             return {'status': 'online'} if result.returncode == 0 else {'status': 'offline'}
         except:
             return {'status': 'offline'}
@@ -452,7 +484,6 @@ def api_performance_summary():
             'timestamp': datetime.now().isoformat()
         })
     
-    # Would execute performance-monitor.sh and parse results
     return jsonify({'error': 'Performance data not available'}), 503
 
 @app.route('/api/performance/<node_id>')
@@ -481,11 +512,9 @@ def api_performance_node(node_id):
 def api_isr_adsb_aircraft():
     """Get list of currently tracked aircraft (ADSB)"""
     if DEMO_MODE:
-        # Return realistic demo aircraft data
         import random
         aircraft = []
         callsigns = ['AAL123', 'UAL456', 'DAL789', 'SWA101', 'JBU202', 'SKW303', 'ASA404']
-        
         for i, cs in enumerate(callsigns):
             aircraft.append({
                 'icao': f'A{i:05X}',
@@ -496,10 +525,8 @@ def api_isr_adsb_aircraft():
                 'speed': random.randint(300, 500),
                 'heading': random.randint(0, 360)
             })
-        
         return jsonify({'aircraft': aircraft})
     
-    # Production: Query actual dump1090 API
     try:
         result = subprocess.run(
             ['curl', '-s', 'http://192.168.1.20:8080/data/aircraft.json'],
@@ -540,14 +567,11 @@ def api_node_tool_status(node_id):
         return jsonify({'error': 'Node not found'}), 404
     
     if DEMO_MODE:
-        # Return demo tool status
         node = NODES[node_id]
         tools_status = {}
-        
         for category, tools in node['tools'].items():
             tools_status[category] = {}
             for tool in tools:
-                # Mark PLACEHOLDER tools as "not_installed"
                 if 'PLACEHOLDER' in tool:
                     tools_status[category][tool] = {
                         'installed': False,
@@ -560,14 +584,12 @@ def api_node_tool_status(node_id):
                         'running': tool not in ['Alert Config', 'Route Optimization'],
                         'status': 'running' if tool not in ['Alert Config', 'Route Optimization'] else 'idle'
                     }
-        
         return jsonify({
             'node_id': node_id,
             'timestamp': datetime.now().isoformat(),
             'tools_status': tools_status
         })
     
-    # Production: Query actual tool status
     return jsonify({'error': 'Tool status not available in production'}), 503
 
 @app.route('/api/nodes/<node_id>/tool/<tool_name>', methods=['GET', 'POST'])
@@ -588,7 +610,6 @@ def api_node_tool_action(node_id, tool_name):
             'timestamp': datetime.now().isoformat()
         })
     
-    # Production: Execute tool action via SSH
     result = ClusterAPI.execute_command(node_id, f'which {tool_name}')
     return jsonify(result) if result.get('success') else \
            jsonify({'error': f'{tool_name} not found on {node_id}'}), 404
@@ -614,7 +635,6 @@ def api_cluster_node_summary():
             })
         return jsonify(summary)
     
-    # Production: Gather actual data
     summary = []
     for node_id, node_info in NODES.items():
         online = ClusterAPI.ping_node(node_id)
