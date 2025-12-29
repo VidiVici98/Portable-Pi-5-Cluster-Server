@@ -7,124 +7,18 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
-<body>
+<body data-page="isr">
     {% if demo_mode %}
-    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    <navbar class="demo-mode">⚠ DEMO MODE - No Cluster Connected</navbar>
     {% endif %}
     <!-- Collapsible Quick Nav Sidebar -->
-<aside id="quick-sidebar" class="quick-sidebar collapsed">
-    <button class="sidebar-toggle vertical-label" onclick="toggleSidebar()" title="Quick Navigation">
-        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Drag_Horizontal"> <g id="Vector"> <path d="M18 14C17.4477 14 17 14.4477 17 15C17 15.5523 17.4477 16 18 16C18.5523 16 19 15.5523 19 15C19 14.4477 18.5523 14 18 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 14C11.4477 14 11 14.4477 11 15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15C13 14.4477 12.5523 14 12 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 14C5.44772 14 5 14.4477 5 15C5 15.5523 5.44772 16 6 16C6.55228 16 7 15.5523 7 15C7 14.4477 6.55228 14 6 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18 8C17.4477 8 17 8.44772 17 9C17 9.55228 17.4477 10 18 10C18.5523 10 19 9.55228 19 9C19 8.44772 18.5523 8 18 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 8C11.4477 8 11 8.44772 11 9C11 9.55228 11.4477 10 12 10C12.5523 10 13 9.55228 13 9C13 8.44772 12.5523 8 12 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 8C5.44772 8 5 8.44772 5 9C5 9.55228 5.44772 10 6 10C6.55228 10 7 9.55228 7 9C7 8.44772 6.55228 8 6 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>
-        Quick Nav Panel
-    </button>
-    <nav class="sidebar-content">
-        <h4>Quick Nav Panel</h4>
-        <a href="#adsb-section">ADS-B / UAT</a>
-        <a href="#controls-section">Tracking Controls</a>
-        <a href="#map-section">Live Map</a>
-        <a href="#aircraft-section">Aircraft List</a>
-        <a href="#">SDR Frequency Control</a>
-        <a href="#">Signal Analysis</a>
-        <a href="#">Reciever Status</a>
-        <a href="#">Inbound Signals Triangulation</a>
-    </nav>
-</aside>
-<nav class="navbar" id="main-navbar">
-    <!-- COLLAPSE ANCHOR (REQUIRED) -->
-    <div class="nav-collapse-anchor">
-        <!-- Left column: brand + nav links -->
-        <div class="nav-left">
-            <div class="nav-brand">⌘ Modern Warrior Systems</div>
-            <div class="nav-links">
-                <a href="/">Dashboard</a>
-                <a href="/monitor">Cluster Health</a>
-                <a href="/control">Control</a>
-                <div class="nav-dropdown">
-                    <a href="/tools" class="nav-parent active">Tools</a>
-                    <div class="dropdown-menu">
-                        <a href="/isr" class="active">ADSB / UAT / SDR</a>
-                        <a href="/mesh">Mesh Networking</a>
-                        <a href="/vhf">RF Communication</a>
-                        <a href="/backup">Backup & Restore</a>
-                    </div>
-                </div>
-                <a href="/settings">Settings</a>
-                <!-- Tactical alert icon -->
-                <div class="nav-alert">
-                    <button href="#" class="alert-icon" title="Notifications">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        <span class="alert-badge">3</span>
-                        <div class="alert-panel">
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    ADS-B Node high temp <span class="alert-meta">71°C</span>
-                                </div>
-                            </div>
-                            <div class="alert-item alert-down">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Tx/Rx Node offline
-                                </div>
-                            </div>
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Mesh Node CPU high <span class="alert-meta">88%</span>
-                                </div>
-                            </div>
-                            <div class="alert-logs">
-                                <div class="alert-log">[12:02] ADS-B Node temp spike detected</div>
-                                <div class="alert-log">[12:01] Tx/Rx Node lost connectivity</div>
-                                <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
-                            </div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Right column: node status -->
-        <div class="nav-status">
-            <div class="node-status ok">
-                <button class="node-btn" title="Reboot Boot Node">⭮</button>
-                Boot
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:45%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status warn">
-                <button class="node-btn" title="Reboot ADS-B Node">⭮</button>
-                ADS-B
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:78%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:71%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status ok">
-                <button class="node-btn" title="Reboot Mesh Node">⭮</button>
-                Mesh
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status down">
-                <button class="node-btn" title="Reboot Tx/Rx Node">⭮</button>
-                Tx/Rx
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                </div>
-            </div>
-        </div>
+    {% include 'components/sidebar.html' %}
+    <div id="content">
+        <!-- page-specific content -->
     </div>
+<!--Header Embed Container-->
+<nav class="navbar" id="main-navbar">
+        <div id="header-container"></div>
 </nav>
     <main class="container">
         <section class="panel" id="adsb-section">
@@ -403,192 +297,363 @@
     </div>
 </div>
     </main>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<!--ADS-B / UAT Map Logic-->
+    <script src="https://rawcdn.githack.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>
     <script>
-        let triangulationMap;
-        function initTriangulationMap() {
-            const mapEl = document.getElementById('triangulationMap');
-            if (!mapEl) return;
-            triangulationMap = L.map('triangulationMap', {
-                center: [37.7749, -122.4194],
-                zoom: 10
-            });
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(triangulationMap);
+        // Node positions for triangulation
+        const nodes = {
+            "Tx/Rx Node": { lat: 37.7750, lon: -122.4183 },
+            "Mesh Node": { lat: 37.7765, lon: -122.4170 },
+            "ADS-B Node": { lat: 37.7740, lon: -122.4190 } // ignored for triangulation
+        };
+        // Convert degrees to radians
+        function deg2rad(deg) {
+            return deg * Math.PI / 180;
         }
-        // Initialize triangulation map when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            initTriangulationMap();
+        // Simple triangulation: intersect two bearings
+        function triangulate(nodeData) {
+            const nodeKeys = Object.keys(nodeData).filter(k => k !== 'ADS-B Node');
+            if (nodeKeys.length < 2) return null;
+            const [nodeA, nodeB] = nodeKeys;
+            const posA = nodes[nodeA];
+            const posB = nodes[nodeB];
+            const bearingA = parseFloat(document.querySelector(
+                `tr:has(td:contains("${nodeA}")) td:nth-child(2)`
+            )?.textContent) || 0;
+            const bearingB = parseFloat(document.querySelector(
+                `tr:has(td:contains("${nodeB}")) td:nth-child(2)`
+            )?.textContent) || 0;
+            const thetaA = deg2rad(bearingA);
+            const thetaB = deg2rad(bearingB);
+            const x1 = posA.lon, y1 = posA.lat;
+            const x2 = posB.lon, y2 = posB.lat;
+            const m1 = Math.tan(thetaA);
+            const m2 = Math.tan(thetaB);
+            const denom = m1 - m2;
+            if (Math.abs(denom) < 0.0001) return null;
+           const x = (m1*x1 - m2*x2 + y2 - y1) / denom;
+            const y = y1 + m1 * (x - x1);
+            return [y, x];
+        }
+        function updateTriangulation() {
+            const estimated = triangulate(nodes);
+            if (!estimated) return;
+            const [lat, lon] = estimated;
+            // Use global marker variables
+            if (!window.triangulationMarker) {
+                window.triangulationMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        html: '<div style="background:#FF1744;color:#000;padding:4px 8px;border-radius:3px;font-size:12px;font-weight:bold;border:2px solid #FF1744;box-shadow:0 0 10px rgba(255,23,68,0.5)">ESTIMATED ORIGIN</div>',
+                        className: 'tri-marker',
+                        iconSize: [100, 30],
+                        iconAnchor: [50, 15]
+                    })
+                }).addTo(triangulationMap);
+            } else {
+                window.triangulationMarker.setLatLng([lat, lon]);
+            }
+            const errorRadiusMeters = 420;
+            if (!window.errorCircle) {
+                window.errorCircle = L.circle([lat, lon], {
+                    radius: errorRadiusMeters,
+                    color: '#FF1744',
+                    fillColor: 'rgba(255,23,68,0.1)',
+                    weight: 2
+                }).addTo(triangulationMap);
+            } else {
+                window.errorCircle.setLatLng([lat, lon]);
+                window.errorCircle.setRadius(errorRadiusMeters);
+            }
+    frameTriangulationMap(lat, lon);
+
+        }
+        setInterval(updateTriangulation, 3000);
+    </script>
+<script>
+/* ===== MAP FRAMING HELPER ===== */
+function fitMapToPoints(map, points, options = {}) {
+    if (!map || !points || points.length === 0) return;
+
+    const bounds = L.latLngBounds(points);
+
+    map.fitBounds(bounds, {
+        padding: options.padding || [40, 40],
+        maxZoom: options.maxZoom || 15,
+        animate: options.animate !== false
+    });
+}
+</script>
+
+    <!--ADS-B / UAT Map Logic-->
+<script>
+    let map;
+    let aircraft = [];
+    let markers = {};
+    let selectedAircraftId = null;
+    let trackingEnabled = false;
+    let refreshInterval = 5;
+    let planeIcon; // initialized AFTER Leaflet exists
+
+    // Initialize map
+    function initMap() {
+        map = L.map('map').setView([37.7749, -122.4194], 8);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(map);
+
+
+        // Plane icon MUST be created after Leaflet loads
+        planeIcon = L.icon({
+            iconUrl: '/static/icons/plane-icon.svg',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20] // center rotation
         });
-    </script>
-<!--ADS-B / UAT Map Logic-->
-    <script>
-        let map;
-        let aircraft = [];
-        let markers = {};
-        let selectedAircraftId = null;
-        let trackingEnabled = false;
-        let refreshInterval = 5;
-        // Initialize map
-        function initMap() {
-            map = L.map('map').setView([37.7749, -122.4194], 8);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(map);
-        }
-        // Load aircraft data
-        async function loadAircraft() {
-            try {
-                const response = await fetch('/api/nodes/isr/adsb/aircraft');
-                const data = await response.json();
-                aircraft = data.aircraft || [];
-                updateAircraftDisplay();
-                updateStats();
-                updateMap();
-                updateAircraftList();
-            } catch (error) {
-                console.error('Error loading aircraft:', error);
-            }
-        }
-        // Update aircraft display on map
-        function updateMap() {
-            // Clear old markers
-            for (const id in markers) {
-                map.removeLayer(markers[id]);
-            }
-            markers = {};
-            // Add new markers
-            aircraft.forEach(ac => {
-                if (ac.latitude && ac.longitude) {
-                    const icon = L.divIcon({
-                        html: `<div style="
-                            background: #00FF00;
-                            color: #000;
-                            padding: 4px 8px;
-                            border-radius: 3px;
-                            font-size: 11px;
-                            font-weight: bold;
-                            border: 2px solid #00FF00;
-                            box-shadow: 0 0 10px rgba(0,255,0,0.5);
-                        ">${ac.callsign || ac.icao}</div>`,
-                        className: 'aircraft-marker',
-                        iconSize: [80, 25],
-                        iconAnchor: [40, 12]
-                    });
-                    const marker = L.marker([ac.latitude, ac.longitude], { icon })
-                        .bindPopup(`
-                            <strong>${ac.callsign || 'Unknown'}</strong><br>
-                            ICAO: ${ac.icao}<br>
-                            Alt: ${ac.altitude} ft<br>
-                            Speed: ${ac.speed} kts
-                        `)
-                        .addTo(map)
-                        .on('click', () => selectAircraft(ac));
-                    
-                    markers[ac.icao] = marker;
-                }
-            });
-        }
-        // Update aircraft list
-        function updateAircraftList() {
-            const container = document.getElementById('aircraftListContainer');
-            if (aircraft.length === 0) {
-                container.innerHTML = '<div style="color: #AAA; text-align: center; padding: 20px;">No aircraft detected</div>';
-                return;
-            }
-            container.innerHTML = aircraft.map(ac => `
-                <div class="aircraft-item ${ac.icao === selectedAircraftId ? 'selected' : ''}" 
-                     onclick="selectAircraft(${JSON.stringify(ac).replace(/"/g, '&quot;')})">
-                    <div class="callsign">${ac.callsign || 'UNKNOWN'}</div>
-                    <div class="icao">${ac.icao}</div>
-                    <div class="stats">
-                        <strong>${ac.altitude}</strong> ft<br>
-                        <strong>${ac.speed}</strong> kts<br>
-                        ${ac.heading ? '<strong>Hdg:</strong> ' + ac.heading + '°<br>' : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-        // Select aircraft and show details
-        function selectAircraft(ac) {
-            selectedAircraftId = ac.icao;
-            const details = document.getElementById('selectedAircraft');
-            details.innerHTML = `
-                <div style="text-align: left;">
-                    <h4 style="color: #00FF00; margin: 0 0 10px 0;">${ac.callsign || 'UNKNOWN'}</h4>
-                    <table style="width: 100%; font-size: 12px; color: #AAA;">
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>ICAO:</strong></td>
-                            <td style="color: #00FF00;">${ac.icao}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>Altitude:</strong></td>
-                            <td style="color: #00FF00;">${ac.altitude} ft</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>Speed:</strong></td>
-                            <td style="color: #00FF00;">${ac.speed} kts</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>Heading:</strong></td>
-                            <td style="color: #00FF00;">${ac.heading || 'N/A'}°</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>Position:</strong></td>
-                            <td style="color: #00FF00;">${ac.latitude?.toFixed(4)}, ${ac.longitude?.toFixed(4)}</td>
-                        </tr>
-                    </table>
-                </div>
-            `;
+    }
+
+    // Load aircraft data
+    async function loadAircraft() {
+        try {
+            const response = await fetch('/api/nodes/isr/adsb/aircraft');
+            const data = await response.json();
+
+            aircraft = data.aircraft || [];
+
+            updateAircraftDisplay();
+            updateStats();
+            updateMap();
             updateAircraftList();
+        } catch (error) {
+            console.error('Error loading aircraft:', error);
         }
-        // Update statistics
-        function updateStats() {
-            document.getElementById('aircraftCount').textContent = aircraft.length;
-            document.getElementById('messageRate').textContent = Math.floor(Math.random() * 100 + 50);
-            if (aircraft.length > 0) {
-                const maxAlt = Math.max(...aircraft.map(a => a.altitude || 0));
-                const avgSpeed = Math.round(aircraft.reduce((sum, a) => sum + (a.speed || 0), 0) / aircraft.length);
-                document.getElementById('maxAltitude').textContent = `${maxAlt} ft`;
-                document.getElementById('avgSpeed').textContent = `${avgSpeed} kts`;
+    }
+
+    // Update aircraft display on map
+    function updateMap() {
+        const seen = new Set();
+
+        aircraft.forEach(ac => {
+            if (!ac.latitude || !ac.longitude || !ac.icao) return;
+
+            seen.add(ac.icao);
+
+            const heading =
+                typeof ac.heading === 'number' ? ac.heading : 0;
+
+            // EXISTING marker → move + rotate
+            if (markers[ac.icao]) {
+                markers[ac.icao]
+                    .setLatLng([ac.latitude, ac.longitude])
+                    .setRotationAngle(heading);
+                return;
+
+            }
+
+            // NEW marker → create once
+            const marker = L.marker(
+                [ac.latitude, ac.longitude],
+                {
+                    icon: planeIcon,
+                    rotationAngle: heading,
+                    rotationOrigin: 'center center'
+                }
+            )
+            .addTo(map)
+            .bindPopup(`
+                <strong>${ac.callsign || 'Unknown'}</strong><br>
+                ICAO: ${ac.icao}<br>
+                Alt: ${ac.altitude} ft<br>
+                Speed: ${ac.speed} kts<br>
+                Heading: ${ac.heading ?? 'N/A'}°
+            `)
+            .on('click', () => selectAircraft(ac));
+
+            markers[ac.icao] = marker;
+        });
+
+        // Remove stale aircraft markers
+        for (const icao in markers) {
+            if (!seen.has(icao)) {
+                map.removeLayer(markers[icao]);
+                delete markers[icao];
             }
         }
-        // Update display
-        function updateAircraftDisplay() {
-            // Apply filters
-            const typeFilter = document.getElementById('typeFilter').value;
-            const minAlt = parseInt(document.getElementById('minAltitude').value) || 0;
-            if (typeFilter) {
-                // Filter logic would go here
-            }
+            updateBearingRays(
+    selectedAircraftId
+        ? aircraft.filter(a => a.icao === selectedAircraftId)
+        : aircraft
+);
+
+/* Auto-frame ADS-B map */
+const framePoints = aircraft
+    .filter(a => a.latitude && a.longitude)
+    .map(a => [a.latitude, a.longitude]);
+
+if (window.nodes) {
+    Object.values(nodes).forEach(n => framePoints.push([n.lat, n.lon]));
+}
+
+fitMapToPoints(map, framePoints, { maxZoom: 12 });
+
+    }
+
+    // Update aircraft list
+    function updateAircraftList() {
+        const container = document.getElementById('aircraftListContainer');
+
+        if (aircraft.length === 0) {
+            container.innerHTML =
+                '<div style="color: #AAA; text-align: center; padding: 20px;">No aircraft detected</div>';
+            return;
         }
-        // Toggle tracking
-        function toggleTracking() {
-            trackingEnabled = !trackingEnabled;
-            const btn = event.target;
-            btn.textContent = trackingEnabled ? '⏹ Stop Tracking' : '▶ Start Tracking';
-            btn.className = trackingEnabled ? 'btn btn-danger' : 'btn btn-primary';
-            if (trackingEnabled) {
-                loadAircraft();
-                startAutoRefresh();
-            }
+
+        container.innerHTML = aircraft.map(ac => `
+            <div class="aircraft-item ${ac.icao === selectedAircraftId ? 'selected' : ''}"
+                 onclick="selectAircraft(${JSON.stringify(ac).replace(/"/g, '&quot;')})">
+                <div class="callsign">${ac.callsign || 'UNKNOWN'}</div>
+                <div class="icao">${ac.icao}</div>
+                <div class="stats">
+                    <strong>${ac.altitude}</strong> ft<br>
+                    <strong>${ac.speed}</strong> kts<br>
+                    ${typeof ac.heading === 'number'
+                        ? `<strong>Hdg:</strong> ${ac.heading}°<br>`
+                        : ''}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Select aircraft
+    function selectAircraft(ac) {
+        selectedAircraftId = ac.icao;
+
+        const details = document.getElementById('selectedAircraft');
+        details.innerHTML = `
+            <div style="text-align: left;">
+                <h4 style="color: #00FF00; margin: 0 0 10px 0;">
+                    ${ac.callsign || 'UNKNOWN'}
+                </h4>
+                <table style="width: 100%; font-size: 12px; color: #AAA;">
+                    <tr><td><strong>ICAO:</strong></td><td style="color:#00FF00">${ac.icao}</td></tr>
+                    <tr><td><strong>Altitude:</strong></td><td style="color:#00FF00">${ac.altitude} ft</td></tr>
+                    <tr><td><strong>Speed:</strong></td><td style="color:#00FF00">${ac.speed} kts</td></tr>
+                    <tr><td><strong>Heading:</strong></td><td style="color:#00FF00">${ac.heading ?? 'N/A'}°</td></tr>
+                    <tr>
+                        <td><strong>Position:</strong></td>
+                        <td style="color:#00FF00">
+                            ${ac.latitude?.toFixed(4)}, ${ac.longitude?.toFixed(4)}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        `;
+
+        updateAircraftList();
+    }
+
+    // Update statistics
+    function updateStats() {
+        document.getElementById('aircraftCount').textContent = aircraft.length;
+        document.getElementById('messageRate').textContent =
+            Math.floor(Math.random() * 100 + 50);
+
+        if (aircraft.length > 0) {
+            const maxAlt = Math.max(...aircraft.map(a => a.altitude || 0));
+            const avgSpeed = Math.round(
+                aircraft.reduce((sum, a) => sum + (a.speed || 0), 0) / aircraft.length
+            );
+
+            document.getElementById('maxAltitude').textContent = `${maxAlt} ft`;
+            document.getElementById('avgSpeed').textContent = `${avgSpeed} kts`;
         }
-        // Auto-refresh
-        function startAutoRefresh() {
-            refreshInterval = parseInt(document.getElementById('refreshInterval').value) || 5;
-            if (trackingEnabled) {
-                loadAircraft();
-                setTimeout(startAutoRefresh, refreshInterval * 1000);
-            }
+    }
+
+    // Placeholder for filters
+    function updateAircraftDisplay() {
+        const typeFilter = document.getElementById('typeFilter').value;
+        const minAlt = parseInt(document.getElementById('minAltitude').value) || 0;
+    }
+
+    // Toggle tracking
+    function toggleTracking() {
+        trackingEnabled = !trackingEnabled;
+
+        const btn = event.target;
+        btn.textContent = trackingEnabled ? '⏹ Stop Tracking' : '▶ Start Tracking';
+        btn.className = trackingEnabled ? 'btn btn-danger' : 'btn btn-primary';
+
+        if (trackingEnabled) {
+            loadAircraft();
+            startAutoRefresh();
         }
-        // Initialize
-        initMap();
-        loadAircraft();
-    </script>
+    }
+
+    // Auto-refresh
+    function startAutoRefresh() {
+        refreshInterval =
+            parseInt(document.getElementById('refreshInterval').value) || 5;
+
+        if (trackingEnabled) {
+            loadAircraft();
+            setTimeout(startAutoRefresh, refreshInterval * 1000);
+        }
+    }
+
+    // Initialize
+    initMap();
+    loadAircraft();
+</script>
+<script>
+/* ===== ADS-B BEARING RAYS ===== */
+
+const bearingRays = {};
+
+/* Simple geographic bearing ray */
+function bearingRay(lat, lon, bearingDeg, lengthKm = 80) {
+    const rad = bearingDeg * Math.PI / 180;
+    const dLat = (Math.cos(rad) * lengthKm) / 111;
+    const dLon = (Math.sin(rad) * lengthKm) / (111 * Math.cos(lat * Math.PI / 180));
+
+    return [
+        [lat, lon],
+        [lat + dLat, lon + dLon]
+    ];
+}
+
+function updateBearingRays(aircraftList) {
+    if (!map || !window.nodes) return;
+
+    /* Clear old rays */
+    Object.values(bearingRays).forEach(ray => map.removeLayer(ray));
+    Object.keys(bearingRays).forEach(k => delete bearingRays[k]);
+
+    aircraftList.forEach(ac => {
+        if (!ac.heading || !ac.icao) return;
+
+        Object.entries(nodes).forEach(([nodeName, node]) => {
+            const key = `${nodeName}-${ac.icao}`;
+
+            const path = bearingRay(
+                node.lat,
+                node.lon,
+                ac.heading,
+                80
+            );
+
+            bearingRays[key] = L.polyline(path, {
+                color: '#FFB300',
+                weight: 1.5,
+                dashArray: '6,4',
+                opacity: 0.7
+            }).addTo(map);
+        });
+    });
+}
+</script>
+
 <!--Demo Waterfall Logic-->
     <script>
         (() => {
@@ -872,6 +937,21 @@
             }, 3000);
         });
     </script>
+    <script>
+    let triangulationMap;
+
+    function initTriangulationMap() {
+        triangulationMap = L.map('triangulationMap', {
+            zoomControl: false,
+            attributionControl: false
+        }).setView([37.7749, -122.4194], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(triangulationMap);
+    }
+    document.addEventListener('DOMContentLoaded', initTriangulationMap);
+</script>
 <!--Triangulation Markers-->
     <script>
         // Global variables (declare once)
@@ -949,74 +1029,23 @@
         });
     </script>
 <!--Triangulation Node Positions-->
+
     <script>
-        // Node positions for triangulation
-        const nodes = {
-            "Tx/Rx Node": { lat: 37.7750, lon: -122.4183 },
-            "Mesh Node": { lat: 37.7765, lon: -122.4170 },
-            "ADS-B Node": { lat: 37.7740, lon: -122.4190 } // ignored for triangulation
-        };
-        // Convert degrees to radians
-        function deg2rad(deg) {
-            return deg * Math.PI / 180;
-        }
-        // Simple triangulation: intersect two bearings
-        function triangulate(nodeData) {
-            const nodeKeys = Object.keys(nodeData).filter(k => k !== 'ADS-B Node');
-            if (nodeKeys.length < 2) return null;
-            const [nodeA, nodeB] = nodeKeys;
-            const posA = nodes[nodeA];
-            const posB = nodes[nodeB];
-            const bearingA = parseFloat(document.querySelector(
-                `tr:has(td:contains("${nodeA}")) td:nth-child(2)`
-            )?.textContent) || 0;
-            const bearingB = parseFloat(document.querySelector(
-                `tr:has(td:contains("${nodeB}")) td:nth-child(2)`
-            )?.textContent) || 0;
-            const thetaA = deg2rad(bearingA);
-            const thetaB = deg2rad(bearingB);
-            const x1 = posA.lon, y1 = posA.lat;
-            const x2 = posB.lon, y2 = posB.lat;
-            const m1 = Math.tan(thetaA);
-            const m2 = Math.tan(thetaB);
-            const denom = m1 - m2;
-            if (Math.abs(denom) < 0.0001) return null;
-           const x = (m1*x1 - m2*x2 + y2 - y1) / denom;
-            const y = y1 + m1 * (x - x1);
-            return [y, x];
-        }
-        function updateTriangulation() {
-            const estimated = triangulate(nodes);
-            if (!estimated) return;
-            const [lat, lon] = estimated;
-            // Use global marker variables
-            if (!window.triangulationMarker) {
-                window.triangulationMarker = L.marker([lat, lon], {
-                    icon: L.divIcon({
-                        html: '<div style="background:#FF1744;color:#000;padding:4px 8px;border-radius:3px;font-size:12px;font-weight:bold;border:2px solid #FF1744;box-shadow:0 0 10px rgba(255,23,68,0.5)">ESTIMATED ORIGIN</div>',
-                        className: 'tri-marker',
-                        iconSize: [100, 30],
-                        iconAnchor: [50, 15]
-                    })
-                }).addTo(triangulationMap);
-            } else {
-                window.triangulationMarker.setLatLng([lat, lon]);
-            }
-            const errorRadiusMeters = 420;
-            if (!window.errorCircle) {
-                window.errorCircle = L.circle([lat, lon], {
-                    radius: errorRadiusMeters,
-                    color: '#FF1744',
-                    fillColor: 'rgba(255,23,68,0.1)',
-                    weight: 2
-                }).addTo(triangulationMap);
-            } else {
-                window.errorCircle.setLatLng([lat, lon]);
-                window.errorCircle.setRadius(errorRadiusMeters);
-            }
-        }
-        setInterval(updateTriangulation, 3000);
-    </script>
+/* ===== TRIANGULATION MAP FRAMING ===== */
+function frameTriangulationMap(lat, lon) {
+    if (!triangulationMap || !window.nodes) return;
+
+    const points = [
+        ...Object.values(nodes).map(n => [n.lat, n.lon]),
+        [lat, lon]
+    ];
+
+    fitMapToPoints(triangulationMap, points, {
+        maxZoom: 16
+    });
+}
+</script>
+
 <!--Node Actions Modal-->
     <script>
         const modal = document.getElementById('node-modal');
@@ -1048,32 +1077,7 @@
         });
     </script>
 <!--Toggle Sidebar Logic-->
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('quick-sidebar');
-            sidebar.classList.toggle('expanded');
-            sidebar.classList.toggle('collapsed');
-        }
-    </script>
-<!--Collapse Sticky Top Nav On Scroll-->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const navbar = document.querySelector('.navbar');
-            if (!navbar) return;
-            let isCollapsed = false;
-            const COLLAPSE_THRESHOLD = 10;
-            function checkCollapse() {
-                const scrollTop = window.scrollY || document.documentElement.scrollTop;
-                const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
-                if (shouldCollapse !== isCollapsed) {
-                    navbar.classList.toggle('collapsed', shouldCollapse);
-                    isCollapsed = shouldCollapse;
-                }
-            }
-            window.addEventListener('scroll', checkCollapse);
-            checkCollapse(); // initial check in case page is already scrolled
-        });
-    </script>
+
 <!--Prevent Accidential Map Interactions-->
     <script>
         (() => {

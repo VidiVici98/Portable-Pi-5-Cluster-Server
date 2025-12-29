@@ -21,6 +21,8 @@ from functools import wraps
 
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_cors import CORS
+# web/app.py
+from flask import Flask, render_template
 
 # Local configuration
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
@@ -117,6 +119,9 @@ def logout():
 def boot_landing():
     """Dashboard boot landing / preloader page"""
     return render_template('boot_landing.html')
+@app.route('/header')
+def header():
+    return render_template('components/header.html')
 
 ################################################################################
 # UTILITIES

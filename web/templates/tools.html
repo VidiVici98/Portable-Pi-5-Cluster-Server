@@ -6,121 +6,18 @@
     <title>Node Tools - Cluster Dashboard</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-<body>
+<body data-page="tools">
     {% if demo_mode %}
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
     <!-- Collapsible Quick Nav Sidebar -->
-<aside id="quick-sidebar" class="quick-sidebar collapsed">
-    <button class="sidebar-toggle vertical-label" onclick="toggleSidebar()" title="Quick Navigation">
-        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Drag_Horizontal"> <g id="Vector"> <path d="M18 14C17.4477 14 17 14.4477 17 15C17 15.5523 17.4477 16 18 16C18.5523 16 19 15.5523 19 15C19 14.4477 18.5523 14 18 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 14C11.4477 14 11 14.4477 11 15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15C13 14.4477 12.5523 14 12 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 14C5.44772 14 5 14.4477 5 15C5 15.5523 5.44772 16 6 16C6.55228 16 7 15.5523 7 15C7 14.4477 6.55228 14 6 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18 8C17.4477 8 17 8.44772 17 9C17 9.55228 17.4477 10 18 10C18.5523 10 19 9.55228 19 9C19 8.44772 18.5523 8 18 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 8C11.4477 8 11 8.44772 11 9C11 9.55228 11.4477 10 12 10C12.5523 10 13 9.55228 13 9C13 8.44772 12.5523 8 12 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 8C5.44772 8 5 8.44772 5 9C5 9.55228 5.44772 10 6 10C6.55228 10 7 9.55228 7 9C7 8.44772 6.55228 8 6 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>
-        Quick Nav Panel
-    </button>
-    <nav class="sidebar-content">
-        <h4>Quick Nav Panel</h4>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-    </nav>
-</aside>
-<nav class="navbar" id="main-navbar">
-    <!-- COLLAPSE ANCHOR (REQUIRED) -->
-    <div class="nav-collapse-anchor">
-        <!-- Left column: brand + nav links -->
-        <div class="nav-left">
-            <div class="nav-brand">⌘ Modern Warrior Systems</div>
-            <div class="nav-links">
-                <a href="/">Dashboard</a>
-                <a href="/monitor">Cluster Health</a>
-                <a href="/control">Control</a>
-                <div class="nav-dropdown">
-                    <a href="/tools" class="nav-parent active">Tools</a>
-                    <div class="dropdown-menu">
-                        <a href="/isr">ADSB / UAT / SDR</a>
-                        <a href="/mesh">Mesh Networking</a>
-                        <a href="/vhf">RF Communication</a>
-                        <a href="/backup">Backup & Restore</a>
-                    </div>
-                </div>
-                <a href="/settings">Settings</a>
-                <!-- Tactical alert icon -->
-                <div class="nav-alert">
-                    <button href="#" class="alert-icon" title="Notifications">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        <span class="alert-badge">3</span>
-                        <div class="alert-panel">
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    ADS-B Node high temp <span class="alert-meta">71°C</span>
-                                </div>
-                            </div>
-                            <div class="alert-item alert-down">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Tx/Rx Node offline
-                                </div>
-                            </div>
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Mesh Node CPU high <span class="alert-meta">88%</span>
-                                </div>
-                            </div>
-                            <div class="alert-logs">
-                                <div class="alert-log">[12:02] ADS-B Node temp spike detected</div>
-                                <div class="alert-log">[12:01] Tx/Rx Node lost connectivity</div>
-                                <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
-                            </div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <!-- Right column: node status -->
-        <div class="nav-status">
-            <div class="node-status ok">
-                <button class="node-btn" title="Reboot Boot Node">⭮</button>
-                Boot
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:45%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status warn">
-                <button class="node-btn" title="Reboot ADS-B Node">⭮</button>
-                ADS-B
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:78%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:71%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status ok">
-                <button class="node-btn" title="Reboot Mesh Node">⭮</button>
-                Mesh
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
-                </div>
-            </div>
-            <div class="node-status down">
-                <button class="node-btn" title="Reboot Tx/Rx Node">⭮</button>
-                Tx/Rx
-                <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                </div>
-            </div>
-        </div>
+    {% include 'components/sidebar.html' %}
+    <div id="content">
+        <!-- page-specific content -->
     </div>
+<!--Header Embed Container-->
+<nav class="navbar" id="main-navbar">
+        <div id="header-container"></div>
 </nav>
     <main class="container">
         <section class="panel">
@@ -131,6 +28,8 @@
             <!-- Populated by JavaScript -->
         </div>
     </main>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
     <script>
         const NODES = {
             'boot': {
@@ -297,35 +196,6 @@ document.querySelectorAll('.alert-icon').forEach(icon => {
     e.preventDefault();
     icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
   });
-});
-</script>
-<script>
-function toggleSidebar() {
-    const sidebar = document.getElementById('quick-sidebar');
-    sidebar.classList.toggle('expanded');
-    sidebar.classList.toggle('collapsed');
-}
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar');
-    if (!navbar) return;
-
-    let isCollapsed = false;
-    const COLLAPSE_THRESHOLD = 10;
-
-    function checkCollapse() {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
-
-        if (shouldCollapse !== isCollapsed) {
-            navbar.classList.toggle('collapsed', shouldCollapse);
-            isCollapsed = shouldCollapse;
-        }
-    }
-
-    window.addEventListener('scroll', checkCollapse);
-    checkCollapse(); // initial check in case page is already scrolled
 });
 </script>
 <script>

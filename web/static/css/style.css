@@ -278,6 +278,9 @@ nav a.active {
     gap: 6px;
     justify-content: flex-end;
     margin-top: 54px;
+    position: absolute;
+    right:24px;
+    top:4px;
 }
 .node-status {
     position: relative;
@@ -726,7 +729,7 @@ tbody tr:hover {
     position: fixed;
     bottom: 10px;
     right: 10px;
-    background: rgba(188, 115, 32, 0.2);
+    background: rgba(50, 45, 30, 0.9);
     border: 1px solid var(--secondary);
     color: var(--secondary);
     padding: 10px 15px;
@@ -753,7 +756,6 @@ tbody tr:hover {
     border: 2px solid #00FF00;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
     margin: 15px 0;
-    filter: brightness(.75);
     justify-self: center;
     align-self: center;
 }
