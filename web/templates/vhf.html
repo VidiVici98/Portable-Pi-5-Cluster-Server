@@ -93,7 +93,6 @@
                 <!-- Signal Strength Meter -->
                 <div class="spectrum-display">
                     <h3 style="margin: 0 0 15px 0; color: #2196F3;">SIGNAL ANALYSIS</h3>
-                    
                     <div class="signal-meter">
                         <div class="meter-label">S-Meter (Signal Strength)</div>
                         <div class="meter-bar">
@@ -164,12 +163,97 @@
                 </div>
             </div>
         </div>
+<section class="panel">
+    <h2>📨 DIGITAL MESSAGE & DATA TRANSFER</h2>
+    <p style="color:#AAA; margin:0;">
+        Non-voice digital signaling over RF-linked transports (text-first, template-capable)
+    </p>
+    <!-- Mode Tabs -->
+    <div class="mode-selector" style="margin-top:15px;">
+       <button class="mode-btn active" data-tab="text" onclick="setDataTab('text')">TEXT</button>
+        <button class="mode-btn" data-tab="templates" onclick="setDataTab('templates')">TEMPLATES</button>
+        <button class="mode-btn" data-tab="files" onclick="setDataTab('files')">FILES / IMAGES</button>
+        <button class="mode-btn" data-tab="log" onclick="setDataTab('log')">INBOX / LOG</button>
+    </div>
+    <!-- TEXT TAB -->
+    <div class="data-tab" id="data-tab-text">
+        <div class="control-group">
+            <label class="control-label">Destination / Callsign / Node</label>
+            <input type="text" placeholder="e.g. W3XYZ, NODE-ALPHA, BROADCAST">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Message Body</label>
+            <textarea rows="6"
+                placeholder="Plain text message. Keep concise for weak-signal or burst modes."></textarea>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="requestTransmit('TEXT')">TRANSMIT</button>
+            <button class="btn">QUEUE</button>
+            <button class="btn btn-warning">CLEAR</button>
+        </div>
+        <p style="color:#777; font-size:11px; margin-top:8px;">
+            Transport, encoding, and modulation determined by active RF profile.
+        </p>
+    </div>
+    <!-- TEMPLATES TAB -->
+    <div class="data-tab" id="data-tab-templates" style="display:none;">
+<div class="control-group">
+    <label class="control-label">Template Type</label>
+    <select id="template-select" onchange="renderTemplate(this.value)">
+        <option value="">-- Select Template --</option>
+        <option value="ICS-213">ICS-213 General Message</option>
+        <option value="ARRL-RADIOGRAM">ARRL Radiogram</option>
+        <option value="SITREP">Tactical SITREP</option>
+    </select>
+</div>
+<div id="template-fields"></div>
+<button class="btn btn-primary" onclick="requestTransmit('TEMPLATE')">
+    ENCODE & TRANSMIT
+</button>
+        <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" onclick="requestTransmit('TEXT')">TRANSMIT</button>
+            <button class="btn">SAVE DRAFT</button>
+        </div>
+    </div>
+    <!-- FILES TAB -->
+    <div class="data-tab" id="data-tab-files" style="display:none;">
+        <div class="control-group">
+            <label class="control-label">Attach File or Image</label>
+            <input type="file">
+        </div>
+        <div class="control-group">
+            <label class="control-label">Transfer Notes</label>
+            <input type="text" placeholder="Optional description or checksum note">
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" onclick="requestTransmit('TEXT')">TRANSMIT</button>
+            <button class="btn btn-warning">CANCEL</button>
+        </div>
+        <p style="color:#FF8800; font-size:11px; margin-top:8px;">
+            Warning: File transfers may require sustained link time and are detectable.
+        </p>
+    </div>
+    <!-- LOG TAB -->
+    <div class="data-tab" id="data-tab-log" style="display:none;">
+        <table class="info-table">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Dir</th>
+            <th>Type</th>
+            <th>Peer</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="inbox-body"></tbody>
+</table>
+    </div>
+</section>
         <section class="panel">
     <h2>📡 RF PROPAGATION ESTIMATION</h2>
     <p style="color:#AAA; margin:0;">
         Coverage visualization (demo model – geometry + environmental degradation)
     </p>
-
     <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
         <label>
             Frequency (MHz)
@@ -191,127 +275,149 @@
                 <option value="rural">Rural</option>
             </select>
         </label>
+        <div class="control-group">
+    <h3 style="color:#2196F3; margin-bottom:10px;">HF Skywave Parameters</h3>
+    <label class="control-label" for="hfMUF">
+        Maximum Usable Frequency (MHz)
+    </label>
+    <input type="number" id="hfMUF" value="10" min="1" step="0.5">
+    <label class="control-label" for="hfNight" style="margin-top:8px;">
+        <input type="checkbox" id="hfNight">
+        Nighttime Ionospheric Conditions
+    </label>
+<hr style="border-color:#333; margin:20px 0;">
+    <h3 style="color:#2196F3; margin-bottom:10px;">Directional Antenna Parameters</h3>
+    <label class="control-label" for="antAzimuth">
+        Antenna Azimuth (Degrees)
+    </label>
+    <input type="number" id="antAzimuth" value="90" min="0" max="360">
+    <label class="control-label" for="antBeam" style="margin-top:8px;">
+        Antenna Beamwidth (Degrees)
+    </label>
+    <input type="number" id="antBeam" value="60" min="5" max="180">
         <button class="btn btn-primary" onclick="updatePropagation()">Recalculate</button>
     </div>
-
-    <div id="propagationMap"
-         style="width:100%; height:420px; margin-top:15px; border:1px solid #333;">
+    <div class="map-guard">
+        <div id="propagationMap"
+            style="width:100%; height:420px; margin-top:15px; border:1px solid #333;">
+        </div>
+        <div class="map-overlay" aria-hidden="true"></div>
     </div>
 </section>
-
     </main>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<div id="tx-warning-modal" class="modal">
+    <div class="modal-content">
+        <h3 style="color:#FF1744;">⚠ TRANSMISSION WARNING</h3>
+        <p style="font-size:13px;">
+            You are about to transmit digital data over an RF-linked channel.
+        </p>
+        <ul style="font-size:12px; color:#CCC;">
+            <li>Transmission may be intercepted or direction-found</li>
+            <li>Content may persist in logs or relays</li>
+            <li>File and template traffic increases detectability</li>
+        </ul>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-danger" onclick="confirmTransmit()">CONFIRM TRANSMIT</button>
+            <button class="btn" onclick="closeWarningModal()">CANCEL</button>
+        </div>
+    </div>
+</div>
+<div id="msg-modal" class="modal">
+    <div class="modal-content">
+        <h3>📨 MESSAGE CONTENT</h3>
+        <pre id="msg-modal-body"
+             style="background:#000; padding:10px; color:#00FF00;
+                    max-height:300px; overflow:auto;"></pre>
+        <button class="btn" onclick="closeMessageModal()">CLOSE</button>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let propMap;
 let txMarker;
 let idealCoverage;
 let degradedCoverage;
-
 function initPropagationMap() {
-    propMap = L.map('propagationMap').setView([39.5, -98.35], 5);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(propMap);
-
+    propMap = L.map('propagationMap').setView([39.5, -98.35], 10);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(propMap);
     txMarker = L.marker(propMap.getCenter())
         .addTo(propMap)
         .bindPopup('Transmitter Location');
-
     updatePropagation();
 }
-
 document.addEventListener('DOMContentLoaded', initPropagationMap);
 </script>
 <script>
 function updatePropagation() {
     if (!propMap || !txMarker) return;
-
     const freq   = parseFloat(document.getElementById('propFreq').value);
     const power  = parseFloat(document.getElementById('propPower').value);
     const height = parseFloat(document.getElementById('propHeight').value);
     const env    = document.getElementById('propEnv').value;
-
     if (idealCoverage) propMap.removeLayer(idealCoverage);
     if (degradedCoverage) propMap.removeLayer(degradedCoverage);
-
     const center = txMarker.getLatLng();
-
     // ---- DEMO RF SCALING (plausible + explainable) ----
     const freqFactor   = Math.sqrt(150 / freq);
     const powerFactor  = Math.sqrt(power);
     const heightFactor = Math.sqrt(height / 10);
-
     const envLoss = {
         urban: 0.45,
         suburban: 0.65,
         rural: 0.85
     }[env];
-
     const baseRangeKm =
         15 * freqFactor * powerFactor * heightFactor * envLoss;
-
     const majorKm = baseRangeKm * 1.3;
     const minorKm = baseRangeKm * 0.8;
     const tiltDeg = Math.random() * 30 - 15;
     const tiltRad = tiltDeg * Math.PI / 180;
-
     // ---- IDEAL ELLIPSE (polygon approximation) ----
     const ellipsePoints = [];
     const steps = 72;
-
     for (let i = 0; i < steps; i++) {
         const theta = (i / steps) * 2 * Math.PI;
-
         const x = majorKm * Math.cos(theta);
         const y = minorKm * Math.sin(theta);
-
         const xr = x * Math.cos(tiltRad) - y * Math.sin(tiltRad);
         const yr = x * Math.sin(tiltRad) + y * Math.cos(tiltRad);
-
         const latOffset = yr / 111;
         const lngOffset = xr / (111 * Math.cos(center.lat * Math.PI / 180));
-
         ellipsePoints.push([
             center.lat + latOffset,
             center.lng + lngOffset
         ]);
     }
-
     idealCoverage = L.polygon(ellipsePoints, {
         color: '#00ff00',
         fillColor: '#00ff00',
         fillOpacity: 0.25,
         weight: 2
     }).addTo(propMap);
-
     // ---- DEGRADED ENVIRONMENT BLOB ----
     const blobPoints = [];
-
     for (let i = 0; i < steps; i++) {
         const theta = (i / steps) * 2 * Math.PI;
-
         const distortion =
             env === 'urban'
                 ? 0.5 + Math.random() * 0.7
                 : 0.7 + Math.random() * 0.4;
-
         const x = majorKm * Math.cos(theta) * distortion;
         const y = minorKm * Math.sin(theta) * distortion;
-
         const xr = x * Math.cos(tiltRad) - y * Math.sin(tiltRad);
         const yr = x * Math.sin(tiltRad) + y * Math.cos(tiltRad);
-
         const latOffset = yr / 111;
         const lngOffset = xr / (111 * Math.cos(center.lat * Math.PI / 180));
-
         blobPoints.push([
             center.lat + latOffset,
             center.lng + lngOffset
         ]);
     }
-
     degradedCoverage = L.polygon(blobPoints, {
         color: '#00ff00',
         fillColor: '#00ff00',
@@ -319,19 +425,16 @@ function updatePropagation() {
         weight: 1,
         dashArray: '6,6'
     }).addTo(propMap);
-
     idealCoverage.bindPopup(
         `Ideal Coverage<br>
          Major Axis: ${majorKm.toFixed(1)} km<br>
          Minor Axis: ${minorKm.toFixed(1)} km`
     );
-
     degradedCoverage.bindPopup(
         `Environment-Degraded Coverage`
     );
 }
 </script>
-
     <script>
         let currentFrequency = 146.52;
         let currentMode = 'FM';
@@ -459,6 +562,94 @@ function updatePropagation() {
         }
         init();
     </script>
+    <script>
+/*
+ * DIGITAL DATA PANEL – HARDENED UI LOGIC
+ * UI-only, transport-agnostic
+ */
+const DataUI = {
+    activeTab: 'text',
+    pendingAction: null,
+    messageStore: [] // UI-only log
+};
+function setDataTab(tab) {
+    DataUI.activeTab = tab;
+    document.querySelectorAll('.data-tab').forEach(t => {
+        t.style.display = 'none';
+    });
+    document.querySelectorAll('.mode-selector .mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const tabEl = document.getElementById(`data-tab-${tab}`);
+    const btnEl = document.querySelector(
+        `.mode-selector .mode-btn[data-tab="${tab}"]`
+    );
+    if (tabEl) tabEl.style.display = 'block';
+    if (btnEl) btnEl.classList.add('active');
+}
+/* ---------- SEND GATING ---------- */
+function requestTransmit(type) {
+    DataUI.pendingAction = type;
+    openWarningModal();
+}
+function confirmTransmit() {
+    closeWarningModal();
+    const entry = {
+        time: new Date().toLocaleTimeString(),
+        direction: 'TX',
+        type: DataUI.pendingAction,
+        peer: 'UNSPECIFIED',
+        status: 'QUEUED',
+        body: '[UI DEMO CONTENT]'
+    };
+    DataUI.messageStore.unshift(entry);
+    renderInboxTable();
+
+    alert('Transmission queued (UI demo only)');
+    DataUI.pendingAction = null;
+}
+/* ---------- INBOX ---------- */
+function renderInboxTable() {
+    const tbody = document.getElementById('inbox-body');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    DataUI.messageStore.forEach((msg, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${msg.time}</td>
+            <td>${msg.direction}</td>
+            <td>${msg.type}</td>
+            <td>${msg.peer}</td>
+            <td style="color:#FFB300; cursor:pointer;"
+                onclick="openMessageModal(${idx})">
+                ${msg.status}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+function openMessageModal(index) {
+    const msg = DataUI.messageStore[index];
+    if (!msg) return;
+    document.getElementById('msg-modal-body').textContent = msg.body;
+    document.getElementById('msg-modal').style.display = 'block';
+}
+/* ---------- MODALS ---------- */
+
+function openWarningModal() {
+    document.getElementById('tx-warning-modal').style.display = 'block';
+}
+function closeWarningModal() {
+    document.getElementById('tx-warning-modal').style.display = 'none';
+}
+function closeMessageModal() {
+    document.getElementById('msg-modal').style.display = 'none';
+}
+/* ---------- INIT ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+    setDataTab('text');
+});
+</script>
 <script>
 const modal = document.getElementById('node-modal');
 const modalNodeName = document.getElementById('modal-node-name');
@@ -487,6 +678,345 @@ document.querySelectorAll('.alert-icon').forEach(icon => {
     icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
   });
 });
+</script>
+<script>
+let hfHopLayers = [];
+function drawHFSkywave() {
+    clearHFLayers();
+    const center = txMarker.getLatLng();
+    const muf = parseFloat(document.getElementById('hfMUF').value);
+    const freq = parseFloat(document.getElementById('propFreq').value);
+    const isNight = document.getElementById('hfNight').checked;
+    if (freq > muf) return; // no skywave
+    const hopBase = isNight ? 500 : 300;
+    const maxHops = 4;
+    for (let hop = 1; hop <= maxHops; hop++) {
+        const radiusKm = hopBase * hop;
+        const ring = L.circle(center, {
+            radius: radiusKm * 1000,
+            color: '#00bfff',
+            weight: 1,
+            fillOpacity: 0,
+            dashArray: '4,8'
+        }).addTo(propMap);
+        ring.bindPopup(`HF Hop ${hop}<br>${radiusKm} km`);
+        hfHopLayers.push(ring);
+    }
+}
+function clearHFLayers() {
+    hfHopLayers.forEach(l => propMap.removeLayer(l));
+    hfHopLayers = [];
+}
+</script>
+<script>
+let antennaPattern;
+function drawAntennaPattern() {
+    if (antennaPattern) propMap.removeLayer(antennaPattern);
+    const center = txMarker.getLatLng();
+    const azimuth = parseFloat(document.getElementById('antAzimuth').value);
+    const beamwidth = parseFloat(document.getElementById('antBeam').value);
+    const rangeKm = 50;
+    const points = [];
+    const steps = 60;
+    for (let i = -beamwidth / 2; i <= beamwidth / 2; i += beamwidth / steps) {
+        const angle = (azimuth + i) * Math.PI / 180;
+        const latOffset = (rangeKm / 111) * Math.sin(angle);
+        const lngOffset =
+            (rangeKm / (111 * Math.cos(center.lat * Math.PI / 180))) *
+            Math.cos(angle);
+        points.push([
+            center.lat + latOffset,
+            center.lng + lngOffset
+        ]);
+    }
+    points.unshift([center.lat, center.lng]);
+    antennaPattern = L.polygon(points, {
+        color: '#ff8800',
+        fillColor: '#ff8800',
+        fillOpacity: 0.25,
+        weight: 2
+    }).addTo(propMap);
+    antennaPattern.bindPopup('Directional Antenna Lobe');
+}
+</script>
+<script>
+let threatLayers = [];
+function addThreatReceiver(lat, lng, sensitivityKm) {
+    const receiver = L.marker([lat, lng], {
+        icon: L.divIcon({
+            className: '',
+            html: '📡',
+            iconSize: [24, 24]
+        })
+    }).addTo(propMap);
+    const detectionZone = L.circle([lat, lng], {
+        radius: sensitivityKm * 1000,
+        color: '#ff1744',
+        fillColor: '#ff1744',
+        fillOpacity: 0.15,
+        dashArray: '3,6'
+    }).addTo(propMap);
+    receiver.bindPopup('Adversary Receiver');
+    threatLayers.push(receiver, detectionZone);
+}
+function clearThreats() {
+    threatLayers.forEach(l => propMap.removeLayer(l));
+    threatLayers = [];
+}
+</script>
+<script>
+let fresnelLayer;
+function drawFresnelZone(rxLat, rxLng) {
+    if (fresnelLayer) propMap.removeLayer(fresnelLayer);
+    const tx = txMarker.getLatLng();
+    const rx = L.latLng(rxLat, rxLng);
+    const points = [];
+    const steps = 40;
+    const fresnelRadiusKm = 2; // demo radius
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const lat = tx.lat + (rx.lat - tx.lat) * t;
+        const lng = tx.lng + (rx.lng - tx.lng) * t;
+        const offsetLat = fresnelRadiusKm / 111;
+        const offsetLng =
+            fresnelRadiusKm / (111 * Math.cos(lat * Math.PI / 180));
+        points.push([lat + offsetLat, lng + offsetLng]);
+    }
+    for (let i = steps; i >= 0; i--) {
+        const t = i / steps;
+        const lat = tx.lat + (rx.lat - tx.lat) * t;
+        const lng = tx.lng + (rx.lng - tx.lng) * t;
+        const offsetLat = fresnelRadiusKm / 111;
+        const offsetLng =
+            fresnelRadiusKm / (111 * Math.cos(lat * Math.PI / 180));
+        points.push([lat - offsetLat, lng - offsetLng]);
+    }
+    fresnelLayer = L.polygon(points, {
+        color: '#ffb300',
+        fillColor: '#ffb300',
+        fillOpacity: 0.25,
+        weight: 2
+    }).addTo(propMap);
+    fresnelLayer.bindPopup('Fresnel Zone (Clearance)');
+}
+</script>
+<script>
+/*
+ * DIGITAL MESSAGE TEMPLATES
+ * UI-only reference definitions
+ */
+
+const MessageTemplates = {
+    "ICS-213": {
+        label: "ICS-213 General Message",
+        body:
+`ICS 213 – GENERAL MESSAGE
+Incident Name:
+To (Name / Position):
+From (Name / Position):
+Subject:
+Date:
+Time:
+Message:
+Approved By:
+Reply Required: YES / NO`
+    },
+    "ICS-214": {
+        label: "ICS-214 Unit Log",
+        body:
+`ICS 214 – UNIT LOG
+Incident Name:
+Operational Period:
+Unit Name / Designators:
+Personnel Assigned:
+Activity Log (Time / Description):
+Prepared By:
+Date / Time Prepared:`
+    },
+    "ARRL-RADIOGRAM": {
+        label: "ARRL Radiogram",
+        body:
+`ARRL RADIOGRAM
+NR:
+PRECEDENCE: EMERGENCY / PRIORITY / WELFARE / ROUTINE
+HX:
+STATION OF ORIGIN:
+CHECK:
+PLACE OF ORIGIN:
+TIME FILED:
+DATE:
+TO:
+ADDRESS:
+PHONE:
+TEXT:
+SIGNATURE:`
+    },
+    "SITREP": {
+        label: "Tactical SITREP",
+        body:
+`SITUATION REPORT (SITREP)
+DTG:
+UNIT:
+LOCATION:
+FRIENDLY STATUS:
+ENEMY / THREAT:
+SIGNIFICANT ACTIVITY:
+LOGISTICS:
+REMARKS:`
+    }
+};
+</script>
+<script>
+function loadTemplate(key) {
+    if (!key || !MessageTemplates[key]) return;
+
+    document.getElementById('template-body').value =
+        MessageTemplates[key].body;
+}
+</script>
+<script>
+/*
+ * FIELD-AWARE TEMPLATE SCHEMAS
+ * UI-only, authoritative structure
+ */
+const TemplateSchemas = {
+    "ICS-213": {
+        label: "ICS-213 General Message",
+        fields: [
+            { id: "incident", label: "Incident Name", required: true },
+            { id: "to", label: "To (Name / Position)", required: true },
+            { id: "from", label: "From (Name / Position)", required: true },
+            { id: "subject", label: "Subject", required: true },
+            { id: "dtg", label: "DTG", auto: "dtg" },
+            { id: "message", label: "Message", type: "textarea", required: true },
+            { id: "approved", label: "Approved By" }
+        ]
+    },
+    "ARRL-RADIOGRAM": {
+        label: "ARRL Radiogram",
+        fields: [
+            { id: "number", label: "Message Number", required: true },
+            { id: "precedence", label: "Precedence", required: true },
+            { id: "hx", label: "HX" },
+            { id: "station", label: "Station of Origin", required: true },
+            { id: "check", label: "CHECK", auto: "check" },
+            { id: "place", label: "Place of Origin", required: true },
+            { id: "dtg", label: "DTG", auto: "dtg" },
+            { id: "to", label: "To", required: true },
+            { id: "address", label: "Address" },
+            { id: "phone", label: "Phone" },
+            { id: "text", label: "Message Text", type: "textarea", required: true },
+            { id: "signature", label: "Signature", required: true }
+        ]
+    },
+    "SITREP": {
+        label: "Tactical SITREP",
+        fields: [
+            { id: "dtg", label: "DTG", auto: "dtg" },
+            { id: "unit", label: "Unit", required: true },
+            { id: "location", label: "Location", required: true },
+            { id: "friendly", label: "Friendly Status" },
+            { id: "enemy", label: "Enemy / Threat" },
+            { id: "activity", label: "Significant Activity", type: "textarea" },
+            { id: "logistics", label: "Logistics" },
+            { id: "remarks", label: "Remarks", type: "textarea" }
+        ]
+    }
+};
+</script>
+<script>
+let activeTemplate = null;
+function renderTemplate(key) {
+    activeTemplate = key;
+    const schema = TemplateSchemas[key];
+    const container = document.getElementById('template-fields');
+    container.innerHTML = '';
+    if (!schema) return;
+    schema.fields.forEach(field => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'control-group';
+        const label = document.createElement('label');
+        label.className = 'control-label';
+        label.textContent = field.label;
+        wrapper.appendChild(label);
+        let input;
+        if (field.type === 'textarea') {
+            input = document.createElement('textarea');
+            input.rows = 4;
+        } else {
+            input = document.createElement('input');
+            input.type = 'text';
+        }
+        input.id = `field-${field.id}`;
+        input.dataset.required = field.required ? "1" : "0";
+        if (field.auto === 'dtg') {
+            input.value = generateDTG();
+            input.readOnly = true;
+        }
+        if (field.auto === 'check') {
+            input.readOnly = true;
+        }
+        if (key === "ARRL-RADIOGRAM" && field.id === "text") {
+            input.addEventListener('input', updateRadiogramCheck);
+        }
+        wrapper.appendChild(input);
+        container.appendChild(wrapper);
+    });
+}
+function generateDTG() {
+    const d = new Date();
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const hour = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    const month = d.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }).toUpperCase();
+    const year = String(d.getUTCFullYear()).slice(-2);
+    return `${day}${hour}${min}Z ${month} ${year}`;
+}
+function updateRadiogramCheck() {
+    const text = document.getElementById('field-text')?.value || '';
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    const checkField = document.getElementById('field-check');
+    if (checkField) checkField.value = words.length;
+}
+</script>
+<script>
+function collectTemplateData() {
+    const schema = TemplateSchemas[activeTemplate];
+    if (!schema) return null;
+    const data = { type: activeTemplate };
+    for (const field of schema.fields) {
+        const el = document.getElementById(`field-${field.id}`);
+        if (!el) continue;
+        const value = el.value.trim();
+        if (field.required && !value) {
+            alert(`Missing required field: ${field.label}`);
+            return null;
+        }
+        data[field.id] = value;
+    }
+    return data;
+}
+/* Hook into your existing confirmTransmit() */
+const originalConfirmTransmit = confirmTransmit;
+confirmTransmit = function () {
+    let payload = null;
+    if (activeTemplate) {
+        payload = collectTemplateData();
+        if (!payload) return; // HARD STOP
+    }
+    console.log("STRUCTURED MESSAGE JSON:", payload);
+    DataUI.messageStore.unshift({
+        time: new Date().toLocaleTimeString(),
+        direction: 'TX',
+        type: payload?.type || 'TEXT',
+        peer: 'UNSPECIFIED',
+        status: 'QUEUED',
+        body: JSON.stringify(payload, null, 2)
+    });
+    renderInboxTable();
+    closeWarningModal();
+    alert('Validated message queued (UI demo only)');
+};
 </script>
 <script>
 (() => {

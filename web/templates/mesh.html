@@ -263,8 +263,12 @@ triggers:L.layerGroup()
 };
 /* ================= MAP ================= */
 function initMap(){
-map=L.map('meshMap').setView([37.7749,-122.4194],13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+map=L.map('meshMap').setView([37.7849,-122.4194],13);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+}).addTo(map)
 Object.values(layers).forEach(l=>l.addTo(map));
 renderAll();
 }
