@@ -1,31 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesh Network Topology - Tactical Dashboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mesh Network – Tactical Dashboard</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* ===== PAGE LAYOUT ===== */
+main.container { padding: 15px; }
+.mesh-layout { display: flex; gap: 15px; }
+#meshMap { height: 80vh; width: 68vw; border: 1px solid #00ff00; }
+.mesh-side { width: 30vw; display: flex; flex-direction: column; gap: 15px; overflow-y:auto; }
+/* ===== CARDS ===== */
+.panel, .card {
+    background: #0b0b0b;
+    border: 1px solid #00ff00;
+    padding: 12px;
+    border-radius: 6px;
+}
+/* ===== STATS ===== */
+.stats-panel { display: flex; gap: 10px; }
+.stat-card {
+    flex: 1;
+    background: #111;
+    color: #0f0;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+}
+/* ===== NODE LIST ===== */
+.node-card {
+    background: #111;
+    color: #0f0;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+.node-header { display: flex; justify-content: space-between; }
+.node-meta { font-size: 0.75rem; color: #8f8; }
+/* ===== STATUS COLORS ===== */
+.ok { color: #00ff00; }
+.warn { color: #ffb300; }
+.down { color: #ff1744; }
+/* ===== CONTROLS ===== */
+.btn {
+    background: #00ff00;
+    color: #000;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    margin-top: 6px;
+    border-radius: 4px;
+    width:100%;
+}
+/* ===== MAP GUARD ===== */
+.map-guard { position: relative; }
+.map-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s;
+}
+.map-overlay.active { opacity: 1; }
+/* ===== COMMS LOG ===== */
+.log {
+    font-size:0.75rem;
+    max-height:160px;
+    overflow-y:auto;
+    background:#050505;
+    padding:6px;
+    border:1px solid #00ff00;
+}
+.log-entry { margin-bottom:4px; }
+/* ===== BROADCAST MODAL ===== */
+#broadcast-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+}
+#broadcast-modal .modal-content {
+    background: #111;
+    color: #0f0;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #0f0;
+    width: 400px;
+    border-radius: 6px;
+}
+#broadcast-modal input, #broadcast-modal textarea, #broadcast-modal select {
+    width: 100%;
+    margin: 6px 0;
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #0f0;
+    background: #000;
+    color: #0f0;
+}
+#broadcast-modal button {
+    margin-top: 10px;
+}
 
-    </style>
+/* ===== EXPANSION 1 NODE ACTIONS MODAL ===== */
+#node-modal {
+    display: none;
+    position: fixed;
+    z-index: 3000;
+    left:0; top:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.8);
+}
+#node-modal .modal-content {
+    background:#111;
+    color:#0f0;
+    margin: 10% auto;
+    padding: 20px;
+    width:350px;
+    border:1px solid #0f0;
+    border-radius:6px;
+}
+#node-modal button { width:100%; margin-top:8px; }
+</style>
 </head>
 <body>
-    {% if demo_mode %}
-    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
-    {% endif %}
-    <!-- Collapsible Quick Nav Sidebar -->
+{% if demo_mode %}
+<div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+{% endif %}
+<!-- Collapsible Quick Nav Sidebar -->
 <aside id="quick-sidebar" class="quick-sidebar collapsed">
     <button class="sidebar-toggle vertical-label" onclick="toggleSidebar()" title="Quick Navigation">
-        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Interface / Drag_Horizontal"> <g id="Vector"> <path d="M18 14C17.4477 14 17 14.4477 17 15C17 15.5523 17.4477 16 18 16C18.5523 16 19 15.5523 19 15C19 14.4477 18.5523 14 18 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 14C11.4477 14 11 14.4477 11 15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15C13 14.4477 12.5523 14 12 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 14C5.44772 14 5 14.4477 5 15C5 15.5523 5.44772 16 6 16C6.55228 16 7 15.5523 7 15C7 14.4477 6.55228 14 6 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M18 8C17.4477 8 17 8.44772 17 9C17 9.55228 17.4477 10 18 10C18.5523 10 19 9.55228 19 9C19 8.44772 18.5523 8 18 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 8C11.4477 8 11 8.44772 11 9C11 9.55228 11.4477 10 12 10C12.5523 10 13 9.55228 13 9C13 8.44772 12.5523 8 12 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 8C5.44772 8 5 8.44772 5 9C5 9.55228 5.44772 10 6 10C6.55228 10 7 9.55228 7 9C7 8.44772 6.55228 8 6 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g> </g></svg>
+        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+        <g id="Interface / Drag_Horizontal"> <g id="Vector"> 
+        <path d="M18 14C17.4477 14 17 14.4477 17 15C17 15.5523 17.4477 16 18 16C18.5523 16 19 15.5523 19 15C19 14.4477 18.5523 14 18 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+        <path d="M12 14C11.4477 14 11 14.4477 11 15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15C13 14.4477 12.5523 14 12 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+        <path d="M6 14C5.44772 14 5 14.4477 5 15C5 15.5523 5.44772 16 6 16C6.55228 16 7 15.5523 7 15C7 14.4477 6.55228 14 6 14Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+        <path d="M18 8C17.4477 8 17 8.44772 17 9C17 9.55228 17.4477 10 18 10C18.5523 10 19 9.55228 19 9C19 8.44772 18.5523 8 18 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+        <path d="M12 8C11.4477 8 11 8.44772 11 9C11 9.55228 11.4477 10 12 10C12.5523 10 13 9.55228 13 9C13 8.44772 12.5523 8 12 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+        <path d="M6 8C5.44772 8 5 8.44772 5 9C5 9.55228 5.44772 10 6 10C6.55228 10 7 9.55228 7 9C7 8.44772 6.55228 8 6 8Z" stroke="rgba(255, 179, 0, 0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+        </g> </g> </g>
+        </svg>
         Quick Nav Panel
     </button>
     <nav class="sidebar-content">
         <h4>Quick Nav Panel</h4>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
-        <a href="#"></a>
+        <a href="#adsb-section">ADS-B / UAT</a>
+        <a href="#controls-section">Tracking Controls</a>
+        <a href="#map-section">Live Map</a>
+        <a href="#aircraft-section">Aircraft List</a>
+        <a href="#">SDR Frequency Control</a>
+        <a href="#">Signal Analysis</a>
+        <a href="#">Reciever Status</a>
+        <a href="#">Inbound Signals Triangulation</a>
     </nav>
 </aside>
 <nav class="navbar" id="main-navbar">
@@ -41,8 +175,8 @@
                 <div class="nav-dropdown">
                     <a href="/tools" class="nav-parent active">Tools</a>
                     <div class="dropdown-menu">
-                        <a href="/isr">ADSB / UAT / SDR</a>
-                        <a href="/mesh" class="active">Mesh Networking</a>
+                        <a href="/isr" class="active">ADSB / UAT / SDR</a>
+                        <a href="/mesh">Mesh Networking</a>
                         <a href="/vhf">RF Communication</a>
                         <a href="/backup">Backup & Restore</a>
                     </div>
@@ -125,367 +259,294 @@
         </div>
     </div>
 </nav>
-    <main class="container">
-        <section class="panel">
-            <h2>🔗 MESH NETWORK TOPOLOGY</h2>
-            <p style="color: #AAA; margin: 0;">Mesh Network Management Tools</p>
-        </section>
-        <!-- Metrics Panel -->
-        <div class="metrics-panel">
-            <div class="metric-card">
-                <div class="metric-label">Nodes Online</div>
-                <div class="metric-value" id="nodesOnline">4/4</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Active Links</div>
-                <div class="metric-value" id="activeLinks">6</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Avg Latency</div>
-                <div class="metric-value" id="avgLatency">12 ms</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-label">Network Health</div>
-                <div class="metric-value" id="networkHealth">95%</div>
-            </div>
-        </div>
-        <!-- Controls -->
-        <div class="controls">
-            <h3 style="margin: 0 0 15px 0; color: #00FF00;">⚙️ TOPOLOGY CONTROLS</h3>
-            <div class="control-group">
-                <label>Display Mode:</label>
-                <select id="displayMode" onchange="changeDisplayMode()">
-                    <option value="topology">Topology Graph</option>
-                    <option value="latency">Latency Heatmap</option>
-                    <option value="bandwidth">Bandwidth Usage</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Update Interval (sec):</label>
-                <input type="number" id="updateInterval" value="5" min="1" max="60" step="1">
-            </div>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="optimizeRoutes()">
-                🔄 Optimize Routes
-            </button>
-        </div>
-        <!-- Topology Canvas -->
-        <div class="card">
-            <h2>NETWORK TOPOLOGY GRAPH</h2>
-            <canvas id="topologyCanvas"></canvas>
-        </div>
-        <!-- Node Details -->
-        <div class="mesh-container">
-            <div class="card">
-                <h3>Node Details</h3>
-                <div id="nodeDetails" style="color: #AAA; text-align: center; padding: 20px;">
-                    Click on a node to view details
-                </div>
-            </div>
-            <div class="node-list">
-                <h4 style="margin: 0 0 10px 0; color: #00FF00; text-transform: uppercase; font-size: 11px;">
-                    Mesh Nodes
-                </h4>
-                <div id="nodeListContainer">
-                    <div style="color: #AAA;">Loading nodes...</div>
-                </div>
-            </div>
-        </div>
-        <!-- Link Quality Table -->
-        <div class="card">
-            <h2>LINK QUALITY MATRIX</h2>
-            <div id="linkQualityTable" style="overflow-x: auto; margin-top: 15px;">
-                <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #00FF00;">
-                            <th style="padding: 10px; text-align: left; color: #00FF00; text-shadow: 1px 2px 1px #111; font-family: Georgia, 'Times New Roman', Times, serif;">From</th>
-                            <th style="padding: 10px; text-align: center; color: #00FF00; text-shadow: 1px 2px 1px #111; font-family: Georgia, 'Times New Roman', Times, serif;">To Boot</th>
-                            <th style="padding: 10px; text-align: center; color: #00FF00; text-shadow: 1px 2px 1px #111; font-family: Georgia, 'Times New Roman', Times, serif;">To ISR</th>
-                            <th style="padding: 10px; text-align: center; color: #00FF00; text-shadow: 1px 2px 1px #111; font-family: Georgia, 'Times New Roman', Times, serif;">To Mesh</th>
-                            <th style="padding: 10px; text-align: center; color: #00FF00; text-shadow: 1px 2px 1px #111; font-family: Georgia, 'Times New Roman', Times, serif;">To VHF</th>
-                        </tr>
-                    </thead>
-                    <tbody id="linkQualityBody">
-                        <!-- Populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-    <script>
-        const nodeColors = {
-            'boot': '#00FF00',
-            'isr': '#FF1744',
-            'mesh': '#FF8800',
-            'vhf': '#2196F3'
-        };
-        const nodeIcons = {
-            'boot': '🖥️',
-            'isr': '📡',
-            'mesh': '🔗',
-            'vhf': '📻'
-        };
-        let nodes = [
-            { id: 'boot', name: 'Boot Node', x: 50, y: 50, status: 'online' },
-            { id: 'isr', name: 'ISR Node', x: 250, y: 100, status: 'online' },
-            { id: 'mesh', name: 'Mesh Node', x: 150, y: 250, status: 'online' },
-            { id: 'vhf', name: 'VHF Node', x: 300, y: 250, status: 'online' }
-        ];
-        let links = [
-            { from: 'boot', to: 'isr', quality: 95, latency: 5 },
-            { from: 'boot', to: 'mesh', quality: 98, latency: 3 },
-            { from: 'boot', to: 'vhf', quality: 92, latency: 8 },
-            { from: 'isr', to: 'mesh', quality: 85, latency: 12 },
-            { from: 'isr', to: 'vhf', quality: 88, latency: 10 },
-            { from: 'mesh', to: 'vhf', quality: 96, latency: 4 }
-        ];
-        let selectedNode = null;
-        function drawTopology() {
-            const canvas = document.getElementById('topologyCanvas');
-            const ctx = canvas.getContext('2d');
-            // Scale to canvas size
-            const scale = canvas.width / 400;
-            // Clear canvas
-            ctx.fillStyle = '#0A0E27';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // Draw links
-            ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
-            ctx.lineWidth = 2;
-            links.forEach(link => {
-                const fromNode = nodes.find(n => n.id === link.from);
-                const toNode = nodes.find(n => n.id === link.to); 
-                ctx.beginPath();
-                ctx.moveTo(fromNode.x * scale, fromNode.y * scale);
-                ctx.lineTo(toNode.x * scale, toNode.y * scale);
-                ctx.stroke();
-                // Draw quality indicator
-                const midX = (fromNode.x + toNode.x) / 2 * scale;
-                const midY = (fromNode.y + toNode.y) / 2 * scale;
-                ctx.fillStyle = link.quality > 90 ? '#00FF00' : link.quality > 80 ? '#FF8800' : '#FF1744';
-                ctx.font = 'bold 11px Courier New';
-                ctx.fillText(link.quality + '%', midX, midY - 5);
-            });
-            // Draw nodes
-            nodes.forEach(node => {
-                const x = node.x * scale;
-                const y = node.y * scale;
-                // Node circle
-                ctx.fillStyle = nodeColors[node.id];
-                ctx.beginPath();
-                ctx.arc(x, y, 30, 0, Math.PI * 2);
-                ctx.fill();
-                // Glow
-                ctx.strokeStyle = nodeColors[node.id];
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(x, y, 35, 0, Math.PI * 2);
-                ctx.stroke();
-                // Icon
-                ctx.fillStyle = '#000';
-                ctx.font = 'bold 20px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(nodeIcons[node.id], x, y);
-                // Label
-                ctx.fillStyle = nodeColors[node.id];
-                ctx.font = 'bold 12px Courier New';
-                ctx.fillText(node.name, x, y + 50);
-                // Status
-                ctx.fillStyle = node.status === 'online' ? '#00FF00' : '#FF1744';
-                ctx.font = '10px Courier New';
-                ctx.fillText(node.status.toUpperCase(), x, y + 65);
-            });
-        }
-        function updateNodeList() {
-            const container = document.getElementById('nodeListContainer');
-            container.innerHTML = nodes.map(node => `
-                <div class="node-item ${node.id === selectedNode?.id ? 'selected' : ''}" 
-                     onclick="selectNode('${node.id}')">
-                    <div class="node-name">${nodeIcons[node.id]} ${node.name}</div>
-                    <div class="mesh-node-status">
-                        <span class="status-indicator ${node.status}"></span>
-                        ${node.status === 'online' ? 'ONLINE' : 'OFFLINE'}
-                    </div>
-                </div>
-            `).join('');
-        }
-        function selectNode(nodeId) {
-            selectedNode = nodes.find(n => n.id === nodeId);
-            const details = document.getElementById('nodeDetails');
-            const nodeLinks = links.filter(l => l.from === nodeId || l.to === nodeId);
-            details.innerHTML = `
-                <div style="text-align: left;">
-                    <h4 style="color: ${nodeColors[nodeId]}; margin: 0 0 10px 0;">
-                        ${nodeIcons[nodeId]} ${selectedNode.name}
-                    </h4>
-                    <table style="width: 100%; font-size: 12px; color: #AAA;">
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>Status:</strong></td>
-                            <td style="color: ${selectedNode.status === 'online' ? '#00FF00' : '#FF1744'};">
-                                ${selectedNode.status.toUpperCase()}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 3px 0;"><strong>Links:</strong></td>
-                            <td style="color: #00FF00;">${nodeLinks.length}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="padding: 8px 0; border-top: 1px solid rgba(0,255,0,0.2);">
-                                <strong style="color: #00FF00;">Connected To:</strong>
-                            </td>
-                        </tr>
-                        ${nodeLinks.map(link => {
-                            const otherNode = link.from === nodeId ? link.to : link.from;
-                            return `
-                                <tr>
-                                    <td colspan="2" style="padding: 3px 0; color: ${nodeColors[otherNode]};">
-                                        ${nodeIcons[otherNode]} ${nodes.find(n => n.id === otherNode).name}
-                                        <span style="color: #AAA; font-size: 10px;">
-                                            (${link.quality}% / ${link.latency}ms)
-                                        </span>
-                                    </td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </table>
-                </div>
-            `;
-            updateNodeList();
-            drawTopology();
-        }
-        function updateLinkQualityTable() {
-            const body = document.getElementById('linkQualityBody');
-            body.innerHTML = nodes.map(fromNode => `
-                <tr style="border-bottom: 1px solid rgba(0,255,0,0.1);">
-                    <td style="padding: 10px; color: ${nodeColors[fromNode.id]}; font-weight: bold;">
-                        ${fromNode.name}
-                    </td>
-                    ${nodes.map(toNode => {
-                        if (fromNode.id === toNode.id) {
-                            return `<td style="padding: 10px; text-align: center; color: #AAA;">—</td>`;
-                        }
-                        const link = links.find(l => 
-                            (l.from === fromNode.id && l.to === toNode.id) ||
-                            (l.from === toNode.id && l.to === fromNode.id)
-                        );
-                        if (!link) {
-                            return `<td style="padding: 10px; text-align: center; color: #FF1744;">✗</td>`;
-                        }
-                        const qualityColor = link.quality > 90 ? '#00FF00' : link.quality > 80 ? '#FF8800' : '#FF1744';
-                        return `
-                            <td style="padding: 10px; text-align: center; color: ${qualityColor}; font-weight: bold;">
-                                ${link.quality}%
-                            </td>
-                        `;
-                    }).join('')}
-                </tr>
-            `).join('');
-        }
-        function changeDisplayMode() {
-            // Would switch between different visualization modes
-            const mode = document.getElementById('displayMode').value;
-            console.log('Changed to mode:', mode);
-        }
-        function optimizeRoutes() {
-            alert('🔄 Route optimization initiated. Analyzing topology and link quality...');
-            // Would trigger actual optimization
-        }
-        // Initialize
-        function init() {
-            const canvas = document.getElementById('topologyCanvas');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight; 
-            drawTopology();
-            updateNodeList();
-            updateLinkQualityTable();
-            // Select first node
-            selectNode('boot');
-        }
-        init();
-    </script>
+<main class="container">
+<section class="panel">
+<h2>📡 Mesh Network Overview</h2>
+<div class="stats-panel">
+    <div class="stat-card">Total Nodes<br><strong id="totalNodes">0</strong></div>
+    <div class="stat-card">Online<br><strong id="onlineNodes">0</strong></div>
+    <div class="stat-card">Degraded<br><strong id="degradedNodes">0</strong></div>
+    <div class="stat-card">Offline<br><strong id="offlineNodes">0</strong></div>
+</div>
+</section>
+<div class="mesh-layout">
+<section class="card">
+    <h3>🗺 Tactical Map</h3>
+    <div class="map-guard">
+        <div id="meshMap"></div>
+        <div class="map-overlay" aria-hidden="true"></div>
+    </div>
+</section>
+<section class="mesh-side">
+<div class="panel">
+<h3>🧭 Map Layers</h3>
+<label><input type="checkbox" checked onchange="toggleLayer('mesh')"> Mesh Nodes</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('tak')"> TAK Entities</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('links')"> Mesh Links</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('geofences')"> Geofences</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('sensors')"> Sensor Cones</label><br>
+<label><input type="checkbox" checked onchange="toggleLayer('hostiles')"> Hostiles</label>
+</div>
+<div class="panel">
+<h3>⚙️ Controls</h3>
+<button class="btn" onclick="simulateUpdate()">Simulate Network Event</button>
+<button class="btn" onclick="broadcastAlert()">Broadcast Alert</button>
+<button class="btn" onclick="openBroadcastModal()">Create Broadcast Message</button>
+</div>
+<div class="panel">
+<h3>🖥 Nodes</h3>
+<div id="nodesList"></div>
+</div>
+<div class="panel">
+<h3>📨 Communications Log</h3>
+<div id="commsLog" class="log"></div>
+</div>
+</section>
+</div>
+</main>
+<!-- ===== BROADCAST MODAL ===== -->
+<div id="broadcast-modal">
+  <div class="modal-content">
+    <h3>Create Broadcast Message</h3>
+    <label>Target Nodes:</label>
+    <select id="broadcast-target" multiple>
+      <option value="all">All Nodes</option>
+      <option value="A">NODE-A</option>
+      <option value="B">NODE-B</option>
+      <option value="C">NODE-C</option>
+      <option value="D">NODE-D</option>
+    </select>
+    <label>Message:</label>
+    <textarea id="broadcast-message" rows="4"></textarea>
+    <button onclick="sendBroadcast()">Send</button>
+    <button onclick="closeBroadcastModal()">Cancel</button>
+  </div>
+</div>
+<!-- ===== EXPANSION 1 NODE ACTIONS MODAL ===== -->
+<div id="node-modal">
+  <div class="modal-content">
+    <h3 id="modal-node-name">Node Actions</h3>
+    <button onclick="rebootNode()">Reboot Node</button>
+    <button onclick="runDiagnostics()">Run Diagnostics</button>
+    <button onclick="closeNodeModal()">Close</button>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ===== BROADCAST MODAL LOGIC ===== */
+const broadcastModal = document.getElementById('broadcast-modal');
+function openBroadcastModal(){ broadcastModal.style.display='block'; }
+function closeBroadcastModal(){ broadcastModal.style.display='none'; }
+function sendBroadcast(){
+    const targets = Array.from(document.getElementById('broadcast-target').selectedOptions).map(o=>o.value);
+    const msg = document.getElementById('broadcast-message').value;
+    log(`📡 Broadcast to [${targets.join(', ')}]: ${msg}`);
+    closeBroadcastModal();
+}
+</script>
+<script>
+const DATA_MODE = "demo";
+/* ================= DEMO DATA ================= */
+let meshNodes = [
+{ id:"A", uid:"MESH.A", callsign:"NODE-A", lat:37.7749, lon:-122.4194, status:"ok", role:"gateway", az:45 },
+{ id:"B", uid:"MESH.B", callsign:"NODE-B", lat:37.7849, lon:-122.4094, status:"warn", role:"relay", az:120 },
+{ id:"C", uid:"MESH.C", callsign:"NODE-C", lat:37.7649, lon:-122.4294, status:"ok", role:"sensor", az:270 },
+{ id:"D", uid:"MESH.D", callsign:"NODE-D", lat:37.7700, lon:-122.4000, status:"ok", role:"mesh", az:330 },
+{ id:"E", uid:"MESH.E", callsign:"NODE-E", lat:37.7650, lon:-122.4100, status:"ok", role:"relay", az:90 },
+{ id:"F", uid:"MESH.F", callsign:"NODE-F", lat:37.7800, lon:-122.4300, status:"ok", role:"sensor", az:180 }
+];
+let takEntities = [
+{ uid:"TAK.BLUE.1", callsign:"ALPHA-1", lat:37.779, lon:-122.42 },
+{ uid:"TAK.BLUE.2", callsign:"BRAVO-2", lat:37.775, lon:-122.425 }
+];
+let hostileEntities = [
+{ uid:"RED.1", callsign:"HOSTILE-1", lat:37.781, lon:-122.435 },
+{ uid:"RED.2", callsign:"HOSTILE-2", lat:37.768, lon:-122.418 }
+];
+let geofences = [
+L.circle([37.7749,-122.4194],{radius:800,color:"#ff8800",dashArray:"4"}),
+L.circle([37.7800,-122.4300],{radius:600,color:"#ff1744",dashArray:"4"})
+];
+let map, layers={
+mesh:L.layerGroup(),
+tak:L.layerGroup(),
+links:L.layerGroup(),
+geofences:L.layerGroup(),
+sensors:L.layerGroup(),
+hostiles:L.layerGroup(),
+c2:L.layerGroup(),
+triggers:L.layerGroup()
+};
+/* ================= MAP ================= */
+function initMap(){
+map=L.map('meshMap').setView([37.7749,-122.4194],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+Object.values(layers).forEach(l=>l.addTo(map));
+renderAll();
+}
+function renderAll(){
+Object.values(layers).forEach(l=>l.clearLayers());
+let online=0,warn=0,down=0;
+meshNodes.forEach(n=>{
+if(n.status==="ok")online++; else if(n.status==="warn")warn++; else down++;
+layers.mesh.addLayer(
+L.circleMarker([n.lat,n.lon],{radius:8,color:"#0f0"})
+.bindPopup(`<b>${n.callsign}</b><br>${n.uid}<br>${n.role}`)
+);
+let cone=L.polygon([
+[n.lat,n.lon],
+[n.lat+0.01*Math.cos(n.az*Math.PI/180),n.lon+0.01*Math.sin(n.az*Math.PI/180)],
+[n.lat+0.01*Math.cos((n.az+20)*Math.PI/180),n.lon+0.01*Math.sin((n.az+20)*Math.PI/180)]
+],{color:"#00ff00",fillOpacity:0.1});
+layers.sensors.addLayer(cone);
+});
+// Links for all nodes
+for(let i=0;i<meshNodes.length-1;i++){
+layers.links.addLayer(
+L.polyline([[meshNodes[i].lat,meshNodes[i].lon],[meshNodes[i+1].lat,meshNodes[i+1].lon]],{dashArray:"4"})
+);
+}
+// C2 Overlays
+meshNodes.forEach(n=>{
+layers.c2.addLayer(
+L.circle([n.lat,n.lon],{radius:100,color:"#00ffff",fillOpacity:0.05}).bindPopup(`C2 Overlay: ${n.callsign}`)
+);
+});
+// Triggers
+meshNodes.forEach(n=>{
+layers.triggers.addLayer(
+L.circle([n.lat+0.002,n.lon+0.002],{radius:50,color:"#ff00ff",fillOpacity:0.2}).bindPopup(`Trigger zone: ${n.callsign}`)
+);
+});
+takEntities.forEach(t=>{
+layers.tak.addLayer(L.marker([t.lat,t.lon]).bindPopup(t.callsign));
+});
+hostileEntities.forEach(h=>{
+layers.hostiles.addLayer(
+L.circleMarker([h.lat,h.lon],{radius:8,color:"#ff1744"}).bindPopup(h.callsign)
+);
+});
+geofences.forEach(g=>layers.geofences.addLayer(g));
+updateNodeList(online,warn,down);
+}
+function updateNodeList(o,w,d){
+nodesList.innerHTML='';
+meshNodes.forEach(n=>{
+nodesList.innerHTML+=`
+<div class="node-card">
+<div class="node-header">
+<strong>${n.callsign}</strong>
+<span class="${n.status}">${n.status.toUpperCase()}</span>
+</div>
+<div class="node-meta">${n.uid}<br>${n.role}</div>
+</div>`;
+});
+totalNodes.textContent=meshNodes.length;
+onlineNodes.textContent=o;
+degradedNodes.textContent=w;
+offlineNodes.textContent=d;
+}
+function simulateUpdate(){
+meshNodes.forEach(n=>{
+n.status=Math.random()>0.7?"down":Math.random()>0.4?"warn":"ok";
+});
+log("Network state update received");
+renderAll();
+}
+function broadcastAlert(){
+log("⚠ Broadcast alert issued to all mesh nodes");
+}
+function log(msg){
+const d=document.createElement('div');
+d.className="log-entry";
+d.textContent=new Date().toLocaleTimeString()+" — "+msg;
+commsLog.prepend(d);
+}
+function toggleLayer(n){
+map.hasLayer(layers[n])?map.removeLayer(layers[n]):map.addLayer(layers[n]);
+}
+document.addEventListener('DOMContentLoaded',initMap);
+</script>
+<!--Node Actions Modal-->
 <script>
 const modal = document.getElementById('node-modal');
 const modalNodeName = document.getElementById('modal-node-name');
 let currentNode = '';
 function openNodeModal(nodeName){
-  currentNode = nodeName;
-  modalNodeName.textContent = nodeName + " Node Actions";
-  modal.style.display = "block";
+currentNode = nodeName;
+modalNodeName.textContent = nodeName + " Node Actions";
+modal.style.display = "block";
 }
 function closeNodeModal(){
-  modal.style.display = "none";
+modal.style.display = "none";
 }
 function rebootNode(){
-  alert(currentNode + " node reboot triggered!");
+alert(currentNode + " node reboot triggered!");
 }
 function runDiagnostics(){
-  alert("Running diagnostics on " + currentNode + " node.");
+alert("Running diagnostics on " + currentNode + " node.");
 }
 window.onclick = function(event){
-  if(event.target == modal){ closeNodeModal(); }
+if(event.target == modal){ closeNodeModal(); }
 }
 // Toggle alerts
 document.querySelectorAll('.alert-icon').forEach(icon => {
-  icon.addEventListener('click', e => {
-    e.preventDefault();
-    icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
-  });
+icon.addEventListener('click', e => {
+e.preventDefault();
+icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
+});
 });
 </script>
+<!--Toggle Sidebar Logic-->
 <script>
 function toggleSidebar() {
-    const sidebar = document.getElementById('quick-sidebar');
-    sidebar.classList.toggle('expanded');
-    sidebar.classList.toggle('collapsed');
+const sidebar = document.getElementById('quick-sidebar');
+sidebar.classList.toggle('expanded');
+sidebar.classList.toggle('collapsed');
 }
 </script>
+<!--Collapse Sticky Top Nav On Scroll-->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar');
-    if (!navbar) return;
-
-    let isCollapsed = false;
-    const COLLAPSE_THRESHOLD = 10;
-
-    function checkCollapse() {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
-
-        if (shouldCollapse !== isCollapsed) {
-            navbar.classList.toggle('collapsed', shouldCollapse);
-            isCollapsed = shouldCollapse;
-        }
-    }
-
-    window.addEventListener('scroll', checkCollapse);
-    checkCollapse(); // initial check in case page is already scrolled
+const navbar = document.querySelector('.navbar');
+if (!navbar) return;
+let isCollapsed = false;
+const COLLAPSE_THRESHOLD = 10;
+function checkCollapse() {
+const scrollTop = window.scrollY || document.documentElement.scrollTop;
+const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
+if (shouldCollapse !== isCollapsed) {
+navbar.classList.toggle('collapsed', shouldCollapse);
+isCollapsed = shouldCollapse;
+}
+}
+window.addEventListener('scroll', checkCollapse);
+checkCollapse(); // initial check in case page is already scrolled
 });
 </script>
+<!--Prevent Accidential Map Interactions-->
 <script>
 (() => {
-    const mapGuard = document.querySelector('.map-guard');
-    const overlay  = document.querySelector('.map-overlay');
-
-    if (!mapGuard || !overlay) return;
-
-    let blockTimer = null;
-
-    mapGuard.addEventListener('mouseenter', () => {
-        overlay.classList.add('active');
-
-        blockTimer = setTimeout(() => {
-            overlay.classList.remove('active');
-            blockTimer = null;
-        }, 900);
-    });
-
-    mapGuard.addEventListener('mouseleave', () => {
-        overlay.classList.remove('active');
-
-        if (blockTimer) {
-            clearTimeout(blockTimer);
-            blockTimer = null;
-        }
-    });
+const mapGuards = document.querySelectorAll('.map-guard');
+mapGuards.forEach(guard => {
+const overlay = guard.querySelector('.map-overlay');
+if (!overlay) return;
+let blockTimer = null;
+guard.addEventListener('mouseenter', () => {
+overlay.classList.add('active');
+blockTimer = setTimeout(() => {
+overlay.classList.remove('active');
+blockTimer = null;
+}, 900);
+});
+guard.addEventListener('mouseleave', () => {
+overlay.classList.remove('active');
+if (blockTimer) {
+clearTimeout(blockTimer);
+blockTimer = null;
+}
+});
+});
 })();
 </script>
 </body>
