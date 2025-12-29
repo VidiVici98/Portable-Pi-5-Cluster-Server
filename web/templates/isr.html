@@ -349,7 +349,7 @@
     <!-- Compass / Bearing Visualization -->
     <div class="tri-card">
         <h3>BEARING / CARDINAL ORIENTATION</h3>
-        <canvas id="bearingCompass" width="300" height="300"></canvas>
+        <canvas id="bearingCompass" width="270" height="270"></canvas>
 
         <div class="bearing-readout">
             <div><span>Primary Bearing:</span> <strong id="primaryBearing">072° (ENE)</strong></div>
@@ -403,105 +403,28 @@
     </div>
 </div>
     </main>
-<!-- SIGNALS TRIANGULATION VISUALS -->
-<script>
-let triMap;
-let emitterMarker;
-let bearingLines = [];
-function initTriangulationMap() {
-    const mapEl = document.getElementById('triangulationMap');
-    if (!mapEl) {
-        console.error('Triangulation map container not found');
-        return;
-    }
-    triMap = L.map(mapEl, {
-        zoomControl: false,
-        attributionControl: false
-    }).setView([37.78, -122.42], 11);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19
-    }).addTo(triMap);
-    const receivers = [
-        { name: 'ADS-B', lat: 37.80, lon: -122.45, bearing: 68 },
-        { name: 'Tx/Rx', lat: 37.72, lon: -122.48, bearing: 81 },
-        { name: 'Mesh',  lat: 37.75, lon: -122.38, bearing: 74 }
-    ];
-    receivers.forEach(r => {
-        L.circleMarker([r.lat, r.lon], {
-            radius: 6,
-            color: '#00FF00',
-            fillOpacity: 1
-        }).addTo(triMap)
-          .bindTooltip(r.name);
-        drawBearing(r.lat, r.lon, r.bearing);
-    });
-    emitterMarker = L.circleMarker([37.77, -122.41], {
-        radius: 8,
-        color: '#FF1744',
-        fillOpacity: 0.85
-    }).addTo(triMap)
-      .bindPopup('Estimated Signal Origin');
-    setTimeout(() => triMap.invalidateSize(), 200);
-}
-function drawBearing(lat, lon, bearing) {
-    const distance = 0.35;
-    const rad = bearing * Math.PI / 180;
-    const endLat = lat + distance * Math.cos(rad);
-    const endLon = lon + distance * Math.sin(rad);
-    const line = L.polyline(
-        [[lat, lon], [endLat, endLon]],
-        {
-            color: '#FFB300',
-            weight: 2,
-            dashArray: '6,6'
-        }
-    ).addTo(triMap);
-    bearingLines.push(line);
-}
-/* === COMPASS === */
-function drawCompass(bearing) {
-    const canvas = document.getElementById('bearingCompass');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const c = canvas.width / 2;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.strokeStyle = '#00FF00';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(c, c, c - 10, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.fillStyle = '#00FF00';
-    ctx.font = '12px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('N', c, 16);
-    ctx.fillText('S', c, canvas.height - 6);
-    ctx.fillText('E', canvas.width - 10, c + 4);
-    ctx.fillText('W', 10, c + 4);
-    const rad = (bearing - 90) * Math.PI / 180;
-    ctx.strokeStyle = '#FF1744';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(c, c);
-    ctx.lineTo(
-        c + Math.cos(rad) * (c - 20),
-        c + Math.sin(rad) * (c - 20)
-    );
-    ctx.stroke();
-}
-function updateTriangulationDemo() {
-    const bearing = 70 + Math.random() * 10;
-    document.getElementById('primaryBearing').textContent =
-        `${bearing.toFixed(0)}°`;
-    drawCompass(bearing);
-}
-document.addEventListener('DOMContentLoaded', () => {
-    initTriangulationMap();
-    drawCompass(74);
-    setInterval(updateTriangulationDemo, 4000);
-});
-</script>
-<!--ADS-B / UAT Map Logic-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<!--ADS-B / UAT Map Logic-->
+    <script>
+        let triangulationMap;
+        function initTriangulationMap() {
+            const mapEl = document.getElementById('triangulationMap');
+            if (!mapEl) return;
+            triangulationMap = L.map('triangulationMap', {
+                center: [37.7749, -122.4194],
+                zoom: 10
+            });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(triangulationMap);
+        }
+        // Initialize triangulation map when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initTriangulationMap();
+        });
+    </script>
+<!--ADS-B / UAT Map Logic-->
     <script>
         let map;
         let aircraft = [];
@@ -666,85 +589,515 @@ document.addEventListener('DOMContentLoaded', () => {
         initMap();
         loadAircraft();
     </script>
-    <!--Node Actions Modal-->
+<!--Demo Waterfall Logic-->
     <script>
-const modal = document.getElementById('node-modal');
-const modalNodeName = document.getElementById('modal-node-name');
-let currentNode = '';
-function openNodeModal(nodeName){
-  currentNode = nodeName;
-  modalNodeName.textContent = nodeName + " Node Actions";
-  modal.style.display = "block";
-}
-function closeNodeModal(){
-  modal.style.display = "none";
-}
-function rebootNode(){
-  alert(currentNode + " node reboot triggered!");
-}
-function runDiagnostics(){
-  alert("Running diagnostics on " + currentNode + " node.");
-}
-window.onclick = function(event){
-  if(event.target == modal){ closeNodeModal(); }
-}
-// Toggle alerts
-document.querySelectorAll('.alert-icon').forEach(icon => {
-  icon.addEventListener('click', e => {
-    e.preventDefault();
-    icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
-  });
-});
-</script>
+        (() => {
+            const canvas = document.getElementById("spectrumCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            /* ================= CONFIG ================= */
+            const FREQ_BINS = 512;
+            let UPDATE_MS = 45;
+            let GAIN = 1.0;
+            let paused = false;
+            const NOISE_BASE = 0.28;
+            const NOISE_VAR  = 0.08;
+            let centerFreq = 146.520; // MHz example
+            let spanMHz = 2;           // visible spectrum span
+            let xOffset = 0;           // horizontal pan
+            /* ================= CANVAS INIT ================= */
+            function initCanvas() {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width  = FREQ_BINS;
+                canvas.height = Math.floor(rect.height);
+                ctx.imageSmoothingEnabled = false;
+            }
+            initCanvas();
+            window.addEventListener("resize", initCanvas);
+            /* ================= UI CONTROLS ================= */
+            const controls = document.createElement("div");
+            controls.style.cssText = `
+                display:flex;
+                gap:8px;
+                margin-top:6px;
+                align-items:center;
+                font-size:12px;
+            `;
+            function button(label, fn) {
+                const b = document.createElement("button");
+                b.textContent = label;
+                b.onclick = fn;
+                return b;
+            }
+            function slider(min, max, step, val, fn) {
+                const s = document.createElement("input");
+                s.type = "range";
+                s.min = min;
+                s.max = max;
+                s.step = step;
+                s.value = val;
+                s.oninput = e => fn(parseFloat(e.target.value));
+                return s;
+            }
+            controls.append(
+                button("Pause", () => paused = !paused),
+                button("Snapshot", () => snapshotWaterfall()),
+                document.createTextNode("Gain"),
+                slider(0.5, 2.5, 0.1, GAIN, v => GAIN = v)
+            );
+            canvas.parentElement.appendChild(controls);
+            /* ================= SIGNAL STATE ================= */
+            const carriers = [
+                { f: 120, bw: 3, p: 0.45, d: 0.02 },
+                { f: 320, bw: 4, p: 0.35, d: -0.015 }
+            ];
+            let burst = null;
+            let lastDetected = null;
+            /* ================= COLOR MAP ================= */
+            function powerToColor(p) {
+                p = Math.max(0, Math.min(1, p * GAIN));
+                p = Math.pow(p, 0.6);
+                let r=0,g=0,b=0;
+                if (p < 0.25) {
+                    b = 60 + p*4*100;  // blue-green base
+                    g = p*4*140;
+                } else if (p < 0.5) {
+                    g = 140 + (p-0.25)*4*100;
+                    b = 200 - (p-0.25)*4*60;
+                } else if (p < 0.75) {
+                    r = (p-0.5)*4*180;
+                    g = 240;
+                } else {
+                    r = 255;
+                    g = 240 - (p-0.75)*4*160;
+                }
+                return [r|0,g|0,b|0];
+            }
+            /* ================= FFT FRAME ================= */
+            function generateFrame() {
+                const frame = new Float32Array(FREQ_BINS);
+                for (let i=0;i<FREQ_BINS;i++) {
+                    frame[i] = NOISE_BASE + Math.random()*NOISE_VAR;
+                }
+                for (const c of carriers) {
+                    c.f += c.d;
+                    if (c.f < 20 || c.f > FREQ_BINS-20) c.d *= -1;
+                    const f = c.f|0;
+                    for (let i=-c.bw;i<=c.bw;i++) {
+                        const idx = f+i;
+                        if (idx>=0 && idx<FREQ_BINS)
+                            frame[idx]+=c.p*Math.exp(-Math.abs(i));
+                    }
+                }
+                if (!burst && Math.random()<0.02) {
+                    burst = {
+                        f: Math.random()*FREQ_BINS|0,
+                        bw: 6,
+                        life: 30,
+                        p: 0.7
+                    };
+                    lastDetected = burst.f;
+                }
+                if (burst) {
+                    for (let i=-burst.bw;i<=burst.bw;i++) {
+                        const idx = burst.f+i;
+                        if (idx>=0 && idx<FREQ_BINS)
+                            frame[idx]+=burst.p*Math.exp(-Math.abs(i));
+                    }
+                    burst.life--;
+                    if (burst.life<=0) burst=null;
+                }
+                return frame;
+            }
+            /* ================= OVERLAYS ================= */
+            function drawOverlays() {
+                ctx.save();
+                const w = canvas.width;
+                const h = canvas.height;
+                // Center window
+                const winWidth = w * 0.1;
+                const x1 = w/2 - winWidth/2;
+                const x2 = w/2 + winWidth/2;
+                ctx.fillStyle = "rgba(0,0,0,0.005)";
+                ctx.fillRect(x1, 0, winWidth, h);
+                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x1,0); ctx.lineTo(x1,h);
+                ctx.moveTo(x2,0); ctx.lineTo(x2,h);
+                ctx.stroke();
+                // Signal detection marker
+                if (lastDetected!==null) {
+                    ctx.strokeStyle="rgba(255,0,0,0.6)";
+                    ctx.beginPath();
+                    ctx.moveTo(lastDetected, h-10);
+                    ctx.lineTo(lastDetected, h);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+            /* ================= MOUSE HUD ================= */
+            canvas.addEventListener("mousemove", e=>{
+                const r = canvas.getBoundingClientRect();
+                const x = e.clientX - r.left;
+                const bin = Math.floor(x / r.width * FREQ_BINS);
+                canvas.title = `Freq Bin: ${bin}`;
+            });
+            /* ================= SNAPSHOT WITH METADATA ================= */
+            function snapshotWaterfall() {
+                const tmpCanvas = document.createElement('canvas');
+                tmpCanvas.width = canvas.width;
+                tmpCanvas.height = canvas.height;
+                const tmpCtx = tmpCanvas.getContext('2d');
+                tmpCtx.drawImage(canvas,0,0);
+                tmpCtx.fillStyle = 'rgba(0,0,0,0.6)';
+                tmpCtx.fillRect(5,5,240,50);
+                tmpCtx.fillStyle = '#00FF00';
+                tmpCtx.font = '12px monospace';
+                tmpCtx.fillText(`Time: ${new Date().toLocaleString()}`, 10, 20);
+                tmpCtx.fillText(`Center Freq: ${centerFreq.toFixed(3)} MHz`, 10, 35);
+                tmpCtx.fillText(`Span: ${spanMHz.toFixed(3)} MHz`, 10, 50);
+                tmpCtx.fillText(`Gain: ${GAIN.toFixed(2)}`, 10, 65);
+                const link = document.createElement('a');
+                link.download = `waterfall_${Date.now()}.png`;
+                link.href = tmpCanvas.toDataURL();
+                link.click();
+            }
+            /* ================= MAIN LOOP ================= */
+            function tick() {
+                if (!paused) {
+                    // scroll existing image up by 1 pixel
+                    ctx.drawImage(canvas,0,1,FREQ_BINS,canvas.height-1,0,0,FREQ_BINS,canvas.height-1);
+                    const frame = generateFrame();
+                    const row = ctx.createImageData(FREQ_BINS,1);
+                    for (let i=0;i<FREQ_BINS;i++) {
+                        const [r,g,b] = powerToColor(frame[i]);
+                        const o=i*4;
+                        row.data[o]=r;
+                        row.data[o+1]=g;
+                        row.data[o+2]=b;
+                        row.data[o+3]=255;
+                    }
+                    ctx.putImageData(row,0,canvas.height-1);
+                }
+                drawOverlays();
+                setTimeout(tick, UPDATE_MS);
+            }
+            tick();
+            /* ================= X-AXIS PAN ================= */
+            document.addEventListener('keydown', e=>{
+                if (e.key==='ArrowLeft') xOffset -= 10;
+                if (e.key==='ArrowRight') xOffset += 10;
+                xOffset = Math.max(0,xOffset);
+            });
+        })();
+    </script>
+<!-- SIGNALS TRIANGULATION VISUALS -->
+    <script>
+        function normalizeCanvas(canvas) {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width  = rect.width;
+        canvas.height = rect.height;
+        }
+        function drawCompass(bearingDeg) {
+        const canvas = document.getElementById('bearingCompass');
+            if (!canvas) {
+            console.error('bearingCompass not found');
+            return;
+            }
+        normalizeCanvas(canvas);
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+        const c = w / 2;
+        const r = c - 12;
+        ctx.clearRect(0, 0, w, h);
+        /* Outer ring */
+        ctx.strokeStyle = '#00FF00';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(c, c, r, 0, Math.PI * 2);
+        ctx.stroke();
+        /* Cardinal ticks */
+        ctx.strokeStyle = 'rgba(0,255,0,0.4)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 360; i += 30) {
+            const a = (i - 90) * Math.PI / 180;
+            ctx.beginPath();
+            ctx.moveTo(
+                c + Math.cos(a) * (r - 8),
+                c + Math.sin(a) * (r - 8)
+            );
+            ctx.lineTo(
+                c + Math.cos(a) * r,
+                c + Math.sin(a) * r
+            );
+            ctx.stroke();
+        }
+        /* Cardinal labels */
+        ctx.fillStyle = '#00FF00';
+        ctx.font = 'bold 14px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('N', c, 14);
+        ctx.fillText('S', c, h - 14);
+        ctx.fillText('E', w - 14, c);
+        ctx.fillText('W', 14, c);
+        /* Bearing needle */
+        const rad = (bearingDeg - 90) * Math.PI / 180;
+        ctx.strokeStyle = '#FF1744';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(c, c);
+        ctx.lineTo(
+            c + Math.cos(rad) * (r - 16),
+            c + Math.sin(rad) * (r - 16)
+        );
+        ctx.stroke();
+        /* Center dot */
+        ctx.fillStyle = '#FF1744';
+        ctx.beginPath();
+        ctx.arc(c, c, 4, 0, Math.PI * 2);
+        ctx.fill();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            // Draw initial compass
+            drawCompass(72); // example bearing
+            // Optional: demo auto-update
+            setInterval(() => {
+                const bearing = 68 + Math.random() * 12;
+                document.getElementById('primaryBearing').textContent =
+                    `${bearing.toFixed(0)}°`;
+                drawCompass(bearing);
+            }, 3000);
+        });
+    </script>
+<!--Triangulation Markers-->
+    <script>
+        // Global variables (declare once)
+        window.triangulationMarker = null;
+        window.errorCircle = null;
+        /**
+        * Update or create triangulation marker with optional error radius
+        * @param {number} lat - Latitude of estimated origin
+        * @param {number} lng - Longitude of estimated origin
+        * @param {object} options - Optional settings
+        *        options.errorRadius (m)
+        *        options.popupText (string)
+        *        options.pan (bool)
+        */
+        function updateTriangulationMarker(lat, lng, options = {}) {
+            if (!triangulationMap) return;
+            // Create or move marker
+            if (window.triangulationMarker) {
+                window.triangulationMarker.setLatLng([lat, lng]);
+            } else {
+                const markerIcon = L.divIcon({
+                    html: `<div style="
+                        width: 20px;
+                        height: 20px;
+                        background: rgba(255,23,68,0.8);
+                        border: 2px solid #FF1744;
+                        border-radius: 50%;
+                        box-shadow: 0 0 12px rgba(255,23,68,0.8);
+                    "></div>`,
+                    className: '',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+                window.triangulationMarker = L.marker([lat, lng], { icon: markerIcon })
+                    .addTo(triangulationMap)
+                    .bindPopup(options.popupText || 'Estimated Signal Origin');
+            }
+            // Error circle
+            if (options.errorRadius) {
+                if (window.errorCircle) {
+                    window.errorCircle.setLatLng([lat, lng]);
+                    window.errorCircle.setRadius(options.errorRadius);
+                } else {
+                    window.errorCircle = L.circle([lat, lng], {
+                        radius: options.errorRadius,
+                        color: '#FF1744',
+                        fillColor: 'rgba(255,23,68,0.2)',
+                        weight: 2,
+                        fillOpacity: 0.2
+                    }).addTo(triangulationMap);
+                }
+            }
+            // Pan map
+            if (options.pan) triangulationMap.panTo([lat, lng]);
+        }
+        // Example usage: initial placement
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTriangulationMarker(37.7749, -122.4194, {
+                errorRadius: 420,
+                popupText: 'Estimated Signal Source',
+                pan: true
+            });
+            // Optional: auto-update demo
+            setInterval(() => {
+                const newLat = 37.7749 + (Math.random() - 0.5) * 0.01;
+                const newLng = -122.4194 + (Math.random() - 0.5) * 0.01;
+                updateTriangulationMarker(newLat, newLng, {
+                    errorRadius: 420,
+                    popupText: 'Estimated Signal Source',
+                    pan: false
+                });
+                const secondsAgo = ((Math.random() * 5) + 1).toFixed(1);
+                document.getElementById('triUpdate').textContent = `${secondsAgo}s ago`;
+            }, 5000);
+        });
+    </script>
+<!--Triangulation Node Positions-->
+    <script>
+        // Node positions for triangulation
+        const nodes = {
+            "Tx/Rx Node": { lat: 37.7750, lon: -122.4183 },
+            "Mesh Node": { lat: 37.7765, lon: -122.4170 },
+            "ADS-B Node": { lat: 37.7740, lon: -122.4190 } // ignored for triangulation
+        };
+        // Convert degrees to radians
+        function deg2rad(deg) {
+            return deg * Math.PI / 180;
+        }
+        // Simple triangulation: intersect two bearings
+        function triangulate(nodeData) {
+            const nodeKeys = Object.keys(nodeData).filter(k => k !== 'ADS-B Node');
+            if (nodeKeys.length < 2) return null;
+            const [nodeA, nodeB] = nodeKeys;
+            const posA = nodes[nodeA];
+            const posB = nodes[nodeB];
+            const bearingA = parseFloat(document.querySelector(
+                `tr:has(td:contains("${nodeA}")) td:nth-child(2)`
+            )?.textContent) || 0;
+            const bearingB = parseFloat(document.querySelector(
+                `tr:has(td:contains("${nodeB}")) td:nth-child(2)`
+            )?.textContent) || 0;
+            const thetaA = deg2rad(bearingA);
+            const thetaB = deg2rad(bearingB);
+            const x1 = posA.lon, y1 = posA.lat;
+            const x2 = posB.lon, y2 = posB.lat;
+            const m1 = Math.tan(thetaA);
+            const m2 = Math.tan(thetaB);
+            const denom = m1 - m2;
+            if (Math.abs(denom) < 0.0001) return null;
+           const x = (m1*x1 - m2*x2 + y2 - y1) / denom;
+            const y = y1 + m1 * (x - x1);
+            return [y, x];
+        }
+        function updateTriangulation() {
+            const estimated = triangulate(nodes);
+            if (!estimated) return;
+            const [lat, lon] = estimated;
+            // Use global marker variables
+            if (!window.triangulationMarker) {
+                window.triangulationMarker = L.marker([lat, lon], {
+                    icon: L.divIcon({
+                        html: '<div style="background:#FF1744;color:#000;padding:4px 8px;border-radius:3px;font-size:12px;font-weight:bold;border:2px solid #FF1744;box-shadow:0 0 10px rgba(255,23,68,0.5)">ESTIMATED ORIGIN</div>',
+                        className: 'tri-marker',
+                        iconSize: [100, 30],
+                        iconAnchor: [50, 15]
+                    })
+                }).addTo(triangulationMap);
+            } else {
+                window.triangulationMarker.setLatLng([lat, lon]);
+            }
+            const errorRadiusMeters = 420;
+            if (!window.errorCircle) {
+                window.errorCircle = L.circle([lat, lon], {
+                    radius: errorRadiusMeters,
+                    color: '#FF1744',
+                    fillColor: 'rgba(255,23,68,0.1)',
+                    weight: 2
+                }).addTo(triangulationMap);
+            } else {
+                window.errorCircle.setLatLng([lat, lon]);
+                window.errorCircle.setRadius(errorRadiusMeters);
+            }
+        }
+        setInterval(updateTriangulation, 3000);
+    </script>
+<!--Node Actions Modal-->
+    <script>
+        const modal = document.getElementById('node-modal');
+        const modalNodeName = document.getElementById('modal-node-name');
+        let currentNode = '';
+        function openNodeModal(nodeName){
+        currentNode = nodeName;
+        modalNodeName.textContent = nodeName + " Node Actions";
+        modal.style.display = "block";
+        }
+        function closeNodeModal(){
+        modal.style.display = "none";
+        }
+        function rebootNode(){
+          alert(currentNode + " node reboot triggered!");
+        }
+        function runDiagnostics(){
+          alert("Running diagnostics on " + currentNode + " node.");
+        }
+        window.onclick = function(event){
+          if(event.target == modal){ closeNodeModal(); }
+        }
+        // Toggle alerts
+        document.querySelectorAll('.alert-icon').forEach(icon => {
+          icon.addEventListener('click', e => {
+            e.preventDefault();
+            icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
+          });
+        });
+    </script>
 <!--Toggle Sidebar Logic-->
-<script>
-function toggleSidebar() {
-    const sidebar = document.getElementById('quick-sidebar');
-    sidebar.classList.toggle('expanded');
-    sidebar.classList.toggle('collapsed');
-}
-</script>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('quick-sidebar');
+            sidebar.classList.toggle('expanded');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 <!--Collapse Sticky Top Nav On Scroll-->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar');
-    if (!navbar) return;
-    let isCollapsed = false;
-    const COLLAPSE_THRESHOLD = 10;
-    function checkCollapse() {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
-        if (shouldCollapse !== isCollapsed) {
-            navbar.classList.toggle('collapsed', shouldCollapse);
-            isCollapsed = shouldCollapse;
-        }
-    }
-    window.addEventListener('scroll', checkCollapse);
-    checkCollapse(); // initial check in case page is already scrolled
-});
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            let isCollapsed = false;
+            const COLLAPSE_THRESHOLD = 10;
+            function checkCollapse() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
+                if (shouldCollapse !== isCollapsed) {
+                    navbar.classList.toggle('collapsed', shouldCollapse);
+                    isCollapsed = shouldCollapse;
+                }
+            }
+            window.addEventListener('scroll', checkCollapse);
+            checkCollapse(); // initial check in case page is already scrolled
+        });
+    </script>
 <!--Prevent Accidential Map Interactions-->
-<script>
-(() => {
-    const mapGuard = document.querySelector('.map-guard');
-    const overlay  = document.querySelector('.map-overlay');
-    if (!mapGuard || !overlay) return;
-    let blockTimer = null;
-    mapGuard.addEventListener('mouseenter', () => {
-        overlay.classList.add('active');
-        blockTimer = setTimeout(() => {
-            overlay.classList.remove('active');
-            blockTimer = null;
-        }, 900);
-    });
-    mapGuard.addEventListener('mouseleave', () => {
-        overlay.classList.remove('active');
-        if (blockTimer) {
-            clearTimeout(blockTimer);
-            blockTimer = null;
-        }
-    });
-})();
-</script>
+    <script>
+        (() => {
+            const mapGuards = document.querySelectorAll('.map-guard');
+            mapGuards.forEach(guard => {
+                const overlay = guard.querySelector('.map-overlay');
+                if (!overlay) return;
+                let blockTimer = null;
+                guard.addEventListener('mouseenter', () => {
+                    overlay.classList.add('active');
+                    blockTimer = setTimeout(() => {
+                        overlay.classList.remove('active');
+                        blockTimer = null;
+                    }, 900);
+                });
+                guard.addEventListener('mouseleave', () => {
+                    overlay.classList.remove('active');
+                    if (blockTimer) {
+                        clearTimeout(blockTimer);
+                        blockTimer = null;
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

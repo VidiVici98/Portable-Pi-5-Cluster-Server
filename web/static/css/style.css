@@ -1242,6 +1242,7 @@ tbody tr:hover {
             border: 1px solid #333;
             border-radius: 3px;
             margin: 10px 0;
+            filter: brightness(.75);
         }
         .signal-meter {
             margin: 20px 0;
@@ -1612,6 +1613,7 @@ tbody tr:hover {
     min-height: 320px;
     background: #050805;
     border: 1px solid rgba(0,255,0,0.3);
+    filter: brightness(.75);
 }
 .tri {
     position: relative;
@@ -1645,4 +1647,17 @@ tbody tr:hover {
 
 .tri-meta strong {
     color: #00FF00;
+}
+#bearingCompass {
+    display: block;
+    width: 270px;
+    height: 270px;
+    max-width: 100%;
+    margin: 0 auto;
+    background: radial-gradient(circle at center,
+        rgba(0,255,0,0.08),
+        rgba(0,0,0,0.95)
+    );
+    border-radius: 50%;
+    border: 1px solid rgba(0,255,0,0.35);
 }
