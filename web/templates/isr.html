@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Airspace / RF Monitoring - Tactical Dashboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
-<body data-page="isr">
+<body data-page="sigint">
     {% if demo_mode %}
     <navbar class="demo-mode">⚠ DEMO MODE - No Cluster Connected</navbar>
     {% endif %}
@@ -45,7 +45,7 @@
             </div>
         </div>
         <!-- Map -->
-        <div class="card">
+        <div class="card" id="map-section">
             <h2>LIVE AIRCRAFT MAP</h2>
             <div class="map-card">
                 <div class="map-guard">
@@ -80,7 +80,7 @@
             </div>
         </div>
         <!-- Aircraft List -->
-        <div class="adsb-container">
+        <div class="adsb-container" id="aircraft-section">
             <div class="aircraft-details">
                 <h3>Aircraft Details</h3>
                 <div id="selectedAircraft" style="color: #AAA; text-align: center; padding: 20px;">
@@ -102,7 +102,7 @@
             <h2>📻 VHF/SDR FREQUENCY CONTROL</h2>
             <p style="color: #AAA; margin: 0;">SDR Spectrum Monitoring & RF Transciever Tools</p>
         </section>
-        <div class="sdr-container">
+        <div class="sdr-container" id="reciever-control">
             <!-- Frequency Control Panel -->
             <div class="frequency-panel">
                 <h3 style="margin: 0 0 15px 0; color: #2196F3;">RECEIVER CONTROL</h3>
@@ -158,7 +158,7 @@
             <!-- Spectrum Display -->
             <div>
                 <!-- Signal Strength Meter -->
-                <div class="spectrum-display">
+                <div class="spectrum-display" id="rf-waterfall">
                     <h3 style="margin: 0 0 15px 0; color: #2196F3;">SIGNAL ANALYSIS</h3>
                     
                     <div class="signal-meter">
@@ -195,7 +195,7 @@
                     </table>
                 </div>
                 <!-- Receiver Info -->
-                <div class="spectrum-display">
+                <div class="spectrum-display" id="reciever-status">
                     <h3 style="margin: 0 0 15px 0; color: #2196F3;">RECEIVER STATUS</h3>
                     <table class="info-table">
                         <tr>
@@ -239,7 +239,7 @@
     </p>
 </section>
 
-<div class="triangulation-grid">
+<div class="triangulation-grid" id="signal-triangulation">
     <!-- Compass / Bearing Visualization -->
     <div class="tri-card">
         <h3>BEARING / CARDINAL ORIENTATION</h3>
@@ -283,7 +283,7 @@
         </table>
     </div>
     <!-- Triangulation Map -->
-    <div class="tri-card tri-map-card">
+    <div class="tri-card tri-map-card" id="triangulation-map">
         <h3>ESTIMATED SIGNAL ORIGIN</h3>
         <div class="map-guard tri">
             <div id="triangulationMap"></div>
@@ -297,6 +297,7 @@
     </div>
 </div>
     </main>
+    <footer id="footer-embed-container"></footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script src="https://rawcdn.githack.com/bbecquet/Leaflet.RotatedMarker/master/leaflet.rotatedMarker.js"></script>

@@ -32,58 +32,45 @@ DEMO_MODE = os.getenv('DEMO_MODE', 'True').lower() == 'true'
 NODES = {
     'boot': {
         'ip': '192.168.1.10',
-        'name': 'Boot Node',
-        'type': 'infrastructure',
-        'purpose': 'Core cluster infrastructure, NTP sync, NFS server',
+        'name': 'Boot',
+        'type': 'command',
+        'purpose': 'Centralized control and command of the cluster infrastructure.',
         'tools': {
-            'system': ['NTP Sync', 'NFS Server', 'DHCP'],
-            'monitoring': ['Cluster Health', 'Network Monitor'],
-            'admin': ['Shutdown All', 'Reboot All', 'Update All']
+            'services': ['NTP', 'NFS', 'DHCP', 'TFTP', '' ],
         }
     },
     'isr': {
         'ip': '192.168.1.20',
-        'name': 'ISR Node',
-        'type': 'rf_monitoring',
-        'purpose': 'Intelligence, Surveillance, Reconnaissance - ADSB/UAT monitoring',
+        'name': 'SigInt',
+        'type': 'isr',
+        'purpose': 'Airspace and RF spectrum monitoring using software defined radios.',
         'tools': {
-            'adsb': ['dump1090', 'readsb', 'ADSB Track Display'],
-            'uat': ['dump978', 'UAT Monitor', 'Alert System'],
-            'analysis': ['Flight Track History', 'Aircraft Database', 'Alert Config'],
-            'integration': ['PLACEHOLDER: Custom ADSB Receiver', 'PLACEHOLDER: UAT Decoder']
+            'services': ['dump1090', 'readsb', 'rtl-sdr', 'dump978', 'pyaware', 'fldigi', 'aprs'],
         }
     },
     'mesh': {
         'ip': '192.168.1.30',
-        'name': 'Mesh Node',
-        'type': 'networking',
-        'purpose': 'Mesh networking, inter-node communication, redundancy',
+        'name': 'Mesh',
+        'type': 'mesh',
+        'purpose': 'Centralized support and coordinating for ad hoc 915mHz LoRa mesh networks.',
         'tools': {
-            'mesh': ['Batman-adv Status', 'Mesh Route Viewer', 'Network Topology'],
-            'routing': ['OLSR Monitor', 'Route Optimization', 'Peer Status'],
-            'redundancy': ['Link Failover', 'Connection Status', 'Backup Routes'],
-            'integration': ['PLACEHOLDER: Custom Mesh Protocol', 'PLACEHOLDER: Network Tools']
+            'mesh': ['Batman-adv', 'Reticulm', 'freeTAKserver', 'meshtastic', 'mosquito'],
         }
     },
     'vhf': {
         'ip': '192.168.1.40',
-        'name': 'VHF Node',
+        'name': 'RF',
         'type': 'radio',
-        'purpose': 'Software Defined Radio (SDR), VHF/UHF communications',
+        'purpose': 'HF/VHF/UHF voice and data communications via analog or digital RF transmitters with CAT Control.',
         'tools': {
-            'sdr': ['GQRX', 'RTL-SDR Tools', 'Frequency Scanner'],
-            'vhf': ['VHF Receiver', 'VHF Transmitter', 'Squelch Monitor'],
-            'radio': ['Signal Strength', 'Modulation Analyzer', 'Recording'],
-            'integration': ['PLACEHOLDER: Custom SDR App', 'PLACEHOLDER: VHF Tools']
+            'sdr': ['gqrx', 'satscape', 'winlink'],
         }
     }
 }
-
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.getenv('SECRET_KEY', 'tactical-ops-default-key')
 CORS(app)
-
 ################################################################################
 # AUTHENTICATION AND BOOT LANDING PAGE
 ################################################################################
@@ -122,6 +109,9 @@ def boot_landing():
 @app.route('/header')
 def header():
     return render_template('components/header.html')
+@app.route('/footer')
+def footer():
+    return render_template('components/footer.html')
 
 ################################################################################
 # UTILITIES

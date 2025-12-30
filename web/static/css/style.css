@@ -687,6 +687,12 @@ tbody tr:hover {
     position: relative;
     overflow: hidden;
 }
+#node-status {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+}
 .node-card::before {
     content: '';
     position: absolute;
@@ -1662,4 +1668,77 @@ tbody tr:hover {
     );
     border-radius: 50%;
     border: 1px solid rgba(0,255,0,0.35);
+}
+#cluster-status {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+#cluster-status .card {
+    flex: 1 1 calc(25% - 12px);
+    display: flex;
+    flex-direction: column;
+}
+#quick-actions {
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 36px;
+}
+/* 2x2 */
+@media (max-width: 1024px) {
+    #cluster-status .card {
+        flex: 1 1 calc(50% - 12px);
+    }
+}
+
+/* Stack */
+@media (max-width: 600px) {
+    #cluster-status .card {
+        flex: 1 1 100%;
+    }
+}
+.node-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 1000;
+}
+.node-modal.open {
+    display: block;
+}
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+.modal-panel {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 5vh auto;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.modal-close {
+    position: absolute;
+    top: 36px;
+    right: 24px;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.sub-footer {
+    background: linear-gradient(25deg, #000000, #111111, #151515, #111111, #000000);
+    color: #666;
+    padding:2px;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-align: center;
 }

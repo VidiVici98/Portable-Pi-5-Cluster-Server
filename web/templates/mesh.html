@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mesh Network – Tactical Dashboard</title>
-<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
 /* ===== PAGE LAYOUT ===== */
@@ -152,7 +152,7 @@ main.container { padding: 15px; }
 </div>
 </section>
 <div class="mesh-layout">
-<section class="card">
+<section class="card" id="tactical-map">
     <h3>🗺 Tactical Map</h3>
     <div class="map-guard">
         <div id="meshMap"></div>
@@ -169,17 +169,17 @@ main.container { padding: 15px; }
 <label><input type="checkbox" checked onchange="toggleLayer('sensors')"> Sensor Cones</label><br>
 <label><input type="checkbox" checked onchange="toggleLayer('hostiles')"> Hostiles</label>
 </div>
-<div class="panel">
+<div class="panel" id="send-alerts">
 <h3>⚙️ Controls</h3>
 <button class="btn" onclick="simulateUpdate()">Simulate Network Event</button>
 <button class="btn" onclick="broadcastAlert()">Broadcast Alert</button>
 <button class="btn" onclick="openBroadcastModal()">Create Broadcast Message</button>
 </div>
-<div class="panel">
+<div class="panel" id="node-status">
 <h3>🖥 Nodes</h3>
 <div id="nodesList"></div>
 </div>
-<div class="panel">
+<div class="panel" id="comms-log">
 <h3>📨 Communications Log</h3>
 <div id="commsLog" class="log"></div>
 </div>
@@ -213,8 +213,8 @@ main.container { padding: 15px; }
     <button onclick="closeNodeModal()">Close</button>
   </div>
 </div>
+    <footer id="footer-embed-container"></footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ===== BROADCAST MODAL LOGIC ===== */

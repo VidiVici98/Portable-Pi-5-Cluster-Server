@@ -10,54 +10,39 @@
     {% if demo_mode %}
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
     {% endif %}
-    <!-- Collapsible Quick Nav Sidebar -->
+<!-- Collapsible Quick Nav Sidebar -->
     {% include 'components/sidebar.html' %}
-    <div id="content">
-        <!-- page-specific content -->
-    </div>
+    <div id="content"></div>
 <!--Header Embed Container-->
-<nav class="navbar" id="main-navbar">
+    <nav class="navbar" id="main-navbar">
         <div id="header-container"></div>
-</nav>
+    </nav>
     <main class="container">
-        <!-- Node Overview with Purposes -->
-        <div class="card">
-            <h2>📡 CLUSTER COMPOSITION</h2>
-            <div id="node-purposes" class="grid-4" style="margin-bottom: 15px;">
-                <!-- Populated by JavaScript -->
-            </div>
-            <p style="color: #AAA; font-size: 12px; margin: 0;">Each node serves a specific tactical purpose. Click any node to view available tools and integrations.</p>
-        </div>
         <!-- Status Overview -->
         <div class="card">
-            <h2>OPERATIONAL STATUS</h2>
-            <div id="cluster-status" class="grid-4">
-                <!-- Populated by JavaScript -->
+            <h2>NODE STATUS</h2>
+            <div id="node-status">
+                <div id="cluster-status" class="grid-4">
+                    <!-- Populated by JavaScript -->
+                     <!--These cards are the ones we are pairing with the tool-cards-->
+                </div>
             </div>
-        </div>
-        <!-- Quick Actions -->
-        <div class="card">
-            <h2>QUICK ACTIONS</h2>
-            <div class="grid-4">
-                <button class="btn btn-primary" onclick="validateConfig()">
+            <div class="grid-4" id="quick-actions">
+                <button class="btn btn-primary" onclick="validateConfig()" id="validate-config">
                     Validate Config
                 </button>
-                <button class="btn btn-info" onclick="runHealthCheck()">
+                <button class="btn btn-info" onclick="runHealthCheck()" id="health">
                     Health Check
                 </button>
-                <button class="btn btn-warning" onclick="showPerformance()">
+                <button class="btn btn-info" onclick="showPerformance()" id="performance">
                     Performance
                 </button>
-                <button class="btn btn-danger" onclick="confirmRebootAll()">
+                <button class="btn btn-danger" onclick="confirmDestroyData()" id="data-wipe">
+                    Emergency Wipe
+                </button>                
+                <button class="btn btn-danger" onclick="confirmRebootAll()" id="reboot-cluster">
                     Reboot All
                 </button>
-            </div>
-        </div>
-        <!-- Deployment Status -->
-        <div class="card">
-            <h2>DEPLOYMENT STATUS</h2>
-            <div id="deployment-status">
-                <!-- Populated by JavaScript -->
             </div>
         </div>
         <!-- Recent Activity -->
@@ -68,8 +53,9 @@
             </div>
         </div>
     </main>
+    <footer id="footer-embed-container"></footer>
+    <div id="node-tool-modals"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
     <script>
         const nodeDetails = {
             'boot': { icon: '🖥️', color: '#00FF00' },
@@ -105,30 +91,44 @@
             }
         }
         // Reload status every 5 seconds
-        function updateClusterStatus() {
-            fetch('/api/cluster/status')
-                .then(r => r.json())
-                .then(data => {
-                    const statusDiv = document.getElementById('cluster-status');
-                    statusDiv.innerHTML = '';     
-                    let onlineCount = 0;
-                    for (const [nodeId, nodeData] of Object.entries(data.nodes)) {
-                        const online = nodeData.online;
-                        if (online) onlineCount++;   
-                        const nodeEl = document.createElement('div');
-                        nodeEl.className = online ? 'card success' : 'card critical';
-                        nodeEl.innerHTML = `
-                            <h4><span class="status ${online ? 'online' : 'offline'}"></span>${nodeData.name}</h4>
-                            <p style="font-size: 0.9em; color: var(--text-muted);">${nodeData.ip}</p>
-                            <p>${online ? 'ONLINE' : 'OFFLINE'}</p>
-                        `;
-                        statusDiv.appendChild(nodeEl);
-                    }
-                    // Update title
-                    const title = document.querySelector('h1');
-                    title.style.color = onlineCount === data.total_count ? 'var(--success)' : 'var(--warning)';
-                });
-        }
+function updateClusterStatus() {
+    fetch('/api/cluster/status')
+        .then(r => r.json())
+        .then(data => {
+            const statusDiv = document.getElementById('cluster-status');
+            statusDiv.innerHTML = '';
+            let onlineCount = 0;
+            for (const [nodeId, nodeData] of Object.entries(data.nodes)) {
+                const online = nodeData.online;
+                if (online) onlineCount++;
+                const nodeEl = document.createElement('div');
+                nodeEl.className = online
+                    ? 'card success status-card'
+                    : 'card critical status-card';
+                nodeEl.dataset.node = nodeId;
+                nodeEl.innerHTML = `
+                    <h4>
+                        <span class="status ${online ? 'online' : 'offline'}"></span>
+                        ${nodeData.name}
+                    </h4>
+                    <div style="margin-top:auto;">
+                        <p style="font-size: 0.9em; color: var(--text-muted);">
+                            ${nodeData.ip}
+                        </p>
+                        <p>${online ? 'ONLINE' : 'OFFLINE'}</p>
+                    </div>
+                `;
+                statusDiv.appendChild(nodeEl);
+            }
+            const title = document.querySelector('h1');
+            if (title) {
+                title.style.color =
+                    onlineCount === data.total_count
+                        ? 'var(--success)'
+                        : 'var(--warning)';
+            }
+        });
+}
         function validateConfig() {
             if (confirm('Run configuration validation?')) {
                 fetch('/api/validate-config', {method: 'POST'})
@@ -170,6 +170,18 @@
                         });
                 }
             }
+        }        
+        function confirmDestroyData() {
+            if (confirm('⚠ DESTROY SENSITIVE DATA? These actions permanently destroy locally stored data. They are irreversible and may render the system inoperable until re-provisioned.')) {
+                if (confirm('This is a destructive operation. Are you absolutely sure?')) {
+                    fetch('/api/cluster/destroy-data', {method: 'POST'})
+                        .then(r => r.json())
+                        .then(data => {
+                            alert('Secure Data Destruction Initiated');
+                            logActivity('DATA DESCTRUCTION INITIATED');
+                        });
+                }
+            }
         }
         function logActivity(message) {
             const log = document.getElementById('activity-log');
@@ -185,56 +197,167 @@
         setInterval(updateClusterStatus, 5000);
         logActivity('Dashboard initialized');
     </script>
-   <script>
-const modal = document.getElementById('node-modal');
-const modalNodeName = document.getElementById('modal-node-name');
-let currentNode = '';
-function openNodeModal(nodeName){
-  currentNode = nodeName;
-  modalNodeName.textContent = nodeName + " Node Actions";
-  modal.style.display = "block";
+<script>
+/* ============================================================
+   NODE TOOL MODALS (DASHBOARD-LOCAL)
+   Reuses tool-card logic and renders them as modals
+   ============================================================ */
+const NODE_META = {
+    boot: { color: '#00FF00' },
+    isr:  { color: '#FF1744' },
+    mesh: { color: '#FF8800' },
+    vhf:  { color: '#2196F3' }
+};
+/* ---------- TOOL CARD CREATION (COPIED, NOT CHANGED) ---------- */
+function createToolCard(node) {
+    const card = document.createElement('div');
+    card.className = 'tool-card';
+    card.id = `node-${node.id}`;
+    let toolsHTML = '';
+    if (node.tools && node.tools.available) {
+        for (const [category, tools] of Object.entries(node.tools.available)) {
+            toolsHTML += `
+                <div class="tool-category">
+                    <h4>${category}</h4>
+                    ${tools.map(tool => `
+                        <div class="tool-item" data-tool="${tool}">
+                            <span class="tool-name">
+                                ${tool}
+                            </span>
+                            <div class="tool-status">
+                                <span class="status-indicator"></span>
+                                <span class="status-text">-</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+    }
+    card.innerHTML = `
+        <div style="display:block;justify-content:space-between;align-items:start;">
+            <div style="display:flex;flex-direction:row;">
+                    <h3 style="margin:0 0 5px;color:${NODE_META[node.id].color};">◈ ${node.name}</h3>
+                    <p style="margin-left:24px;margin-top:12px;">${node.ip}</p>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Uptime</span>
+                <span class="metric-value">${health.uptime}</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Operating Temp</span>
+                <span class="metric-value">${health.temperature}</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Memory</span>
+                <span class="metric-value">${health.memory?.used || 0} / ${health.memory?.total || 0} MB</span>
+            </div>
+            <div>
+                <p class="node-purpose">${node.purpose}</p>
+                <p class="tool-count">• ${node.tools.total} Services</p>
+            </div>
+        </div>
+        <div id="tools-${node.id}">
+            ${toolsHTML}
+        </div>
+    `
+    return card;
 }
-function closeNodeModal(){
-  modal.style.display = "none";
+/* ---------- MODAL SHELL ---------- */
+function createNodeToolModal(node) {
+    const modal = document.createElement('div');
+    modal.className = 'node-modal';
+    modal.id = `node-modal-${node.id}`;
+    modal.dataset.node = node.id;
+    modal.innerHTML = `
+        <div class="modal-backdrop"></div>
+        <div class="modal-panel">
+            <button class="modal-close">&times;</button>
+        </div>
+    `;
+    const toolCard = createToolCard(node);
+    modal.querySelector('.modal-panel').appendChild(toolCard);
+    return modal;
 }
-function rebootNode(){
-  alert(currentNode + " node reboot triggered!");
+/* ---------- LOAD TOOL MODALS ---------- */
+async function loadNodeToolModals() {
+    const res = await fetch('/api/cluster/node-summary');
+    const nodes = await res.json();
+    const root = document.getElementById('node-tool-modals');
+    root.innerHTML = '';
+    nodes.forEach(node => {
+        const modal = createNodeToolModal(node);
+        root.appendChild(modal);
+    });
+    setTimeout(loadToolStatus, 400);
 }
-function runDiagnostics(){
-  alert("Running diagnostics on " + currentNode + " node.");
+/* ---------- TOOL STATUS (UNCHANGED LOGIC) ---------- */
+async function loadToolStatus() {
+    for (const nodeId of Object.keys(NODE_META)) {
+        try {
+            const res = await fetch(`/api/nodes/${nodeId}/tool-status`);
+            const data = await res.json();
+            updateToolStatus(nodeId, data.tools_status);
+        } catch (e) {
+            console.error('Tool status error:', nodeId, e);
+        }
+    }
 }
-window.onclick = function(event){
-  if(event.target == modal){ closeNodeModal(); }
+function updateToolStatus(nodeId, toolsStatus) {
+    for (const tools of Object.values(toolsStatus)) {
+        for (const [tool, status] of Object.entries(tools)) {
+            const el = document.querySelector(
+                `#node-${nodeId} [data-tool="${tool}"]`
+            );
+            if (!el) continue;
+            const indicator = el.querySelector('.status-indicator');
+            const text = el.querySelector('.status-text');
+            if (status.installed) {
+                indicator.className = 'status-indicator installed';
+                text.textContent = status.running ? 'running' : 'idle';
+            } else {
+                indicator.className = 'status-indicator not-installed';
+                text.textContent = 'not installed';
+            }
+        }
+    }
 }
-// Toggle alerts
-document.querySelectorAll('.alert-icon').forEach(icon => {
-  icon.addEventListener('click', e => {
-    e.preventDefault();
-    icon.parentElement.querySelector('.alert-panel').classList.toggle('visible');
-  });
+/* ---------- OPEN / CLOSE ---------- */
+function openNodeToolModal(nodeId) {
+    const modal = document.getElementById(`node-modal-${nodeId}`);
+    if (modal) modal.classList.add('open');
+}
+document.addEventListener('click', e => {
+    if (e.target.classList.contains('modal-close') ||
+        e.target.classList.contains('modal-backdrop')) {
+        e.target.closest('.node-modal')?.classList.remove('open');
+    }
 });
+/* ---------- STATUS CARD BINDING ---------- */
+document.addEventListener('click', e => {
+    const card = e.target.closest('.status-card');
+    if (!card) return;
+    openNodeToolModal(card.dataset.node);
+});
+/* ---------- INIT ---------- */
+loadNodeToolModals();
+setInterval(loadToolStatus, 15000);
 </script>
 <script>
 (() => {
     const mapGuard = document.querySelector('.map-guard');
     const overlay  = document.querySelector('.map-overlay');
-
     if (!mapGuard || !overlay) return;
-
     let blockTimer = null;
-
     mapGuard.addEventListener('mouseenter', () => {
         overlay.classList.add('active');
-
         blockTimer = setTimeout(() => {
             overlay.classList.remove('active');
             blockTimer = null;
         }, 900);
     });
-
     mapGuard.addEventListener('mouseleave', () => {
         overlay.classList.remove('active');
-
         if (blockTimer) {
             clearTimeout(blockTimer);
             blockTimer = null;

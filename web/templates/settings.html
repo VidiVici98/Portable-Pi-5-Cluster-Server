@@ -36,7 +36,7 @@
 <main class="container settings">
   <!-- FULL SETTINGS SECTIONS -->
   <!-- DEPLOYMENT PROFILE -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="deployment-profile">
     <h2>DEPLOYMENT PROFILE</h2>
     <p class="section-desc">Defines global behavior assumptions for this cluster deployment.</p>
     <div class="settings-grid">
@@ -75,7 +75,7 @@
     </div>
   </section>
   <!-- POWER & HARDWARE POLICY -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="power-hardware">
     <h2>POWER & HARDWARE POLICY</h2>
     <div class="settings-grid">
       <label>Node Power Budget Enforcement
@@ -98,7 +98,7 @@
     </div>
   </section>
   <!-- FAILOVER & AUTONOMY -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="failover">
     <h2>FAILOVER & AUTONOMY</h2>
     <div class="settings-grid">
       <label>Autonomy Level
@@ -122,7 +122,7 @@
     </div>
   </section>
   <!-- NETWORK & MESH BEHAVIOR -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="mesh-network">
     <h2>NETWORK & MESH BEHAVIOR</h2>
     <div class="settings-grid">
       <label>Preferred Backhaul Order
@@ -152,7 +152,7 @@
     </div>
   </section>
   <!-- SECURITY & ACCESS CONTROL -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="access-control">
     <h2>SECURITY & ACCESS CONTROL</h2>
     <div class="settings-grid">
       <label>Authentication Mode
@@ -175,7 +175,7 @@
     </div>
   </section>
 <!-- NETWORK FIREWALL / UFW -->
-<section class="card settings-section danger-zone">
+<section class="card settings-section danger-zone" id="firewall-config">
   <h2>NETWORK FIREWALL (UFW)</h2>
   <p class="section-desc">
     Controls ingress and egress network exposure. Changes may immediately impact node reachability.
@@ -269,7 +269,7 @@
   </div>
 </section>
   <!-- DATA HANDLING & OPSEC -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="opsec">
     <h2>DATA HANDLING & OPSEC</h2>
     <div class="settings-grid">
       <label>Data Classification
@@ -293,13 +293,12 @@
     </div>
   </section>
 <!-- SECURE DATA DESTRUCTION POLICY -->
-<section class="card settings-section danger-zone">
+<section class="card settings-section danger-zone" id="data-destruction">
   <h2>SECURE DATA DESTRUCTION</h2>
   <p class="section-desc danger-text">
     These actions permanently destroy locally stored data. They are irreversible and may
     render the system inoperable until re-provisioned.
   </p>
-
   <div class="settings-grid">
     <label>
       Automatic Data Purge Timer
@@ -314,25 +313,22 @@
         <option>After 7 days</option>
       </select>
     </label>
-
     <label class="checkbox">
       <input type="checkbox" onchange="markPendingChange()">
       Require operator confirmation before auto-purge
     </label>
   </div>
-
   <div class="destruction-actions">
     <button class="btn btn-warning" onclick="openDestructionModal('manual')">
       Manual Secure Purge
     </button>
-
     <button class="btn btn-danger" onclick="openDestructionModal('emergency')">
       EMERGENCY WIPE
     </button>
   </div>
 </section>
   <!-- ALERTING & NOTIFICATIONS -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="notifications">
     <h2>ALERTING & NOTIFICATIONS</h2>
     <div class="settings-grid">
       <label class="checkbox"><input type="checkbox" checked>Enable alert aggregation</label>
@@ -341,7 +337,7 @@
     </div>
   </section>
   <!-- MAINTENANCE & UPDATE POLICY -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="maintenance-updates">
     <h2>MAINTENANCE & UPDATE POLICY</h2>
     <div class="settings-grid">
       <label>Update Channel
@@ -365,7 +361,7 @@
     </div>
   </section>
   <!-- AUDIT & FORENSICS -->
-  <section class="card settings-section">
+  <section class="card settings-section" id="auditing">
     <h2>AUDIT & FORENSICS</h2>
     <div class="settings-grid">
       <label class="checkbox"><input type="checkbox" checked>Log all operator actions</label>
@@ -394,14 +390,11 @@
 <div id="firewall-modal" class="modal">
   <div class="modal-content wide">
     <span class="close" onclick="closeFirewallModal()">&times;</span>
-
     <h3>Confirm Network Security Changes</h3>
-
     <p class="modal-warning">
       You are about to modify firewall rules. Incorrect settings may result in
       loss of remote access or node isolation.
     </p>
-
     <div class="modal-summary">
       <h4>Pending Changes</h4>
       <ul>
@@ -409,12 +402,10 @@
         <li>ALLOW TCP 22 from Trusted Subnet</li>
       </ul>
     </div>
-
     <label class="checkbox modal-ack">
       <input type="checkbox">
       I understand these changes may disrupt connectivity
     </label>
-
     <div class="modal-actions">
       <button class="btn" onclick="closeFirewallModal()">Cancel</button>
       <button class="btn btn-danger" onclick="applyFirewallChanges()">
@@ -427,14 +418,11 @@
 <div id="destruction-modal" class="modal">
   <div class="modal-content wide">
     <span class="close" onclick="closeDestructionModal()">&times;</span>
-
     <h3 class="danger-text">⚠ DATA DESTRUCTION CONFIRMATION</h3>
-
     <p class="modal-warning">
       This action will permanently destroy stored data on this system.
       Recovery will not be possible.
     </p>
-
     <div class="modal-summary">
       <ul>
         <li>Captured data</li>
@@ -442,12 +430,10 @@
         <li>Cached mission state</li>
       </ul>
     </div>
-
     <label class="checkbox modal-ack">
       <input type="checkbox" id="destruction-ack">
       I understand this action is irreversible
     </label>
-
     <div class="modal-actions">
       <button class="btn" onclick="closeDestructionModal()">Cancel</button>
       <button class="btn btn-danger" onclick="confirmDestruction()">
@@ -456,8 +442,8 @@
     </div>
   </div>
 </div>
+    <footer id="footer-embed-container"></footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
 <!--Secure Desctuction Modal-->
 <script>
 let destructionMode = null;
