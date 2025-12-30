@@ -187,7 +187,7 @@ function updateClusterStatus() {
             const log = document.getElementById('activity-log');
             const time = new Date().toLocaleTimeString();
             const entry = document.createElement('div');
-            entry.style.cssText = 'padding: 5px 0; border-bottom: 1px solid var(--border-color-dim);';
+            entry.style.cssText = 'padding: 5px 0; border-bottom: 1px solid var(--border-color-dim);min-height:300px;';
             entry.innerHTML = `<span style="color: var(--text-muted);">[${time}]</span> ${message}`;
             log.insertBefore(entry, log.firstChild);
         }

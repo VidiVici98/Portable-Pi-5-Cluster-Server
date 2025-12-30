@@ -92,7 +92,7 @@ a:hover {
     box-sizing: border-box;
     position: sticky;
     top: -50px;
-    z-index: 1; /* makes zero logical sense, but chatgpt insists */
+    z-index: 2000; 
     transition: all 0.25s ease;
 }
 /* Left column: brand + nav links */
@@ -286,7 +286,7 @@ nav a.active {
     position: relative;
     width: 80px;
     height: 24px;
-    display: flex;
+    display: block;
     align-items: center;
     font-size: 0.75rem;
     text-decoration: none;
@@ -686,10 +686,18 @@ tbody tr:hover {
 .node-card {
     position: relative;
     overflow: hidden;
+    flex: 1 1 calc(25% - 10px); 
+    min-width: 200px;
+    height: fit-content;
+}
+#nodesList {
+    display: flex;          /* Make child cards align in a row */
+    flex-wrap: wrap;        /* Wrap to next row if needed */
+    gap: 10px;              /* Space between cards */
 }
 #node-status {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     width: 100%;
     justify-content: center;
 }
@@ -1385,7 +1393,7 @@ tbody tr:hover {
     box-shadow: 4px 0 12px rgba(0,0,0,0.6);
     transform: translateX(-360px);
     transition: transform 0.25s ease;
-    z-index: 1000;
+    z-index: 2000;
     border-radius: 8px;
     border:1px groove #333;
 }
@@ -1621,7 +1629,6 @@ tbody tr:hover {
     min-height: 320px;
     background: #050805;
     border: 1px solid rgba(0,255,0,0.3);
-    filter: brightness(.75);
 }
 .tri {
     position: relative;
@@ -1704,7 +1711,7 @@ tbody tr:hover {
     position: fixed;
     inset: 0;
     display: none;
-    z-index: 1000;
+    z-index: 3000;
 }
 .node-modal.open {
     display: block;
@@ -1741,4 +1748,28 @@ tbody tr:hover {
     padding:2px;
     font-family: Georgia, 'Times New Roman', Times, serif;
     text-align: center;
+}
+/* ===== FIELD ASSET MODAL ===== */
+#asset-modal {
+    display: none;
+    position: fixed;
+    z-index: 4000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+#asset-modal .modal-content {
+    background: #111;
+    color: #0f0;
+    margin: 6% auto;
+    padding: 20px;
+    width: 420px;
+    border: 1px solid #0f0;
+    border-radius: 6px;
+    width: 60vw;
+    height: 80vh;
+    overflow-y:auto;
 }

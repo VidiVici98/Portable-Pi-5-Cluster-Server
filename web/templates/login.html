@@ -10,13 +10,12 @@
 </head>
 <body>
     <div class="login-container">
-
         <!-- LEFT PANEL: Tactical / notification / animation -->
         <div class="login-left">
             <div class="login-info">
-                <h1>Modern Warrior Systems Cluster Dashboard</h1>
+                <h1 style="font-size:2rem;">Modern Warrior Systems</h1>
+                <h2 style="font-size: 1.5rem;">Command & Control Dashboard</h2>
                 <p>Monitor, manage, and control your nodes in real time. Enterprise-grade cluster operations with tactical insights.</p>
-
                 <div class="notification-panel">
                     <h3>System Notifications</h3>
                     <ul>
@@ -26,33 +25,21 @@
                         <li><span class="status online"></span> ISR feed active</li>
                     </ul>
                 </div>
-
-                <div class="visual-animation">
-                    <div class="node node1"></div>
-                    <div class="node node2"></div>
-                    <div class="node node3"></div>
-                    <div class="node node4"></div>
-                </div>
             </div>
         </div>
-
         <!-- RIGHT PANEL: Login form -->
         <div class="login-right">
             <div class="login-card">
                 <h2>Sign in to Cluster Dashboard</h2>
                 <p>Enter your credentials to access tactical control and monitoring tools.</p>
-
                 {% if error %}
                     <div class="login-error">{{ error }}</div>
                 {% endif %}
-
                 <form method="POST" action="{{ url_for('login') }}">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" placeholder="Enter your username" required>
-
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Enter your password" required>
-
                     <button type="submit">Sign In</button>
                 </form>
             </div>
