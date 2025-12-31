@@ -13,12 +13,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <style>
         /* ===== PAGE LAYOUT ===== */
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px 48px 20px 20px; }
         .mesh-layout { display: flex; gap: 15px; }
         #meshMap { height: 80vh; width: 68vw; border: 1px solid #00ff00; }
         .mesh-side { width: 30vw; display: flex; flex-direction: column; gap: 15px; overflow-y:auto; }
-        /* ===== CARDS ===== */
-        .panel, .card { background: #0b0b0b; border: 1px solid #00ff00; padding: 12px; border-radius: 6px; }
         /* ===== STATS ===== */
         .stats-panel { display: flex; gap: 10px; }
         .stat-card { flex: 1; background: #111; color: #0f0; text-align: center; padding: 10px; border-radius: 6px; }
@@ -34,10 +31,6 @@
         .btn { background: #00ff00; color: #000; border: none; padding: 6px 10px; cursor: pointer; margin-top: 6px; border-radius: 4px; width:100%; }
         .btn.warn { background:#ffb300; color:#000; }
         .btn.down { background:#ff1744; color:#fff; }
-        /* ===== MAP GUARD ===== */
-        .map-guard { position: relative; }
-        .map-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); pointer-events: none; opacity: 0; transition: opacity .2s; }
-        .map-overlay.active { opacity: 1; }
         /* ===== COMMS LOG ===== */
         .log { font-size:0.75rem; min-height:260px; max-height: 500px; overflow-y:auto; background:#050505; padding:6px; border:1px solid #00ff00; }
         .log-entry { margin-bottom:4px; }

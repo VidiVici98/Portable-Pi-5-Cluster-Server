@@ -441,133 +441,156 @@ function updatePropagation() {
     );
 }
 </script>
-    <script>
-        let currentFrequency = 146.52;
-        let currentMode = 'FM';
-        let isRecording = false;
-        let recordStartTime = null;
-        let recordInterval = null;
-        function setFrequency() {
-            const input = document.getElementById('frequencyInput');
-            const freq = parseFloat(input.value);
-            if (isNaN(freq) || freq < 1 || freq > 6000) {
-                alert('Invalid frequency. Must be between 1 and 6000 MHz');
-                return;
-            }
-            currentFrequency = freq;
-            updateFrequencyDisplay();
+<script>
+let currentFrequency = 146.52;
+let currentMode = 'FM';
+let isRecording = false;
+let recordStartTime = null;
+let recordInterval = null;
+// Set mode from buttons
+function setMode(button, mode) {
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    currentMode = mode;
+    document.getElementById('modulation').textContent = mode;
+}
+// Frequency controls
+function setFrequency() {
+    const input = document.getElementById('frequencyInput');
+    const freq = parseFloat(input.value);
+    if (isNaN(freq) || freq < 1 || freq > 6000) {
+        alert('Invalid frequency. Must be between 1 and 6000 MHz');
+        return;
+    }
+    currentFrequency = freq;
+    updateFrequencyDisplay();
+}
+function loadFrequency(freq) {
+    currentFrequency = freq;
+    document.getElementById('frequencyInput').value = freq;
+    updateFrequencyDisplay();
+}
+function adjustFrequency(delta) {
+    currentFrequency += delta;
+    if (currentFrequency < 1) currentFrequency = 1;
+    if (currentFrequency > 6000) currentFrequency = 6000;
+    document.getElementById('frequencyInput').value = currentFrequency.toFixed(3);
+    updateFrequencyDisplay();
+}
+function updateFrequencyDisplay() {
+    document.getElementById('frequencyDisplay').textContent = currentFrequency.toFixed(3);
+    const meter = document.getElementById('sMeter');
+    const strength = 50 + Math.random() * 30;
+    meter.style.width = strength + '%';
+    meter.textContent = 'S ' + Math.round(strength / 10);
+}
+function adjustGain(value) {
+    document.getElementById('gainValue').textContent = value + ' dB';
+    document.getElementById('gainDisplay').textContent = value + ' dB';
+    const meter = document.getElementById('sMeter');
+    const strength = Math.min(100, 30 + (value - 20) * 0.8);
+    meter.style.width = strength + '%';
+}
+// Recording logic
+function toggleRecording() {
+    isRecording = !isRecording;
+    const btn = document.getElementById('recordBtn');
+    const durationSpan = document.getElementById('recordDuration');
+    if (isRecording) {
+        btn.classList.add('active');
+        btn.textContent = '⏹ STOP REC';
+        recordStartTime = Date.now();
+        recordInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            durationSpan.textContent = 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0');
+        }, 100);
+    } else {
+        btn.classList.remove('active');
+        btn.textContent = '● REC';
+        clearInterval(recordInterval);
+        const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+        alert(`📁 Recording saved (${elapsed} seconds)`);
+        durationSpan.textContent = '--:--';
+    }
+}
+// Draw the spectrum
+function drawSpectrum() {
+    const canvas = document.getElementById('spectrumCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    // Clear canvas
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Draw frequency axis
+    ctx.strokeStyle = '#00ff0050';
+    ctx.lineWidth = 2;
+    for (let i = 0; i <= 10; i++) {
+        const x = (canvas.width / 10) * i;
+        ctx.beginPath();
+        ctx.moveTo(x, canvas.height - 5);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+        ctx.save();
+        ctx.translate(x, canvas.height - 10);
+        ctx.rotate(-Math.PI / 3);
+        ctx.fillStyle = '#00ff00';
+        ctx.font = '9px mono';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText((currentFrequency - 5 + i), 0, 0);
+        ctx.restore();
+    }
+    // Draw spectrum data
+    ctx.strokeStyle = '#00FF00';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    let noiseFloor = 38 + Math.random() * 4;
+    for (let x = 0; x < canvas.width; x += 2) {
+        const progress = x / canvas.width;
+        // Noise floor
+        const noise = noiseFloor + (Math.random() - 0.5) * 10;
+        // Signal
+        let signal = 0;
+        const center = 0.5;
+        const distance = Math.abs(progress - center);
+        switch (currentMode) {
+            case 'AM':
+                if (distance < 0.05) signal = 70 * Math.cos((distance / 0.05) * Math.PI / 2);
+                break;
+            case 'FM':
+                if (distance < 0.08) signal = 60 * Math.exp(-Math.pow(distance / 0.08, 2) * 4);
+                break;
+            case 'SSB':
+                if (progress > center && distance < 0.05) signal = 65 * Math.cos((distance / 0.05) * Math.PI / 2);
+                break;
+            case 'CW':
+                if (distance < 0.01) signal = Math.random() < 0.02 ? 0 : 80;
+                break;
         }
-        function loadFrequency(freq) {
-            currentFrequency = freq;
-            document.getElementById('frequencyInput').value = freq;
-            updateFrequencyDisplay();
-        }
-        function adjustFrequency(delta) {
-            currentFrequency += delta;
-            if (currentFrequency < 1) currentFrequency = 1;
-            if (currentFrequency > 6000) currentFrequency = 6000;
-            document.getElementById('frequencyInput').value = currentFrequency.toFixed(3);
-            updateFrequencyDisplay();
-        }
-        function updateFrequencyDisplay() {
-            document.getElementById('frequencyDisplay').textContent = currentFrequency.toFixed(3);
-            // Simulate frequency change effect
-            const meter = document.getElementById('sMeter');
-            const strength = 50 + Math.random() * 30;
-            meter.style.width = strength + '%';
-            meter.textContent = 'S ' + Math.round(strength / 10);
-        }
-        function setMode(button, mode) {
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            currentMode = mode;
-            document.getElementById('modulation').textContent = mode;
-        }
-        function adjustGain(value) {
-            document.getElementById('gainValue').textContent = value + ' dB';
-            document.getElementById('gainDisplay').textContent = value + ' dB';
-            // Update S-meter with gain adjustment
-            const meter = document.getElementById('sMeter');
-            const strength = Math.min(100, 30 + (value - 20) * 0.8);
-            meter.style.width = strength + '%';
-        }
-        function toggleRecording() {
-            isRecording = !isRecording;
-            const btn = document.getElementById('recordBtn');
-            const durationSpan = document.getElementById('recordDuration');
-            if (isRecording) {
-                btn.classList.add('active');
-                btn.textContent = '⏹ STOP REC';
-                recordStartTime = Date.now();
-                recordInterval = setInterval(() => {
-                    const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
-                    const minutes = Math.floor(elapsed / 60);
-                    const seconds = elapsed % 60;
-                    durationSpan.textContent = 
-                        String(minutes).padStart(2, '0') + ':' + 
-                        String(seconds).padStart(2, '0');
-                }, 100);
-            } else {
-                btn.classList.remove('active');
-                btn.textContent = '● REC';
-                clearInterval(recordInterval);
-                const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
-                alert(`📁 Recording saved (${elapsed} seconds)`);
-                durationSpan.textContent = '--:--';
-            }
-        }
-        function drawSpectrum() {
-            const canvas = document.getElementById('spectrumCanvas');
-            const ctx = canvas.getContext('2d');
-            // Clear canvas
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // Draw frequency axis
-            ctx.strokeStyle = 'rgba(33, 150, 243, 0.3)';
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= 10; i++) {
-                const x = (canvas.width / 10) * i;
-                ctx.beginPath();
-                ctx.moveTo(x, canvas.height - 30);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-                ctx.fillStyle = '#2196F3';
-                ctx.font = '10px Courier New';
-                ctx.textAlign = 'center';
-                ctx.fillText((currentFrequency - 5 + i) + ' MHz', x, canvas.height - 5);
-            }
-            // Draw spectrum data
-            ctx.strokeStyle = '#00FF00';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            for (let x = 0; x < canvas.width; x += 2) {
-                const progress = x / canvas.width;
-                const noise = Math.sin(progress * Math.PI * 2) * 20 + 40;
-                const signal = progress > 0.4 && progress < 0.6 ? 80 : 0;
-                const y = canvas.height - 30 - (noise + signal) / 100 * (canvas.height - 30);
-                if (x === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            ctx.stroke();
-            // Draw baseline
-            ctx.strokeStyle = 'rgba(33, 150, 243, 0.2)';
-            ctx.beginPath();
-            ctx.moveTo(0, canvas.height - 30);
-            ctx.lineTo(canvas.width, canvas.height - 30);
-            ctx.stroke();
-        }
-        // Initialize
-        function init() {
-            updateFrequencyDisplay();
-            drawSpectrum();
-            // Redraw spectrum periodically
-            setInterval(drawSpectrum, 100);
-        }
-        init();
-    </script>
+        const y = canvas.height - 30 - (noise + signal) / 100 * (canvas.height - 30);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    // Draw baseline
+    ctx.strokeStyle = '#00ff0030';
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+}
+// Initialize and redraw periodically
+function init() {
+    updateFrequencyDisplay();
+    drawSpectrum();
+    setInterval(drawSpectrum, 600);
+}
+init();
+</script>
     <script>
 /*
  * DIGITAL DATA PANEL – HARDENED UI LOGIC
