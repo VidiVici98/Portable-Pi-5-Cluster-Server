@@ -1147,7 +1147,6 @@ tbody tr:hover {
             border: 2px solid #333;
             border-radius: 4px;
             padding: 20px;
-            box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
         }
         .frequency-display {
             background: #000;
@@ -1162,8 +1161,8 @@ tbody tr:hover {
             font-size: 48px;
             font-weight: bold;
             font-family: 'Courier New', monospace;
-            color: #2196F3;
-            text-shadow: 0 0 10px #2196F3;
+            color: #00ff00;
+            text-shadow: 0 0 8px #2196F3;
             margin: 0;
             line-height: 1.2;
         }
@@ -1312,7 +1311,11 @@ tbody tr:hover {
     transition: all 0.2s;
 }
 .recording-btn:hover {
-    box-shadow: 0 0 15px rgba(255, 136, 0, 0.6);
+    filter: brightness(.75);
+    box-shadow: none;
+    background: #FF8800;
+    transform: translateY(-2px);
+
 }
 .recording-btn.active {
     background: #FF1744;
