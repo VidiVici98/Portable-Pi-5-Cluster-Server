@@ -3,14 +3,14 @@
         <div class="nav-left">
             <div class="nav-brand">⌘ Modern Warrior Systems</div>
             <div class="nav-links">
-                <a href="/">Dashboard</a>
-                <a href="/isr">SIGINT</a>
-                <a href="/mesh">Mesh Network</a>
-                <a href="/vhf">RF Comms</a>
+                <a href="/" data-page="dashboard">Dashboard</a>
+                <a href="/isr" data-page="sigint">SIGINT</a>
+                <a href="/mesh" data-page="mesh">Mesh Network</a>
+                <a href="/vhf" data-page="rf-comms">RF Comms</a>
                 <div class="nav-dropdown">
-                    <a href="/settings" class="nav-parent">Settings</a>
+                    <a href="/settings" class="nav-parent" data-page="settings">Settings</a>
                     <div class="dropdown-menu">
-                        <a href="/backup">Backup & Restore</a>
+                        <a href="/backup" data-page="backup">Backup & Restore</a>
                     </div>
                 </div>
                 <!-- Tactical alert icon -->
@@ -59,32 +59,32 @@
                 <button class="node-btn" title="Reboot Boot Node">⭮</button>
                 Boot
                 <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:45%;"></div></div></div>
+                    <div class="tooltip-item"><span>CPU: 52%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp: 55°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:55%;"></div></div></div>
                 </div>
             </div>
             <div class="node-status warn">
                 <button class="node-btn" title="Reboot ADS-B Node">⭮</button>
-                ADS-B
+                ISR
                 <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:78%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:71%;"></div></div></div>
+                    <div class="tooltip-item"><span>CPU: 78%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:22%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp: 69°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:29%;"></div></div></div>
                 </div>
             </div>
             <div class="node-status ok">
                 <button class="node-btn" title="Reboot Mesh Node">⭮</button>
                 Mesh
                 <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
+                    <div class="tooltip-item"><span>CPU: 48%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp: 57°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
                 </div>
             </div>
             <div class="node-status down">
                 <button class="node-btn" title="Reboot Tx/Rx Node">⭮</button>
-                Tx/Rx
+                RF
                 <div class="node-tooltip">
-                    <div class="tooltip-item"><span>CPU:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
-                    <div class="tooltip-item"><span>Temp:</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:0%;"></div></div></div>
+                    <div class="tooltip-item"><span>CPU: 0%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:100%;"></div></div></div>
+                    <div class="tooltip-item"><span>Temp: 0°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:100%;"></div></div></div>
                 </div>
             </div>
         </div>

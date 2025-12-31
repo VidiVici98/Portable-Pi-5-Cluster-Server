@@ -1,440 +1,394 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mesh Network – Tactical Dashboard</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<style>
-/* ===== PAGE LAYOUT ===== */
-.container { max-width: 1400px; margin: 0 auto; padding: 20px 48px 20px 20px; }
-.mesh-layout { display: flex; gap: 15px; }
-#meshMap { height: 80vh; width: 68vw; border: 1px solid #00ff00; }
-.mesh-side { width: 30vw; display: flex; flex-direction: column; gap: 15px; overflow-y:auto; }
-/* ===== CARDS ===== */
-.panel, .card { background: #0b0b0b; border: 1px solid #00ff00; padding: 12px; border-radius: 6px; }
-/* ===== STATS ===== */
-.stats-panel { display: flex; gap: 10px; }
-.stat-card { flex: 1; background: #111; color: #0f0; text-align: center; padding: 10px; border-radius: 6px; }
-/* ===== NODE LIST ===== */
-.node-card { background: #111; color: #0f0; padding: 8px; margin-bottom: 8px; border-radius: 6px; font-size: 0.85rem; cursor:pointer; }
-.node-header { display: flex; justify-content: space-between; }
-.node-meta { font-size: 0.75rem; color: #8f8; }
-/* ===== STATUS COLORS ===== */
-.ok { color: #00ff00; }
-.warn { color: #ffb300; }
-.down { color: #ff1744; }
-/* ===== CONTROLS ===== */
-.btn { background: #00ff00; color: #000; border: none; padding: 6px 10px; cursor: pointer; margin-top: 6px; border-radius: 4px; width:100%; }
-.btn.warn { background:#ffb300; color:#000; }
-.btn.down { background:#ff1744; color:#fff; }
-/* ===== MAP GUARD ===== */
-.map-guard { position: relative; }
-.map-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); pointer-events: none; opacity: 0; transition: opacity .2s; }
-.map-overlay.active { opacity: 1; }
-/* ===== COMMS LOG ===== */
-.log { font-size:0.75rem; min-height:260px; max-height: 500px; overflow-y:auto; background:#050505; padding:6px; border:1px solid #00ff00; }
-.log-entry { margin-bottom:4px; }
-/* ===== MODALS ===== */
-.modal { display:none; position: fixed; z-index:4000; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.7); }
-.modal .modal-content { background:#111; color:#0f0; margin:10% auto; padding:20px; border:1px solid #0f0; border-radius:6px; width: 350px; }
-.modal textarea, .modal input, .modal select { width:100%; margin:6px 0; padding:6px; border-radius:4px; border:1px solid #0f0; background:#000; color:#0f0; }
-.asset-section { margin-top:12px; }
-.kv-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
-.cap-list { list-style:none; padding-left:0; }
-.asset-log { font-size:0.75rem; max-height:120px; overflow-y:auto; margin-top:6px; }
-.collapsible h4 { cursor:pointer; }
-.status-badge { padding:2px 6px; border-radius:4px; }
-/* ===== FOOTER ===== */
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://rawcdn.githack.com" crossorigin>
+    <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin>
+    <title>Mesh Network – Tactical Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <style>
+        /* ===== PAGE LAYOUT ===== */
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px 48px 20px 20px; }
+        .mesh-layout { display: flex; gap: 15px; }
+        #meshMap { height: 80vh; width: 68vw; border: 1px solid #00ff00; }
+        .mesh-side { width: 30vw; display: flex; flex-direction: column; gap: 15px; overflow-y:auto; }
+        /* ===== CARDS ===== */
+        .panel, .card { background: #0b0b0b; border: 1px solid #00ff00; padding: 12px; border-radius: 6px; }
+        /* ===== STATS ===== */
+        .stats-panel { display: flex; gap: 10px; }
+        .stat-card { flex: 1; background: #111; color: #0f0; text-align: center; padding: 10px; border-radius: 6px; }
+        /* ===== NODE LIST ===== */
+        .node-card { background: #111; color: #0f0; padding: 8px; margin-bottom: 8px; border-radius: 6px; font-size: 0.85rem; cursor:pointer; }
+        .node-header { display: flex; justify-content: space-between; }
+        .node-meta { font-size: 0.75rem; color: #8f8; }
+        /* ===== STATUS COLORS ===== */
+        .ok { color: #00ff00; }
+        .warn { color: #ffb300; }
+        .down { color: #ff1744; }
+        /* ===== CONTROLS ===== */
+        .btn { background: #00ff00; color: #000; border: none; padding: 6px 10px; cursor: pointer; margin-top: 6px; border-radius: 4px; width:100%; }
+        .btn.warn { background:#ffb300; color:#000; }
+        .btn.down { background:#ff1744; color:#fff; }
+        /* ===== MAP GUARD ===== */
+        .map-guard { position: relative; }
+        .map-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); pointer-events: none; opacity: 0; transition: opacity .2s; }
+        .map-overlay.active { opacity: 1; }
+        /* ===== COMMS LOG ===== */
+        .log { font-size:0.75rem; min-height:260px; max-height: 500px; overflow-y:auto; background:#050505; padding:6px; border:1px solid #00ff00; }
+        .log-entry { margin-bottom:4px; }
+        /* ===== MODALS ===== */
+        .modal { display:none; position: fixed; z-index:4000; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.7); }
+        .modal .modal-content { background:#111; color:#0f0; margin:10% auto; padding:20px; border:1px solid #0f0; border-radius:6px; width: 350px; }
+        .modal textarea, .modal input, .modal select { width:100%; margin:6px 0; padding:6px; border-radius:4px; border:1px solid #0f0; background:#000; color:#0f0; }
+        .asset-section { margin-top:12px; }
+        .kv-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+        .cap-list { list-style:none; padding-left:0; }
+        .asset-log { font-size:0.75rem; max-height:120px; overflow-y:auto; margin-top:6px; }
+        .collapsible h4 { cursor:pointer; }
+        .status-badge { padding:2px 6px; border-radius:4px; }
+    </style>
 </head>
 <body data-page="mesh">
 {% if demo_mode %}
-<div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
+    <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
 {% endif %}
-
 <!-- Sidebar -->
 {% include 'components/sidebar.html' %}
-<div id="content"></div>
-
+    <div id="content"></div>
 <!-- Navbar -->
-<nav class="navbar" id="main-navbar"><div id="header-container"></div></nav>
-
+    <nav class="navbar" id="main-navbar"><div id="header-container"></div></nav>
 <main class="container">
-<section class="panel">
-<h2>📡 Mesh Network Overview</h2>
-<div class="stats-panel">
-    <div class="stat-card">Total Nodes<br><strong id="totalNodes">0</strong></div>
-    <div class="stat-card">Online<br><strong id="onlineNodes">0</strong></div>
-    <div class="stat-card">Degraded<br><strong id="degradedNodes">0</strong></div>
-    <div class="stat-card">Offline<br><strong id="offlineNodes">0</strong></div>
-</div>
-</section>
-
-<div class="mesh-layout">
-<section class="card" id="tactical-map">
-<h3>🗺 Tactical Map</h3>
-<div class="map-guard">
-    <div id="meshMap"></div>
-    <div class="map-overlay" aria-hidden="true"></div>
-</div>
-
-<div class="panel" id="node-status">
-<h3>🖥 Field Assets</h3>
-<div id="nodesList"></div>
-</div>
-</section>
-
-<section class="mesh-side">
-<div class="panel">
-<h3>🧭 Map Layers</h3>
-<label><input type="checkbox" checked onchange="toggleLayer('mesh')"> Mesh Nodes</label><br>
-<label><input type="checkbox" checked onchange="toggleLayer('tak')"> TAK Entities</label><br>
-<label><input type="checkbox" checked onchange="toggleLayer('links')"> Mesh Links</label><br>
-<label><input type="checkbox" checked onchange="toggleLayer('geofences')"> Geofences</label><br>
-<label><input type="checkbox" checked onchange="toggleLayer('sensors')"> Sensor Cones</label><br>
-<label><input type="checkbox" checked onchange="toggleLayer('hostiles')"> Hostiles</label>
-</div>
-
-<div class="panel" id="send-alerts">
-<h3>⚙️ Controls</h3>
-<button class="btn" onclick="simulateUpdate()">Simulate Network Event</button>
-<button class="btn" onclick="broadcastAlert()">Broadcast Alert</button>
-<button class="btn" onclick="openBroadcastModal()">Create Broadcast Message</button>
-</div>
-
-<div class="panel" id="comms-log">
-<h3>📨 Comms Log</h3>
-<div id="commsLog" class="log"></div>
-</div>
-</section>
-</div>
+    <section class="panel">
+        <h2>📡 Mesh Network Overview</h2>
+        <div class="stats-panel">
+            <div class="stat-card">Total Nodes<br><strong id="totalNodes">0</strong></div>
+            <div class="stat-card">Online<br><strong id="onlineNodes">0</strong></div>
+            <div class="stat-card">Degraded<br><strong id="degradedNodes">0</strong></div>
+            <div class="stat-card">Offline<br><strong id="offlineNodes">0</strong></div>
+        </div>
+    </section>
+    <div class="mesh-layout">
+    <section class="card" id="tactical-map">
+        <h3>🗺 Tactical Map</h3>
+        <div class="map-guard">
+            <div id="meshMap"></div>
+            <div class="map-overlay" aria-hidden="true"></div>
+        </div>
+        <div class="panel" id="node-status">
+            <h3>🖥 Field Assets</h3>
+            <div id="nodesList"></div>
+        </div>
+    </section>
+    <section class="mesh-side">
+        <div class="panel">
+            <h3>🧭 Map Layers</h3>
+            <label><input type="checkbox" checked onchange="toggleLayer('mesh')"> Mesh Nodes</label><br>
+            <label><input type="checkbox" checked onchange="toggleLayer('tak')"> TAK Entities</label><br>
+            <label><input type="checkbox" checked onchange="toggleLayer('links')"> Mesh Links</label><br>
+            <label><input type="checkbox" checked onchange="toggleLayer('geofences')"> Geofences</label><br>
+            <label><input type="checkbox" checked onchange="toggleLayer('sensors')"> Sensor Cones</label><br>
+            <label><input type="checkbox" checked onchange="toggleLayer('hostiles')"> Hostiles</label>
+        </div>
+        <div class="panel" id="send-alerts">
+            <h3>⚙️ Controls</h3>
+            <button class="btn" onclick="simulateUpdate()">Simulate Network Event</button>
+            <button class="btn" onclick="broadcastAlert()">Broadcast Alert</button>
+            <button class="btn" onclick="openBroadcastModal()">Create Broadcast Message</button>
+        </div>
+        <div class="panel" id="comms-log">
+            <h3>📨 Comms Log</h3>
+            <div id="commsLog" class="log"></div>
+        </div>
+    </section>
+    </div>
 </main>
-
 <!-- Broadcast Modal -->
 <div id="broadcast-modal" class="modal">
-<div class="modal-content">
-<h3>Create Broadcast Message</h3>
-<label>Target Nodes:</label>
-<select id="broadcast-target" multiple>
-<option value="all">All Nodes</option>
-<option value="A">Team-A</option>
-<option value="B">Team-B</option>
-<option value="C">Team-C</option>
-<option value="D">Team-D</option>
-<option value="E">Team-E</option>
-<option value="F">Team-F</option>
-</select>
-<label>Message:</label>
-<textarea id="broadcast-message" rows="4"></textarea>
-<button onclick="sendBroadcast()">Send</button>
-<button onclick="closeBroadcastModal()">Cancel</button>
+    <div class="modal-content">
+        <h3>Create Broadcast Message</h3>
+        <label>Target Nodes:</label>
+        <select id="broadcast-target" multiple>
+            <option value="all">All Nodes</option>
+            <option value="A">Team-A</option>
+            <option value="B">Team-B</option>
+            <option value="C">Team-C</option>
+            <option value="D">Team-D</option>
+            <option value="E">Team-E</option>
+            <option value="F">Team-F</option>
+        </select>
+        <label>Message:</label>
+        <textarea id="broadcast-message" rows="4"></textarea>
+        <button onclick="sendBroadcast()">Send</button>
+        <button onclick="closeBroadcastModal()">Cancel</button>
+    </div>
 </div>
-</div>
-
 <!-- Node Actions Modal -->
 <div id="node-modal" class="modal">
-<div class="modal-content">
-<h3 id="modal-node-name">Node Actions</h3>
-<button onclick="rebootNode()">Reboot Node</button>
-<button onclick="runDiagnostics()">Run Diagnostics</button>
-<button onclick="closeNodeModal()">Close</button>
+    <div class="modal-content">
+        <h3 id="modal-node-name">Node Actions</h3>
+        <button onclick="rebootNode()">Reboot Node</button>
+        <button onclick="runDiagnostics()">Run Diagnostics</button>
+        <button onclick="closeNodeModal()">Close</button>
+    </div>
 </div>
-</div>
-
 <!-- Asset Modal -->
 <div id="asset-modal" class="modal">
-<div class="modal-content">
-<div id="command-status" style="color:#0f0; margin-top:6px;"></div>
-
-<div class="asset-header">
-<div>
-<h3 id="asset-callsign">TEAM-BRAVO</h3>
-<div class="asset-sub">
-<span id="asset-uid">UID: BRAVO-MESH-02</span><br>
-<span id="asset-role">Role: Relay / Gateway</span>
+    <div class="modal-content">
+        <div id="command-status" style="color:#0f0; margin-top:6px;"></div>
+        <div class="asset-header">
+            <div>
+                <h3 id="asset-callsign">TEAM-BRAVO</h3>
+                <div class="asset-sub">
+                    <span id="asset-uid">UID: BRAVO-MESH-02</span><br>
+                    <span id="asset-role">Role: Relay / Gateway</span>
+                </div>
+            </div>
+            <div id="asset-status" class="status-badge warn">DEGRADED</div>
+        </div>
+        <hr>
+        <section class="asset-section">
+            <h4>Connectivity & Health</h4>
+            <div class="kv-grid">
+                <div>Link Quality</div><div id="asset-link">▮▮▮▯</div>
+                <div>Last Heard</div><div id="asset-last-heard">12s ago</div>
+                <div>Power</div><div id="asset-power">62%</div>
+                <div>Position</div><div id="asset-position">Live</div>
+            </div>
+        </section>
+        <section class="asset-section">
+            <h4>Location</h4>
+            <div class="kv-grid">
+                <div>Latitude</div><div id="asset-lat">37.7849</div>
+                <div>Longitude</div><div id="asset-lon">-122.4094</div>
+                <div>Heading</div><div id="asset-heading">120°</div>
+            </div>
+            <button class="btn" onclick="centerAssetOnMap()">Center on Map</button>
+        </section>
+        <section class="asset-section">
+            <h4>Capabilities</h4>
+            <ul class="cap-list" id="asset-capabilities">
+                <li>Mesh Relay</li>
+                <li>TAK Participant</li>
+                <li>Sensor Cone</li>
+            </ul>
+        </section>
+        <section class="asset-section">
+            <h4>Actions</h4>
+            <button class="btn" onclick="confirmAction('message')">Send Direct Message</button>
+            <button class="btn" onclick="confirmAction('task')">Assign Task</button>
+            <button class="btn warn" onclick="confirmAction('diagnostics')">Request Status Update</button>
+            <button class="btn down" onclick="confirmAction('reboot')">Reboot Asset</button>
+        </section>
+        <section class="asset-section collapsible">
+            <h4 onclick="toggleAssetLog()">Recent Activity</h4>
+            <div id="asset-log" class="asset-log">
+                <div>14:02 — Link degraded</div>
+                <div>13:57 — Position updated</div>
+                <div>13:51 — Status OK</div>
+            </div>
+        </section>
+        <button class="btn" onclick="closeAssetModal()">Close</button>
+    </div>
 </div>
-</div>
-<div id="asset-status" class="status-badge warn">DEGRADED</div>
-</div>
-<hr>
-
-<section class="asset-section">
-<h4>Connectivity & Health</h4>
-<div class="kv-grid">
-<div>Link Quality</div><div id="asset-link">▮▮▮▯</div>
-<div>Last Heard</div><div id="asset-last-heard">12s ago</div>
-<div>Power</div><div id="asset-power">62%</div>
-<div>Position</div><div id="asset-position">Live</div>
-</div>
-</section>
-
-<section class="asset-section">
-<h4>Location</h4>
-<div class="kv-grid">
-<div>Latitude</div><div id="asset-lat">37.7849</div>
-<div>Longitude</div><div id="asset-lon">-122.4094</div>
-<div>Heading</div><div id="asset-heading">120°</div>
-</div>
-<button class="btn" onclick="centerAssetOnMap()">Center on Map</button>
-</section>
-
-<section class="asset-section">
-<h4>Capabilities</h4>
-<ul class="cap-list" id="asset-capabilities">
-<li>Mesh Relay</li>
-<li>TAK Participant</li>
-<li>Sensor Cone</li>
-</ul>
-</section>
-
-<section class="asset-section">
-<h4>Actions</h4>
-<button class="btn" onclick="confirmAction('message')">Send Direct Message</button>
-<button class="btn" onclick="confirmAction('task')">Assign Task</button>
-<button class="btn warn" onclick="confirmAction('diagnostics')">Request Status Update</button>
-<button class="btn down" onclick="confirmAction('reboot')">Reboot Asset</button>
-</section>
-
-<section class="asset-section collapsible">
-<h4 onclick="toggleAssetLog()">Recent Activity</h4>
-<div id="asset-log" class="asset-log">
-<div>14:02 — Link degraded</div>
-<div>13:57 — Position updated</div>
-<div>13:51 — Status OK</div>
-</div>
-</section>
-
-<button class="btn" onclick="closeAssetModal()">Close</button>
-</div>
-</div>
-
 <!-- Confirm Modal -->
 <div id="confirm-modal" class="modal">
-<div class="modal-content">
-<h3 id="confirm-title"></h3>
-<div id="confirm-body"></div>
-<textarea id="confirm-input" rows="3" style="display:none;"></textarea>
-<button onclick="executeConfirmedAction()">Confirm</button>
-<button onclick="closeConfirmModal()">Cancel</button>
+    <div class="modal-content">
+        <h3 id="confirm-title"></h3>
+        <div id="confirm-body"></div>
+        <textarea id="confirm-input" rows="3" style="display:none;"></textarea>
+        <button onclick="executeConfirmedAction()">Confirm</button>
+        <button onclick="closeConfirmModal()">Cancel</button>
+    </div>
 </div>
-</div>
-
 <footer id="footer-embed-container"></footer>
-
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
 <script>
-// ================= DEMO DATA =================
-const DATA_MODE="demo";
-let meshNodes=[
-{id:"A",uid:"MESH-A-03",callsign:"Team-ALPHA",lat:37.7749,lon:-122.4194,status:"ok",role:"SAR",az:45},
-{id:"B",uid:"MESH-B-02",callsign:"Team-BRAVO",lat:37.7849,lon:-122.4094,status:"warn",role:"QRF",az:120},
-{id:"C",uid:"MESH-C-01",callsign:"Team-CHARLIE",lat:37.7649,lon:-122.4294,status:"ok",role:"MEDEVAC",az:270},
-{id:"D",uid:"MESH-D-03",callsign:"Team-DELTA",lat:37.7700,lon:-122.4000,status:"ok",role:"ICS",az:330},
-{id:"E",uid:"MESH-E-01",callsign:"Team-ECHO",lat:37.7650,lon:-122.4100,status:"ok",role:"LOGISTICS",az:90},
-{id:"F",uid:"MESH-F-02",callsign:"Team-FOXTROT",lat:37.7800,lon:-122.4300,status:"ok",role:"RELAY",az:180}
-];
-let takEntities=[{uid:"TAK.BLUE.1",callsign:"ALPHA-1",lat:37.779,lon:-122.42},{uid:"TAK.BLUE.2",callsign:"BRAVO-2",lat:37.775,lon:-122.425}];
-let hostileEntities=[{uid:"RED.1",callsign:"HOSTILE-1",lat:37.781,lon:-122.435},{uid:"RED.2",callsign:"HOSTILE-2",lat:37.768,lon:-122.418}];
-let geofences=[L.circle([37.7749,-122.4194],{radius:800,color:"#ff8800",dashArray:"4"}),L.circle([37.7800,-122.4300],{radius:600,color:"#ff1744",dashArray:"4"})];
-
-let map,layers={
-mesh:L.layerGroup(),tak:L.layerGroup(),links:L.layerGroup(),
-geofences:L.layerGroup(),sensors:L.layerGroup(),hostiles:L.layerGroup(),
-c2:L.layerGroup(),triggers:L.layerGroup()
-};
-
-// ================= MAP FUNCTIONS =================
-function initMap(){
-map=L.map('meshMap').setView([37.7849,-122.4194],13);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
-Object.values(layers).forEach(l=>l.addTo(map));
-renderAll();
-}
-
-function renderAll(){
-Object.values(layers).forEach(l=>l.clearLayers());
-let online=0,warn=0,down=0;
-
-meshNodes.forEach(n=>{
-if(n.status==="ok")online++;else if(n.status==="warn")warn++;else down++;
-layers.mesh.addLayer(L.circleMarker([n.lat,n.lon],{radius:8,color:"#0f0"}).bindPopup(`<b>${n.callsign}</b><br>${n.uid}<br>${n.role}`));
-
-let cone=L.polygon([
-[n.lat,n.lon],
-[n.lat+0.01*Math.cos(n.az*Math.PI/180),n.lon+0.01*Math.sin(n.az*Math.PI/180)],
-[n.lat+0.01*Math.cos((n.az+20)*Math.PI/180),n.lon+0.01*Math.sin((n.az+20)*Math.PI/180)]
-],{color:"#00ff00",fillOpacity:0.1});
-layers.sensors.addLayer(cone);
-});
-
-// Links
-for(let i=0;i<meshNodes.length-1;i++){
-layers.links.addLayer(L.polyline([[meshNodes[i].lat,meshNodes[i].lon],[meshNodes[i+1].lat,meshNodes[i+1].lon]],{dashArray:"4"}));
-}
-
-// C2 & Triggers
-meshNodes.forEach(n=>{
-layers.c2.addLayer(L.circle([n.lat,n.lon],{radius:100,color:"#00ffff",fillOpacity:0.05}).bindPopup(`C2 Overlay: ${n.callsign}`));
-layers.triggers.addLayer(L.circle([n.lat+0.002,n.lon+0.002],{radius:50,color:"#ff00ff",fillOpacity:0.2}).bindPopup(`Trigger zone: ${n.callsign}`));
-});
-
-// TAK & Hostiles
-takEntities.forEach(t=>layers.tak.addLayer(L.marker([t.lat,t.lon]).bindPopup(t.callsign)));
-hostileEntities.forEach(h=>layers.hostiles.addLayer(L.circleMarker([h.lat,h.lon],{radius:8,color:"#ff1744"}).bindPopup(h.callsign)));
-
-// Geofences
-geofences.forEach(g=>layers.geofences.addLayer(g));
-
-updateNodeList(online,warn,down);
-}
-
-function updateNodeList(o,w,d){
-nodesList.innerHTML='';
-meshNodes.forEach(n=>{
-nodesList.innerHTML+=`
-<div class="node-card" onclick="openAssetModal('${n.id}')">
-<div class="node-header"><strong>${n.callsign}</strong><span class="${n.status}">${n.status.toUpperCase()}</span></div>
-<div class="node-meta">UID: ${n.uid}<br>Role: ${n.role}</div>
-</div>`;
-});
-totalNodes.textContent=meshNodes.length;
-onlineNodes.textContent=o;
-degradedNodes.textContent=w;
-offlineNodes.textContent=d;
-}
-
-function simulateUpdate(){
-meshNodes.forEach(n=>{n.status=Math.random()>0.7?"down":Math.random()>0.4?"warn":"ok";});
-log("Network state update received");renderAll();
-}
-
-function broadcastAlert(){log("⚠ Broadcast alert issued to all mesh nodes");}
-
-function log(msg){
-const d=document.createElement('div');d.className="log-entry";d.textContent=new Date().toLocaleTimeString()+" — "+msg;commsLog.prepend(d);
-}
-
-function toggleLayer(name){map.hasLayer(layers[name])?map.removeLayer(layers[name]):map.addLayer(layers[name]);}
-
-document.addEventListener('DOMContentLoaded',initMap);
-
-// ================= MODALS =================
-(() => {
-let assetModal=document.getElementById('asset-modal'),activeAsset=null,pendingAction=null;
-const broadcastModal=document.getElementById('broadcast-modal');
-const nodeModal=document.getElementById('node-modal');
-const modalNodeName=document.getElementById('modal-node-name');
-let currentNode='';
-
-// Broadcast Modal
-window.openBroadcastModal=()=>{broadcastModal.style.display='block';};
-window.closeBroadcastModal=()=>{broadcastModal.style.display='none';};
-window.sendBroadcast=()=>{
-let targets=Array.from(document.getElementById('broadcast-target').selectedOptions).map(o=>o.value);
-let msg=document.getElementById('broadcast-message').value;
-log(`📡 Broadcast to [${targets.join(', ')}]: ${msg}`);
-closeBroadcastModal();
-};
-
-// Asset Modal
-window.openAssetModal=(id)=>{
-activeAsset=meshNodes.find(n=>n.id===id);
-if(!activeAsset)return;
-document.getElementById('asset-callsign').textContent=activeAsset.callsign;
-document.getElementById('asset-uid').textContent=`UID: ${activeAsset.uid}`;
-document.getElementById('asset-role').textContent=`Role: ${activeAsset.role}`;
-const statusEl=document.getElementById('asset-status');
-statusEl.textContent=activeAsset.status.toUpperCase();
-statusEl.className=`status-badge ${activeAsset.status}`;
-document.getElementById('asset-link').textContent=activeAsset.status==='ok'?'▮▮▮▮':activeAsset.status==='warn'?'▮▮▯▯':'▮▯▯▯';
-document.getElementById('asset-last-heard').textContent='Just now';
-document.getElementById('asset-power').textContent='—';
-document.getElementById('asset-position').textContent='Live';
-document.getElementById('asset-lat').textContent=activeAsset.lat.toFixed(5);
-document.getElementById('asset-lon').textContent=activeAsset.lon.toFixed(5);
-document.getElementById('asset-heading').textContent=activeAsset.az!==undefined?`${activeAsset.az}°`:'—';
-
-const capList=document.getElementById('asset-capabilities');capList.innerHTML='';
-const capabilities=[];
-if(activeAsset.role.toLowerCase().includes('relay'))capabilities.push('Mesh Relay');
-if(activeAsset.role.toLowerCase().includes('gateway'))capabilities.push('Gateway');
-if(activeAsset.role.toLowerCase().includes('sensor'))capabilities.push('Sensor Cone');
-capabilities.push('Receives Broadcasts');
-capabilities.forEach(c=>{let li=document.createElement('li');li.textContent=c;capList.appendChild(li);});
-
-const logEl=document.getElementById('asset-log');
-logEl.innerHTML=`<div>${new Date().toLocaleTimeString()} — Modal opened</div><div>Status: ${activeAsset.status.toUpperCase()}</div>`;
-
-assetModal.style.display='block';
-};
-window.closeAssetModal=()=>{assetModal.style.display='none';activeAsset=null;};
-window.centerAssetOnMap=()=>{if(!activeAsset)return;map.setView([activeAsset.lat,activeAsset.lon],16);};
-
-// Confirmation Modal
-window.confirmAction=(action)=>{
-pendingAction=action;
-const title=document.getElementById('confirm-title');
-const body=document.getElementById('confirm-body');
-const input=document.getElementById('confirm-input');
-input.style.display='none';input.value='';
-switch(action){
-case 'message':title.textContent="Send Direct Message";body.textContent="Enter message to send to this asset:";input.style.display="block";break;
-case 'task':title.textContent="Assign Task";body.textContent="Enter tasking instructions:";input.style.display="block";break;
-case 'diagnostics':title.textContent="Run Diagnostics";body.textContent="Run diagnostics on this asset?";break;
-case 'reboot':title.textContent="Reboot Asset";body.textContent="WARNING: This may temporarily remove the asset from the mesh.";break;
-}
-document.getElementById('confirm-modal').style.display="block";
-};
-window.closeConfirmModal=()=>{document.getElementById('confirm-modal').style.display='none';pendingAction=null;};
-window.executeConfirmedAction=()=>{
-const inputVal=document.getElementById('confirm-input').value;
-const statusEl=document.getElementById('command-status');
-statusEl.textContent="Command sent...";
-closeConfirmModal();
-log(`📤 ${pendingAction.toUpperCase()} sent to ${activeAsset.callsign}`);
-setTimeout(()=>{statusEl.textContent="Acknowledged by asset...";},800);
-setTimeout(()=>{
-statusEl.textContent="Command completed successfully.";
-log(`✅ ${pendingAction.toUpperCase()} completed on ${activeAsset.callsign}`);
-if(pendingAction==='message')log(`💬 Message to ${activeAsset.callsign}: ${inputVal}`);
-if(pendingAction==='task')log(`📋 Task assigned to ${activeAsset.callsign}: ${inputVal}`);
-},1800);
-};
-
-// Node Modal
-window.openNodeModal=(name)=>{currentNode=name;modalNodeName.textContent=name+" Node Actions";nodeModal.style.display='block';};
-window.closeNodeModal=()=>{nodeModal.style.display='none';};
-window.rebootNode=()=>{alert(currentNode+" node reboot triggered!");};
-window.runDiagnostics=()=>{alert("Running diagnostics on "+currentNode+" node.");};
-
-// Collapsible Log
-window.toggleAssetLog=()=>{const el=document.getElementById('asset-log');el.style.display=el.style.display==='none'?'block':'none';};
-
-// Click Outside Close
-window.addEventListener('click',e=>{
-if(e.target===assetModal)closeAssetModal();
-if(e.target===nodeModal)closeNodeModal();
-if(e.target.id==='confirm-modal')closeConfirmModal();
-});
-})();
-
-// ================= MAP GUARD =================
-(() => {
-const guards=document.querySelectorAll('.map-guard');
-guards.forEach(g=>{
-const overlay=g.querySelector('.map-overlay');
-if(!overlay)return;
-let blockTimer=null;
-g.addEventListener('mouseenter',()=>{overlay.classList.add('active');blockTimer=setTimeout(()=>{overlay.classList.remove('active');blockTimer=null;},900);});
-g.addEventListener('mouseleave',()=>{overlay.classList.remove('active');if(blockTimer){clearTimeout(blockTimer);blockTimer=null;}});
-});
-})();
+    // ================= DEMO DATA =================
+    const DATA_MODE="demo";
+    let meshNodes=[
+    {id:"A",uid:"MESH-A-03",callsign:"Team-ALPHA",lat:37.7749,lon:-122.4194,status:"ok",role:"SAR",az:45},
+    {id:"B",uid:"MESH-B-02",callsign:"Team-BRAVO",lat:37.7849,lon:-122.4094,status:"warn",role:"QRF",az:120},
+    {id:"C",uid:"MESH-C-01",callsign:"Team-CHARLIE",lat:37.7649,lon:-122.4294,status:"ok",role:"MEDEVAC",az:270},
+    {id:"D",uid:"MESH-D-03",callsign:"Team-DELTA",lat:37.7700,lon:-122.4000,status:"ok",role:"ICS",az:330},
+    {id:"E",uid:"MESH-E-01",callsign:"Team-ECHO",lat:37.7650,lon:-122.4100,status:"ok",role:"LOGISTICS",az:90},
+    {id:"F",uid:"MESH-F-02",callsign:"Team-FOXTROT",lat:37.7800,lon:-122.4300,status:"ok",role:"RELAY",az:180}
+    ];
+    let takEntities=[{uid:"TAK.BLUE.1",callsign:"ALPHA-1",lat:37.779,lon:-122.42},{uid:"TAK.BLUE.2",callsign:"BRAVO-2",lat:37.775,lon:-122.425}];
+    let hostileEntities=[{uid:"RED.1",callsign:"HOSTILE-1",lat:37.781,lon:-122.435},{uid:"RED.2",callsign:"HOSTILE-2",lat:37.768,lon:-122.418}];
+    let geofences=[L.circle([37.7749,-122.4194],{radius:800,color:"#ff8800",dashArray:"4"}),L.circle([37.7800,-122.4300],{radius:600,color:"#ff1744",dashArray:"4"})];
+    let map,layers={
+    mesh:L.layerGroup(),tak:L.layerGroup(),links:L.layerGroup(),
+    geofences:L.layerGroup(),sensors:L.layerGroup(),hostiles:L.layerGroup(),
+    c2:L.layerGroup(),triggers:L.layerGroup()
+    };
+    // ================= MAP FUNCTIONS =================
+    function initMap(){
+    map=L.map('meshMap').setView([37.7849,-122.4194],13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© OpenStreetMap © CARTO',subdomains:'abcd',maxZoom:19}).addTo(map);
+    Object.values(layers).forEach(l=>l.addTo(map));
+    renderAll();
+    }
+    function renderAll(){
+    Object.values(layers).forEach(l=>l.clearLayers());
+    let online=0,warn=0,down=0;
+    meshNodes.forEach(n=>{
+    if(n.status==="ok")online++;else if(n.status==="warn")warn++;else down++;
+    layers.mesh.addLayer(L.circleMarker([n.lat,n.lon],{radius:8,color:"#0f0"}).bindPopup(`<b>${n.callsign}</b><br>${n.uid}<br>${n.role}`));
+    let cone=L.polygon([
+    [n.lat,n.lon],
+    [n.lat+0.01*Math.cos(n.az*Math.PI/180),n.lon+0.01*Math.sin(n.az*Math.PI/180)],
+    [n.lat+0.01*Math.cos((n.az+20)*Math.PI/180),n.lon+0.01*Math.sin((n.az+20)*Math.PI/180)]
+    ],{color:"#00ff00",fillOpacity:0.1});
+    layers.sensors.addLayer(cone);
+    });
+    // Links
+    for(let i=0;i<meshNodes.length-1;i++){
+    layers.links.addLayer(L.polyline([[meshNodes[i].lat,meshNodes[i].lon],[meshNodes[i+1].lat,meshNodes[i+1].lon]],{dashArray:"4"}));
+    }
+    // C2 & Triggers
+    meshNodes.forEach(n=>{
+    layers.c2.addLayer(L.circle([n.lat,n.lon],{radius:100,color:"#00ffff",fillOpacity:0.05}).bindPopup(`C2 Overlay: ${n.callsign}`));
+    layers.triggers.addLayer(L.circle([n.lat+0.002,n.lon+0.002],{radius:50,color:"#ff00ff",fillOpacity:0.2}).bindPopup(`Trigger zone: ${n.callsign}`));
+    });
+    // TAK & Hostiles
+    takEntities.forEach(t=>layers.tak.addLayer(L.marker([t.lat,t.lon]).bindPopup(t.callsign)));
+    hostileEntities.forEach(h=>layers.hostiles.addLayer(L.circleMarker([h.lat,h.lon],{radius:8,color:"#ff1744"}).bindPopup(h.callsign)));
+    // Geofences
+    geofences.forEach(g=>layers.geofences.addLayer(g));
+    updateNodeList(online,warn,down);
+    }
+    function updateNodeList(o,w,d){
+    nodesList.innerHTML='';
+    meshNodes.forEach(n=>{
+    nodesList.innerHTML+=`
+    <div class="node-card" onclick="openAssetModal('${n.id}')">
+        <div class="node-header"><strong>${n.callsign}</strong><span class="${n.status}">${n.status.toUpperCase()}</span></div>
+        <div class="node-meta">UID: ${n.uid}<br>Role: ${n.role}</div>
+    </div>`;
+    });
+    totalNodes.textContent=meshNodes.length;
+    onlineNodes.textContent=o;
+    degradedNodes.textContent=w;
+    offlineNodes.textContent=d;
+    }
+    function simulateUpdate(){
+    meshNodes.forEach(n=>{n.status=Math.random()>0.7?"down":Math.random()>0.4?"warn":"ok";});
+    log("Network state update received");renderAll();
+    }
+    function broadcastAlert(){log("⚠ Broadcast alert issued to all mesh nodes");}
+    function log(msg){
+    const d=document.createElement('div');d.className="log-entry";d.textContent=new Date().toLocaleTimeString()+" — "+msg;commsLog.prepend(d);
+    }
+    function toggleLayer(name){map.hasLayer(layers[name])?map.removeLayer(layers[name]):map.addLayer(layers[name]);}
+    document.addEventListener('DOMContentLoaded',initMap);
+    // ================= MODALS =================
+    (() => {
+    let assetModal=document.getElementById('asset-modal'),activeAsset=null,pendingAction=null;
+    const broadcastModal=document.getElementById('broadcast-modal');
+    const nodeModal=document.getElementById('node-modal');
+    const modalNodeName=document.getElementById('modal-node-name');
+    let currentNode='';
+    // Broadcast Modal
+    window.openBroadcastModal=()=>{broadcastModal.style.display='block';};
+    window.closeBroadcastModal=()=>{broadcastModal.style.display='none';};
+    window.sendBroadcast=()=>{
+    let targets=Array.from(document.getElementById('broadcast-target').selectedOptions).map(o=>o.value);
+    let msg=document.getElementById('broadcast-message').value;
+    log(`📡 Broadcast to [${targets.join(', ')}]: ${msg}`);
+    closeBroadcastModal();
+    };
+    // Asset Modal
+    window.openAssetModal=(id)=>{
+    activeAsset=meshNodes.find(n=>n.id===id);
+    if(!activeAsset)return;
+    document.getElementById('asset-callsign').textContent=activeAsset.callsign;
+    document.getElementById('asset-uid').textContent=`UID: ${activeAsset.uid}`;
+    document.getElementById('asset-role').textContent=`Role: ${activeAsset.role}`;
+    const statusEl=document.getElementById('asset-status');
+    statusEl.textContent=activeAsset.status.toUpperCase();
+    statusEl.className=`status-badge ${activeAsset.status}`;
+    document.getElementById('asset-link').textContent=activeAsset.status==='ok'?'▮▮▮▮':activeAsset.status==='warn'?'▮▮▯▯':'▮▯▯▯';
+    document.getElementById('asset-last-heard').textContent='Just now';
+    document.getElementById('asset-power').textContent='—';
+    document.getElementById('asset-position').textContent='Live';
+    document.getElementById('asset-lat').textContent=activeAsset.lat.toFixed(5);
+    document.getElementById('asset-lon').textContent=activeAsset.lon.toFixed(5);
+    document.getElementById('asset-heading').textContent=activeAsset.az!==undefined?`${activeAsset.az}°`:'—';
+    const capList=document.getElementById('asset-capabilities');capList.innerHTML='';
+    const capabilities=[];
+    if(activeAsset.role.toLowerCase().includes('relay'))capabilities.push('Mesh Relay');
+    if(activeAsset.role.toLowerCase().includes('gateway'))capabilities.push('Gateway');
+    if(activeAsset.role.toLowerCase().includes('sensor'))capabilities.push('Sensor Cone');
+    capabilities.push('Receives Broadcasts');
+    capabilities.forEach(c=>{let li=document.createElement('li');li.textContent=c;capList.appendChild(li);});
+    const logEl=document.getElementById('asset-log');
+    logEl.innerHTML=`<div>${new Date().toLocaleTimeString()} — Modal opened</div><div>Status: ${activeAsset.status.toUpperCase()}</div>`;
+    assetModal.style.display='block';
+    };
+    window.closeAssetModal=()=>{assetModal.style.display='none';activeAsset=null;};
+    window.centerAssetOnMap=()=>{if(!activeAsset)return;map.setView([activeAsset.lat,activeAsset.lon],16);};
+    // Confirmation Modal
+    window.confirmAction=(action)=>{
+    pendingAction=action;
+    const title=document.getElementById('confirm-title');
+    const body=document.getElementById('confirm-body');
+    const input=document.getElementById('confirm-input');
+    input.style.display='none';input.value='';
+    switch(action){
+    case 'message':title.textContent="Send Direct Message";body.textContent="Enter message to send to this asset:";input.style.display="block";break;
+    case 'task':title.textContent="Assign Task";body.textContent="Enter tasking instructions:";input.style.display="block";break;
+    case 'diagnostics':title.textContent="Run Diagnostics";body.textContent="Run diagnostics on this asset?";break;
+    case 'reboot':title.textContent="Reboot Asset";body.textContent="WARNING: This may temporarily remove the asset from the mesh.";break;
+    }
+    document.getElementById('confirm-modal').style.display="block";
+    };
+    window.closeConfirmModal=()=>{document.getElementById('confirm-modal').style.display='none';pendingAction=null;};
+    window.executeConfirmedAction=()=>{
+    const inputVal=document.getElementById('confirm-input').value;
+    const statusEl=document.getElementById('command-status');
+    statusEl.textContent="Command sent...";
+    closeConfirmModal();
+    log(`📤 ${pendingAction.toUpperCase()} sent to ${activeAsset.callsign}`);
+    setTimeout(()=>{statusEl.textContent="Acknowledged by asset...";},800);
+    setTimeout(()=>{
+    statusEl.textContent="Command completed successfully.";
+    log(`✅ ${pendingAction.toUpperCase()} completed on ${activeAsset.callsign}`);
+    if(pendingAction==='message')log(`💬 Message to ${activeAsset.callsign}: ${inputVal}`);
+    if(pendingAction==='task')log(`📋 Task assigned to ${activeAsset.callsign}: ${inputVal}`);
+    },1800);
+    };
+    // Node Modal
+    window.openNodeModal=(name)=>{currentNode=name;modalNodeName.textContent=name+" Node Actions";nodeModal.style.display='block';};
+    window.closeNodeModal=()=>{nodeModal.style.display='none';};
+    window.rebootNode=()=>{alert(currentNode+" node reboot triggered!");};
+    window.runDiagnostics=()=>{alert("Running diagnostics on "+currentNode+" node.");};
+    // Collapsible Log
+    window.toggleAssetLog=()=>{const el=document.getElementById('asset-log');el.style.display=el.style.display==='none'?'block':'none';};
+    // Click Outside Close
+    window.addEventListener('click',e=>{
+    if(e.target===assetModal)closeAssetModal();
+    if(e.target===nodeModal)closeNodeModal();
+    if(e.target.id==='confirm-modal')closeConfirmModal();
+    });
+    })();
+    // ================= MAP GUARD =================
+    (() => {
+    const guards=document.querySelectorAll('.map-guard');
+    guards.forEach(g=>{
+    const overlay=g.querySelector('.map-overlay');
+    if(!overlay)return;
+    let blockTimer=null;
+    g.addEventListener('mouseenter',()=>{overlay.classList.add('active');blockTimer=setTimeout(()=>{overlay.classList.remove('active');blockTimer=null;},900);});
+    g.addEventListener('mouseleave',()=>{overlay.classList.remove('active');if(blockTimer){clearTimeout(blockTimer);blockTimer=null;}});
+    });
+    })();
 </script>
-
 </body>
 </html>

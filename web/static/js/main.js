@@ -16,8 +16,10 @@ function loadHeader() {
 
             // Ensure DOM + styles are applied before collapse logic
             requestAnimationFrame(() => {
-                requestAnimationFrame(initNavbarCollapse);
+                initNavbarCollapse();
+                highlightActiveNav();
             });
+
         })
         .catch(err => {
             console.error('Header load error:', err);
@@ -162,6 +164,31 @@ function initSidebar() {
     const pageId = document.body.dataset.page;
     if (!pageId) return;
     populateSidebar(pageId);
+}
+// ==========================
+// ACTIVE NAV PAGE INDICATOR
+// ==========================
+
+function highlightActiveNav() {
+    const pageId = document.body.dataset.page;
+    if (!pageId) return;
+
+    const navbar = document.getElementById('main-navbar');
+    if (!navbar) return;
+
+    // Clear any stale state (safe on reloads)
+    navbar
+        .querySelectorAll('.active-page')
+        .forEach(el => el.classList.remove('active-page'));
+
+    // Match header links using data-page
+    const activeLink = navbar.querySelector(
+        `[data-page="${pageId}"]`
+    );
+
+    if (activeLink) {
+        activeLink.classList.add('active-page');
+    }
 }
 
 // ==========================

@@ -366,17 +366,20 @@ nav a.active {
     margin-bottom: 4px;
 }
 .tooltip-bar {
+    position: relative;
     width: 100%;
     height: 6px;
-    background: rgba(255,255,255,0.1);
+    background: linear-gradient(90deg, #2ecc71 0%, #2ecc71 40%, #f1c40f 50%, #e67e22 85%, #e74377 100%);
     border-radius: 3px;
     overflow: hidden;
 }
 .tooltip-fill {
-    height: 100%;
-    background: rgba(0,255,0,0.7);
-    border-radius: 3px;
+    position: absolute;
+    top:0;
+    right:0;
+    height: 6px;
     transition: width 0.3s ease;
+    background: #333;
 }
 .node-status:hover .node-tooltip { display: block; }
 
@@ -1772,4 +1775,28 @@ tbody tr:hover {
     width: 60vw;
     height: 80vh;
     overflow-y:auto;
+}
+.navbar a {
+    position: relative;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+.navbar a.active-page {
+    border-bottom-color: rgba(0, 255, 0, 0.5); /* your primary accent */
+}
+.navbar a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 2px;
+    background: rgba(0, 255, 0, 0.5);
+    transform: scaleX(0);
+    transition: transform 0.15s ease;
+}
+
+.navbar a.active-page::after {
+    transform: scaleX(1);
 }
