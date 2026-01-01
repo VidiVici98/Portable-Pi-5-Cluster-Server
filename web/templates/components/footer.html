@@ -15,19 +15,22 @@
         <div class="slide-panel-header">Current Session</div>
         <div class="slide-panel-stat">Operator: {{ operator }}</div>
         <button class="slide-panel-btn">Sign Off</button>
-        <button class="slide-panel-btn">Shut Down Cluster</button>
+        <button class="slide-panel-btn">Shut Down</button>
     </div>
     <div id="panel-uptime" class="slide-panel" data-footer-action="uptime">
         <div class="slide-panel-header">Uptime</div>
-        <div class="slide-panel-stat">Server Start Time: {{ start_time }}</div>
-        <div class="slide-panel-stat">Remaining Runtime: {{ remaining_runtime }}</div>
-        <div class="slide-panel-stat">Power Source: {{ power_source }}</div>
+        <div class="slide-panel-stat">Server Start: {{ SERVER_START_TIME }}</div>
+        <div class="slide-panel-stat">Power: <span>Onboard</span></div>
+        <div class="slide-panel-stat" style="text-align: center;"><span style="text-align: center;">~9hrs 30min Left</span></div>
+
     </div>
     <div id="panel-alerts" class="slide-panel" data-footer-action="alerts">
         <div class="slide-panel-header">Active Alerts</div>
-        <div class="slide-panel-stat">{{ active_alerts }}</div>
-        <button class="slide-panel-btn">Acknowledge All</button>
-        <button class="slide-panel-btn">View Logs</button>
+        <div id="alertsLog" class="log" style="height:180px; overflow-y: auto; font-size:0.75rem;"></div>
+        <div class="alerts-panel-btns">
+            <button class="slide-panel-btn">Acknowledge All</button>
+            <a class="slide-panel-btn" href="/#activity-log">View Logs</a>
+        </div>
 </div>
 </section>
 <section class="footer-content">
@@ -49,14 +52,12 @@
             Uptime <span id="uptime-display">--:--:--</span>
         </button>        
         <button class="footer-btn" id="alerts-btn" data-footer-action="alerts">
-            {{ alert_number }} Alerts
+            <svg fill="#ffffff" width="14px" height="16px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M1298.824 1581.176c0 186.805-152.02 338.824-338.824 338.824-186.805 0-338.824-152.019-338.824-338.824h677.648ZM1016.47 0v115.765c378.465 29.026 677.647 345.6 677.647 731.294v282.353c0 124.574 101.308 225.882 225.882 225.882v112.941H0v-112.94c124.574 0 225.882-101.31 225.882-225.883V847.059c0-385.694 299.182-702.268 677.647-731.294V0h112.942Z" fill-rule="evenodd"></path> </g></svg>
         </button>
-    </div>
-    <div class="footer-right">
-        <!-- Reserved for future indicators (crypto, sync, alerts) -->
     </div>
 </div>
 <div class="sub-footer">
-    <p>AUTHORIZED USE ONLY — ACTIVITY MAY BE LOGGED</p>
+    <span class="notice">AUTHORIZED USE ONLY — ACTIVITY MAY BE LOGGED</span>
+    <span class="copyright">&copy; Modern Warrior Systems 2026</span>
 </div>
 </section>

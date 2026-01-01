@@ -13,44 +13,6 @@
                         <a href="/backup" data-page="backup">Backup & Restore</a>
                     </div>
                 </div>
-                <!-- Tactical alert icon -->
-                <div class="nav-alert">
-                    <button href="#" class="alert-icon" title="Notifications">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10.29 3.86L1.82 18a1 1 0 0 0 .87 1.5h18.62a1 1 0 0 0 .87-1.5L13.71 3.86a1 1 0 0 0-1.42 0z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                        <span class="alert-badge">3</span>
-                        <div class="alert-panel">
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    ADS-B Node high temp <span class="alert-meta">71°C</span>
-                                </div>
-                            </div>
-                            <div class="alert-item alert-down">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Tx/Rx Node offline
-                                </div>
-                            </div>
-                            <div class="alert-item alert-warn">
-                                <div class="alert-dot"></div>
-                                <div class="alert-text">
-                                    Mesh Node CPU high <span class="alert-meta">88%</span>
-                                </div>
-                            </div>
-                            <div class="alert-logs">
-                                <div class="alert-log">[12:02] ADS-B Node temp spike detected</div>
-                                <div class="alert-log">[12:01] Tx/Rx Node lost connectivity</div>
-                                <div class="alert-log">[12:00] Mesh Node CPU > 85%</div>
-                            </div>
-                        </div>
-                    </button>
-                </div>
             </div>
         </div>
         <!-- Right column: node status -->
@@ -60,14 +22,16 @@
                 Boot
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 52%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
+                    <div class="tooltip-item"><span>RAM: 67%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:33%;"></div></div></div>
                     <div class="tooltip-item"><span>Temp: 55°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:55%;"></div></div></div>
                 </div>
             </div>
             <div class="node-status warn">
-                <button class="node-btn" title="Reboot ADS-B Node">⭮</button>
+                <button class="node-btn" title="Reboot SIGINT Node">⭮</button>
                 ISR
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 78%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:22%;"></div></div></div>
+                    <div class="tooltip-item"><span>RAM: 53%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:47%;"></div></div></div>
                     <div class="tooltip-item"><span>Temp: 69°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:29%;"></div></div></div>
                 </div>
             </div>
@@ -76,6 +40,7 @@
                 Mesh
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 48%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
+                    <div class="tooltip-item"><span>RAM: 78%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:22%;"></div></div></div>
                     <div class="tooltip-item"><span>Temp: 57°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:50%;"></div></div></div>
                 </div>
             </div>
@@ -84,6 +49,7 @@
                 RF
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 0%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:100%;"></div></div></div>
+                    <div class="tooltip-item"><span>RAM: 0%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:100%;"></div></div></div>
                     <div class="tooltip-item"><span>Temp: 0°C</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:100%;"></div></div></div>
                 </div>
             </div>

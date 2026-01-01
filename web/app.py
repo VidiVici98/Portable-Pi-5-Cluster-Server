@@ -129,7 +129,7 @@ def get_cluster_id():
 
 def get_session_id():
     # Use Flask session if available
-    return session.get('session_id', 'N/A')
+    return session.get('session_id', '7G5K2B1F')
 
 def get_uptime_seconds():
     start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())

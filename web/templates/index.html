@@ -45,9 +45,6 @@
                 <button class="btn btn-info" onclick="runHealthCheck()" id="health">
                     Health Check
                 </button>
-                <button class="btn btn-info" onclick="showPerformance()" id="performance">
-                    Performance
-                </button>
                 <button class="btn btn-danger" onclick="confirmDestroyData()" id="data-wipe">
                     Emergency Wipe
                 </button>                
@@ -59,9 +56,7 @@
         <!-- Recent Activity -->
         <div class="card">
             <h2>ACTIVITY LOG</h2>
-            <div id="activity-log">
-                <p style="color: var(--text-muted);">No recent activity</p>
-            </div>
+            <div id="activity-log"></div>
         </div>
     </main>
     <footer id="footer-embed-container"></footer>
@@ -166,9 +161,6 @@ function updateClusterStatus() {
                         }
                     });
             }
-        }
-        function showPerformance() {
-            window.location.href = '/performance';
         }
         function confirmRebootAll() {
             if (confirm('⚠ REBOOT ALL NODES? This will interrupt all operations.')) {

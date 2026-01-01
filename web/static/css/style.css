@@ -1,6 +1,5 @@
 /* 
  * Tactical Operations Dashboard CSS
- * Military-inspired styling for cluster management
  */
 :root {
     /* Tactical color palette */
@@ -44,7 +43,7 @@ html, body {
 footer {
     background: linear-gradient(25deg, #000000, #111111, #151515, #111111, #000000);
     position:sticky;
-    bottom: -45px;
+    bottom: -35px;
     left: 0;
     width:100%;
 }
@@ -55,6 +54,10 @@ footer button {
     border: none;
     background: transparent;
     color: #bbb;
+    padding-top: 10px;
+    padding-bottom:6px;
+    margin-top: 2px;
+    margin-bottom:4px;
 }
 /* Container */
 .container {
@@ -89,8 +92,6 @@ a {
 a:hover {
     filter: brightness(1.5);
 }
-/* Navigation brand */
-/* Navigation brand */
 /* ================= NAVBAR ================= */
 .navbar {
     display: flex;
@@ -186,103 +187,6 @@ nav a.active {
 .dropdown-menu a.active {
     background: #334155;
     font-weight: 600;
-}
-/* ================= ALERTS ================= */
-.nav-alert {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-.nav-alert .alert-icon {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 12px;
-    border: 1px solid transparent;
-    color: rgba(255, 179, 0, 0.3);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: transparent;
-}
-.nav-alert .alert-icon svg {
-    transform: translate(-2px, -2px);
-}
-.nav-alert .alert-icon:hover {
-    border: 1px solid rgba(0, 255, 0, 0.5);
-    background: rgba(0, 255, 0, 0.05);
-    filter: brightness(1.5);
-}
-.nav-alert .alert-badge {
-    position: absolute;
-    top: -8px;
-    right: 4px;
-    background: #111111cc;
-    color: #ddd;
-    font-family:Georgia, 'Times New Roman', Times, serif;
-    text-shadow: 1px 2px 2px #111,
-                 2px 3px 3px #333;
-    font-size: 0.85rem;
-    font-weight: bold;
-    padding: 3px 6px;
-    border-radius: 50%;
-}
-/* Alert panel dropdown */
-.nav-alert .alert-panel {
-    display: none;
-    position: absolute;
-    top: 120%;
-    right: 0;
-    background: #111;
-    border: 1px solid rgba(255, 179, 0, 0.5);
-    border-radius: 6px;
-    padding: 8px 10px;
-    min-width: 220px;
-    max-height: 250px;
-    overflow-y: auto;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.7);
-    z-index: 1000;
-}
-.alert-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 4px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.alert-item:last-child { border-bottom: none; }
-.alert-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-}
-.alert-item.alert-ok .alert-dot { background: #0f0; }
-.alert-item.alert-warn .alert-dot { background: #ffb300; }
-.alert-item.alert-down .alert-dot { background: #f00; }
-.alert-text {
-    font-size: 0.75rem;
-    color: #eee;
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-}
-.alert-text .alert-meta {
-    font-size: 0.65rem;
-    color: #999;
-}
-/* Scrollable logs */
-.alert-logs {
-    margin-top: 6px;
-    max-height: 120px;
-    overflow-y: auto;
-    border-top: 1px solid rgba(255,179,0,0.2);
-    padding-top: 4px;
-}
-.alert-log {
-    font-size: 0.7rem;
-    color: #ccc;
-    padding: 2px 0;
 }
 /* ================= NODE STATUS ================= */
 .nav-status {
@@ -1777,11 +1681,22 @@ tbody tr:hover {
 .sub-footer {
     color: #666;
     font-family: Georgia, 'Times New Roman', Times, serif;
-    text-align: left;
-    padding-bottom:10px;
-    font-size: 0.85rem;
+    padding-bottom:4px;
     padding-left: 16px;
-    padding-top:8px;
+    padding-top:2px;
+}
+.sub-footer .notice {
+    color: #00ff00;
+    text-align: left;
+    font-size: 0.85rem;
+}
+.sub-footer .copyright {
+    color: #666;
+    text-align: right;
+    font-size: 0.85rem;
+    position: absolute;
+    right: 16px;
+    bottom: 4px;
 }
 /* ===== FIELD ASSET MODAL ===== */
 #asset-modal {
@@ -1902,19 +1817,28 @@ tbody tr:hover {
 } 
 #panel-uptime {
     position:absolute;
-    right: 100px;
+    right: 25px;
 }
 #uptime-btn {
     position:absolute;
-    right: 100px;
+    right: 45px;
 }
 #panel-alerts {
     position:absolute;
     right: 8px;
+    height:300px;
 }
 #alerts-btn {
     position:absolute;
     right: 8px;
+    padding: 8px;
+}
+.alerts-panel-btns {
+    position: absolute;
+    bottom: 8px;
+    text-align: center;
+    border-top: 1px groove #00ff00;
+    padding-top: 8px;
 }
 .slide-panel.visible {
     transform: translateY(0);
