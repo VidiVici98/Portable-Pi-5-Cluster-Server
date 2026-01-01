@@ -16,6 +16,12 @@ import os
 import json
 import subprocess
 import socket
+import secrets
+from datetime import datetime
+from flask import session
+from config.dashboard import DASHBOARD_CONFIG
+from datetime import datetime
+
 from datetime import datetime
 from functools import wraps
 
@@ -67,10 +73,12 @@ NODES = {
         }
     }
 }
+
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.getenv('SECRET_KEY', 'tactical-ops-default-key')
 CORS(app)
+
 ################################################################################
 # AUTHENTICATION AND BOOT LANDING PAGE
 ################################################################################
@@ -106,12 +114,41 @@ def logout():
 def boot_landing():
     """Dashboard boot landing / preloader page"""
     return render_template('boot_landing.html')
+
 @app.route('/header')
 def header():
     return render_template('components/header.html')
+
+# FOOTER - UPDATED TO INCLUDE DYNAMIC NODE STATUS
+
+def get_dashboard_build():
+    return DASHBOARD_CONFIG.get("BUILD_VERSION", "v0.0.0")
+
+def get_cluster_id():
+    return DASHBOARD_CONFIG.get("CLUSTER_ID", "UNKNOWN")
+
+def get_session_id():
+    # Use Flask session if available
+    return session.get('session_id', 'N/A')
+
+def get_uptime_seconds():
+    start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())
+    delta = datetime.utcnow() - start
+    return int(delta.total_seconds())
+
 @app.route('/footer')
 def footer():
-    return render_template('components/footer.html')
+    """Dynamic footer component for all pages"""
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    return render_template(
+        'components/footer.html',
+        dashboard_build=get_dashboard_build(),
+        cluster_id=get_cluster_id(),
+        session_id=get_session_id(),
+        uptime_seconds=get_uptime_seconds(),
+        timestamp=timestamp
+    )
 
 ################################################################################
 # UTILITIES

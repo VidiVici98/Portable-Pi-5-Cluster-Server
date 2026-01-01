@@ -1,3 +1,62 @@
-<div class="sub-footer">
-    <small> &copy; 2026 Modern Warrior School LLC | All Rights Reserved</small>
+<section class="footer-slide-panels">
+    <div id="panel-build" class="slide-panel" data-footer-action="build">
+        <div class="slide-panel-header">Build Version</div>
+        <div class="slide-panel-stat">Build Date: {{ build_date }}</div>
+        <div class="slide-panel-stat">Build Hash: {{ build_hash }}</div>
+        <button class="slide-panel-btn">Check For Updates</button>
+    </div>
+    <div id="panel-cluster" class="slide-panel" data-footer-action="cluster">
+        <div class="slide-panel-header">Cluster Stats</div>
+        <div class="slide-panel-stat">Connected Users: {{ connected_users }}</div>
+        <div class="slide-panel-stat">Average Latency: {{ average_latency }}</div>
+        <div class="slide-panel-stat">Operating Mode: {{ operating_mode }}</div>
+    </div>
+    <div id="panel-session" class="slide-panel" data-footer-action="session">
+        <div class="slide-panel-header">Current Session</div>
+        <div class="slide-panel-stat">Operator: {{ operator }}</div>
+        <button class="slide-panel-btn">Sign Off</button>
+        <button class="slide-panel-btn">Shut Down Cluster</button>
+    </div>
+    <div id="panel-uptime" class="slide-panel" data-footer-action="uptime">
+        <div class="slide-panel-header">Uptime</div>
+        <div class="slide-panel-stat">Server Start Time: {{ start_time }}</div>
+        <div class="slide-panel-stat">Remaining Runtime: {{ remaining_runtime }}</div>
+        <div class="slide-panel-stat">Power Source: {{ power_source }}</div>
+    </div>
+    <div id="panel-alerts" class="slide-panel" data-footer-action="alerts">
+        <div class="slide-panel-header">Active Alerts</div>
+        <div class="slide-panel-stat">{{ active_alerts }}</div>
+        <button class="slide-panel-btn">Acknowledge All</button>
+        <button class="slide-panel-btn">View Logs</button>
 </div>
+</section>
+<section class="footer-content">
+<div class="dashboard-footer-inner">
+    <div class="footer-center">
+        <button class="footer-btn" data-footer-action="build">
+            {{ dashboard_build }}
+        </button>
+        <span class="footer-separator">|</span>
+        <button class="footer-btn" data-footer-action="cluster">
+            Cluster {{ cluster_id }}
+        </button>
+        <span class="footer-separator">|</span>
+        <button class="footer-btn" data-footer-action="session">
+            Session {{ session_id }}
+        </button>
+        <span class="footer-separator">|</span>
+        <button class="footer-btn" id="uptime-btn" data-footer-action="uptime">
+            Uptime <span id="uptime-display">--:--:--</span>
+        </button>        
+        <button class="footer-btn" id="alerts-btn" data-footer-action="alerts">
+            {{ alert_number }} Alerts
+        </button>
+    </div>
+    <div class="footer-right">
+        <!-- Reserved for future indicators (crypto, sync, alerts) -->
+    </div>
+</div>
+<div class="sub-footer">
+    <p>AUTHORIZED USE ONLY — ACTIVITY MAY BE LOGGED</p>
+</div>
+</section>
