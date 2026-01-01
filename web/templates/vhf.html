@@ -447,17 +447,70 @@ let currentMode = 'FM';
 let isRecording = false;
 let recordStartTime = null;
 let recordInterval = null;
-// S-meter state
-let displayedStrength = 50;
-let targetStrength = 50;
-// Set mode from buttons
+/* =========================
+   RF SIGNAL MODEL
+========================= */
+// Base propagation signal (0–1)
+let signalLevel = 0.55;
+let signalTarget = 0.55;
+// Receiver tuning loss (0–1)
+let tuningLoss = 1.0;
+// Change propagation slowly
+function updateSignalTarget() {
+    signalTarget = 0.3 + Math.random() * 0.5; // ~S3–S8
+}
+// Smooth physical signal movement
+function updateSignalLevel() {
+    const riseRate = 0.004;
+    const fallRate = 0.002;
+    if (signalLevel < signalTarget) signalLevel += riseRate;
+    else signalLevel -= fallRate;
+    let flutter = 0;
+    switch (currentMode) {
+        case 'AM':  flutter = (Math.random() - 0.5) * 0.02; break;
+        case 'SSB': flutter = (Math.random() - 0.5) * 0.015; break;
+        case 'CW':  flutter = (Math.random() - 0.5) * 0.03; break;
+        case 'FM':  flutter = (Math.random() - 0.5) * 0.008; break;
+    }
+    signalLevel = Math.min(1, Math.max(0, signalLevel + flutter));
+}
+// Frequency-dependent tuning loss
+function updateTuningLoss() {
+    const offset = Math.abs(currentFrequency - 146.52);
+    const bw = getBandwidth(currentMode);
+    tuningLoss = Math.max(0, 1 - offset / bw);
+}
+// Receiver bandwidth by mode
+function getBandwidth(mode) {
+    switch (mode) {
+        case 'AM':  return 0.10;
+        case 'FM':  return 0.20;
+        case 'SSB': return 0.05;
+        case 'CW':  return 0.015;
+    }
+}
+/* =========================
+   S-METER (DERIVED)
+========================= */
+function animateSMeter() {
+    const meter = document.getElementById('sMeter');
+    // Combined signal strength
+    const effectiveSignal = signalLevel * tuningLoss;
+    // Map to 30–80%
+    const strength = 30 + effectiveSignal * 50;
+    meter.style.width = strength + '%';
+    meter.textContent = 'S ' + Math.round(strength / 10);
+    requestAnimationFrame(animateSMeter);
+}
+/* =========================
+   UI CONTROLS
+========================= */
 function setMode(button, mode) {
     document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     currentMode = mode;
     document.getElementById('modulation').textContent = mode;
 }
-// Frequency controls
 function setFrequency() {
     const input = document.getElementById('frequencyInput');
     const freq = parseFloat(input.value);
@@ -480,39 +533,12 @@ function adjustFrequency(delta) {
     document.getElementById('frequencyInput').value = currentFrequency.toFixed(3);
     updateFrequencyDisplay();
 }
-// Generate a new S-meter target
-function generateTargetStrength() {
-    targetStrength = 30 + Math.random() * 50; // 30–80% range
+function updateFrequencyDisplay() {
+    document.getElementById('frequencyDisplay').textContent = currentFrequency.toFixed(3);
 }
-// Smooth S-meter animation
-function updateSMeter() {
-    const meter = document.getElementById('sMeter');
-    // Smooth rise/fall
-    if (displayedStrength < targetStrength) {
-        displayedStrength += Math.random() * 1.8 + 0.2; // faster rise
-        if (displayedStrength > targetStrength) displayedStrength = targetStrength;
-    } else {
-        displayedStrength -= Math.random() * 0.8 + 0.1; // slower decay
-        if (displayedStrength < targetStrength) displayedStrength = targetStrength;
-    }
-    // Small jitter for realism
-    const jitter = (Math.random() - 0.5) * 2;
-    const strength = Math.min(100, Math.max(0, displayedStrength + jitter));
-    meter.style.width = strength + '%';
-    meter.textContent = 'S ' + Math.round(strength / 10);
-    requestAnimationFrame(updateSMeter);
-}
-// Start S-meter animation
-updateSMeter();
-// Update target periodically
-setInterval(generateTargetStrength, 500);
-// Gain adjustment
-function adjustGain(value) {
-    document.getElementById('gainValue').textContent = value + ' dB';
-    document.getElementById('gainDisplay').textContent = value + ' dB';
-    // Optional: could tie gain into S-meter directly
-}
-// Recording logic
+/* =========================
+   RECORDING
+========================= */
 function toggleRecording() {
     isRecording = !isRecording;
     const btn = document.getElementById('recordBtn');
@@ -523,30 +549,29 @@ function toggleRecording() {
         recordStartTime = Date.now();
         recordInterval = setInterval(() => {
             const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            durationSpan.textContent = 
-                String(minutes).padStart(2, '0') + ':' + 
-                String(seconds).padStart(2, '0');
+            durationSpan.textContent =
+                String(Math.floor(elapsed / 60)).padStart(2, '0') + ':' +
+                String(elapsed % 60).padStart(2, '0');
         }, 100);
     } else {
         btn.classList.remove('active');
         btn.textContent = '● REC';
         clearInterval(recordInterval);
-        const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
-        alert(`📁 Recording saved (${elapsed} seconds)`);
         durationSpan.textContent = '--:--';
     }
 }
-// Draw spectrum
+/* =========================
+   SPECTRUM
+========================= */
 function drawSpectrum() {
     const canvas = document.getElementById('spectrumCanvas');
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
-    // Clear canvas
+    updateTuningLoss();
+    updateSignalLevel();
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    // Frequency axis
+    // Axis
     ctx.strokeStyle = '#00ff0050';
     ctx.lineWidth = 2;
     for (let i = 0; i <= 10; i++) {
@@ -565,59 +590,58 @@ function drawSpectrum() {
         ctx.fillText((currentFrequency - 5 + i), 0, 0);
         ctx.restore();
     }
-    // Spectrum data
+    // Spectrum trace
     ctx.strokeStyle = '#00FF00';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    let noiseFloor = 38 + Math.random() * 4;
+    const noiseFloor = 35 + Math.random() * 6;
+    const effectiveSignal = signalLevel * tuningLoss;
     for (let x = 0; x < canvas.width; x += 2) {
-        const progress = x / canvas.width;
-        const noise = noiseFloor + (Math.random() - 0.5) * 10;
-        let signal = 0;
+        const p = x / canvas.width;
         const center = 0.5;
-        const distance = Math.abs(progress - center);
+        const d = Math.abs(p - center);
+        let signal = 0;
         switch (currentMode) {
             case 'AM':
-                if (distance < 0.05) signal = 70 * Math.cos((distance / 0.05) * Math.PI / 2);
+                if (d < 0.05)
+                    signal = 80 * Math.cos(d / 0.05 * Math.PI / 2);
                 break;
+
             case 'FM':
-                if (distance < 0.08) signal = 60 * Math.exp(-Math.pow(distance / 0.08, 2) * 4);
+                if (d < 0.08)
+                    signal = 65 * Math.exp(-Math.pow(d / 0.08, 2) * 4);
                 break;
+
             case 'SSB':
-                if (progress > center && distance < 0.05) signal = 65 * Math.cos((distance / 0.05) * Math.PI / 2);
+                if (p > center && d < 0.05)
+                    signal = 75 * Math.cos(d / 0.05 * Math.PI / 2);
                 break;
+
             case 'CW':
-                if (distance < 0.01) signal = Math.random() < 0.02 ? 0 : 80;
+                if (d < 0.008)
+                    signal = Math.random() < 0.05 ? 0 : 90;
                 break;
         }
+        signal *= effectiveSignal;
+        const noise = noiseFloor + (Math.random() - 0.5) * 10;
         const y = canvas.height - 30 - (noise + signal) / 100 * (canvas.height - 30);
         if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
     }
     ctx.stroke();
-    // Baseline
-    ctx.strokeStyle = '#00ff0030';
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height / 2);
-    ctx.lineTo(canvas.width, canvas.height / 2);
-    ctx.stroke();
 }
-// Update frequency display (text) without interfering with S-meter animation
-function updateFrequencyDisplay() {
-    document.getElementById('frequencyDisplay').textContent = currentFrequency.toFixed(3);
-}
-// Initialize
+/* =========================
+   INIT
+========================= */
 function init() {
     updateFrequencyDisplay();
-    drawSpectrum();
-    setInterval(() => {
-        generateTargetStrength();
-        drawSpectrum();
-    }, 600); // redraw spectrum every 600ms
+    animateSMeter();
+    setInterval(updateSignalTarget, 1200);
+    setInterval(drawSpectrum, 100);
 }
 init();
 </script>
-    <script>
+<script>
 /*
  * DIGITAL DATA PANEL – HARDENED UI LOGIC
  * UI-only, transport-agnostic
