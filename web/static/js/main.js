@@ -133,7 +133,7 @@ function initFooterDynamic() {
             batterySpans[currentIndex].classList.remove('active');
             currentIndex = (currentIndex + 1) % batterySpans.length;
             batterySpans[currentIndex].classList.add('active');
-        }, 5000); // 5 seconds per display
+        }, 6000); // 5 seconds per display
     }
 }
 

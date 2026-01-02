@@ -349,12 +349,13 @@ nav a.active {
 .aircraft-details {
     background: radial-gradient(circle at 50%, #151515, #252525);
     border: 1px solid #333;
-    padding: 20px;
+    padding: 8px;
     margin-bottom: 20px;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.05), inset 0 1px 0 rgba(0, 255, 0, 0.1);
     transition: all 0.3s ease;
     max-width: 70vw;
     width: 100%;
+    height: 350px;
 }
 /* Buttons */
 button, .btn {
@@ -741,8 +742,8 @@ tbody tr:hover {
     background: linear-gradient(135deg, #151515 0%, #252525 100%);
     border: 2px solid #333;
     border-radius: 4px;
-    padding: 15px;
-    max-height: 600px;
+    padding: 8px;
+    height: 350px;
     max-width:28vw;
     overflow-y: auto;
     box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
@@ -1830,7 +1831,13 @@ tbody tr:hover {
     font-size: 0.75rem;
     font-family: monospace;
     margin-left: 4px;
+    margin-right: 4px;
 }
+.slide-panel-stat a {
+    font-style: italic;
+    font-size: 0.7rem;
+}
+
 .slide-panel-btn:hover,
 .alerts-panel-btns #view-logs-btn:hover {
     color:#00ff00;
@@ -1847,12 +1854,14 @@ tbody tr:hover {
 } 
 #panel-session {
     left: 290px;
+    height:200px;
 } 
 #panel-uptime {
     position:absolute;
     right: 25px;
     width: 275px;
     height: 200px;
+    overflow-x: clip;
 }
 #uptime-btn {
     position:absolute;
@@ -1892,8 +1901,8 @@ tbody tr:hover {
     right: auto;
     bottom: 8px;
     width: 120px;
-    transition: opacity 1s ease-in-out, 
-                transform 1s ease-in-out;
+    transition: opacity 3s ease-in-out, 
+                transform 2s ease-in-out;
     transform: translateX(0px);
     justify-self: center;
     white-space:nowrap;
@@ -1902,4 +1911,40 @@ tbody tr:hover {
 #battery-display span.active {
     opacity: 1;
     transform: translateX(-100px);
+}
+/* === TOOLTIP === */
+[data-tip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 120%;
+  background: #000;
+  color: #0f0;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  border: 1px solid #0f0;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10000;
+}
+
+[data-tip]:hover::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 110%;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #000 transparent transparent transparent;
+  z-index: 10001;
+}
+select {
+    width: 200px;
 }

@@ -100,7 +100,7 @@ def login():
         password = request.form.get('password')
         if USERS.get(username) == password:
             session['user'] = username
-            return redirect(request.args.get('next') or url_for('boot_landing'))
+            return redirect(request.args.get('next') or url_for('index'))
         return render_template('login.html', error='Invalid credentials')
     return render_template('login.html')
 
@@ -109,12 +109,6 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('login'))
 
-@app.route('/boot')
-@login_required
-def boot_landing():
-    """Dashboard boot landing / preloader page"""
-    return render_template('boot_landing.html')
-
 @app.route('/header')
 def header():
     return render_template('components/header.html')
@@ -122,7 +116,7 @@ def header():
 # FOOTER - UPDATED TO INCLUDE DYNAMIC NODE STATUS
 
 def get_dashboard_build():
-    return DASHBOARD_CONFIG.get("BUILD_VERSION", "v0.0.0")
+    return DASHBOARD_CONFIG.get("BUILD_VERSION", "v0.2.0")
 
 def get_cluster_id():
     return DASHBOARD_CONFIG.get("CLUSTER_ID", "UNKNOWN")
@@ -284,10 +278,10 @@ def vhf():
     """VHF/SDR frequency control page"""
     return render_template('vhf.html', nodes=NODES, demo_mode=DEMO_MODE)
 
-@app.route('/performance')
+@app.route('/manage-users')
 def performance():
-    """Performance analysis page"""
-    return render_template('performance.html', nodes=NODES, demo_mode=DEMO_MODE)
+    """Manage users page"""
+    return render_template('manage-users.html', nodes=NODES, demo_mode=DEMO_MODE)
 
 @app.route('/backup')
 def backup():
