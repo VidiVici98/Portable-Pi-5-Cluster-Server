@@ -18,7 +18,7 @@
         <!-- Right column: node status -->
         <div class="nav-status">
             <div class="node-status ok">
-                <button class="node-btn" title="Reboot Boot Node">⭮</button>
+                <button class="node-btn" title="Reboot Boot Node" data-modal="reboot-boot-modal">⭮</button>
                 Boot
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 52%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:48%;"></div></div></div>
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="node-status warn">
-                <button class="node-btn" title="Reboot SIGINT Node">⭮</button>
+                <button class="node-btn" title="Reboot SIGINT Node" data-modal="reboot-sigint-modal">⭮</button>
                 ISR
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 78%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:22%;"></div></div></div>
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="node-status ok">
-                <button class="node-btn" title="Reboot Mesh Node">⭮</button>
+                <button class="node-btn" title="Reboot Mesh Node" data-modal="reboot-mesh-modal">⭮</button>
                 Mesh
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 48%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:52%;"></div></div></div>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="node-status down">
-                <button class="node-btn" title="Reboot Tx/Rx Node">⭮</button>
+                <button class="node-btn" title="Reboot UHF/VHF/HF Node" data-modal="reboot-rf-node">⭮</button>
                 RF
                 <div class="node-tooltip">
                     <div class="tooltip-item"><span>CPU: 0%</span><div class="tooltip-bar"><div class="tooltip-fill" style="width:100%;"></div></div></div>

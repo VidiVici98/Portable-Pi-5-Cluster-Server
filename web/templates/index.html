@@ -34,7 +34,6 @@
             <h2>NODE STATUS</h2>
             <div id="node-status">
                 <div id="cluster-status" class="grid-4">
-                    <!-- Populated by JavaScript -->
                      <!--These cards are the ones we are pairing with the tool-cards-->
                 </div>
             </div>
@@ -74,8 +73,12 @@
             try {
                 const response = await fetch('/api/cluster/node-summary');
                 const nodes = await response.json();     
-                const purposesDiv = document.getElementById('node-purposes');
-                purposesDiv.innerHTML = '';   
+                const container = document.getElementById('node-purposes');
+                    if (!container) {
+                        console.warn('Node purposes container not found; skipping.');
+                        return;
+                    }
+                container.innerHTML = '';
                 for (const node of nodes) {
                     const details = nodeDetails[node.id];
                     const card = document.createElement('div');
@@ -193,6 +196,9 @@ function updateClusterStatus() {
             entry.style.cssText = 'padding: 5px 0; border-bottom: 1px solid var(--border-color-dim);min-height:300px;';
             entry.innerHTML = `<span style="color: var(--text-muted);">[${time}]</span> ${message}`;
             log.insertBefore(entry, log.firstChild);
+        }
+        function rebootNode(){
+          alert(currentNode + " node reboot triggered!");
         }
         // Initial load and refresh
         loadNodePurposes();
@@ -368,5 +374,6 @@ setInterval(loadToolStatus, 15000);
     });
 })();
 </script>
+
 </body>
 </html>

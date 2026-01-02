@@ -129,34 +129,56 @@ def get_cluster_id():
 
 def get_session_id():
     # Use Flask session if available
-    return session.get('session_id', '7G5K2B1F')
+    return session.get('session_id', '7G5K2B1F')    
 
 def get_uptime_seconds():
-    start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())
-    delta = datetime.utcnow() - start
-    return int(delta.total_seconds())
+    try:
+        start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())
+        delta = datetime.utcnow() - start
+        return int(delta.total_seconds())
+    except Exception as e:
+        print("Error calculating uptime:", e)
+        return 0
+        
+def format_uptime_hhmm(seconds):
+    """Convert seconds to HH:MM string."""
+    hours, remainder = divmod(seconds, 3600)
+    minutes, _ = divmod(remainder, 60)
+    return f"{hours:02d}:{minutes:02d}"
 
 @app.route('/footer')
 def footer():
     """Dynamic footer component for all pages"""
-    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        uptime_sec = get_uptime_seconds()
+        uptime_hhmm = format_uptime_hhmm(uptime_sec)
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    return render_template(
-        'components/footer.html',
-        dashboard_build=get_dashboard_build(),
-        cluster_id=get_cluster_id(),
-        session_id=get_session_id(),
-        uptime_seconds=get_uptime_seconds(),
-        timestamp=timestamp
-    )
+        # Get the server start time from the dashboard config
+        server_start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())
+        # Format it for display
+        server_start_str = server_start.strftime('%Y-%m-%d %H:%M')
+
+        return render_template(
+            'components/footer.html',
+            dashboard_build=get_dashboard_build(),
+            cluster_id=get_cluster_id(),
+            session_id=get_session_id(),
+            uptime_seconds=uptime_sec,   # raw seconds for JS ticker
+            uptime_hhmm=uptime_hhmm,     # human-readable HH:MM
+            server_start=server_start_str,  # <--- new variable
+            timestamp=timestamp
+        )
+    except Exception as e:
+        print("Error rendering footer:", e)
+        return jsonify({'error': 'Could not render footer'}), 500
 
 ################################################################################
 # UTILITIES
 ################################################################################
-
 class ClusterAPI:
     """Interface with cluster nodes"""
-    
+
     @staticmethod
     def ping_node(node_id):
         """Check if node is reachable"""

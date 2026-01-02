@@ -114,15 +114,29 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(err => console.error('Footer load error:', err));
     }
 
-    function initFooterDynamic() {
-        updateFooterValues();
-        updateUptime();
-        setInterval(updateUptime, 1000);
-        initFooterButtons();
-        initSlidePanelOutsideClose();
-        flushActivityBuffer();
-        trackPanels();
+function initFooterDynamic() {
+    updateFooterValues();
+    initFooterButtons();
+    initSlidePanelOutsideClose();
+    flushActivityBuffer();
+    trackPanels();
+
+    // ==========================
+    // BATTERY DISPLAY TOGGLE
+    // ==========================
+    const batterySpans = document.querySelectorAll('#battery-display span');
+    if (batterySpans.length > 1) {
+        let currentIndex = 0;
+        batterySpans[currentIndex].classList.add('active');
+
+        setInterval(() => {
+            batterySpans[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % batterySpans.length;
+            batterySpans[currentIndex].classList.add('active');
+        }, 5000); // 5 seconds per display
     }
+}
+
 
     function updateFooterValues() {
         if (!window.CONFIG) return;
@@ -501,5 +515,4 @@ setInterval(fetchNodes, 5000);
     initSidebar();
     loadFooter();
     console.log('[Dashboard] Main JS fully initialized');
-
 });

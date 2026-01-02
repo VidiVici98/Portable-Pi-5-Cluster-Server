@@ -1,35 +1,46 @@
 <section class="footer-slide-panels">
     <div id="panel-build" class="slide-panel" data-footer-action="build">
         <div class="slide-panel-header">Build Version</div>
-        <div class="slide-panel-stat">Build Date: {{ build_date }}</div>
-        <div class="slide-panel-stat">Build Hash: {{ build_hash }}</div>
-        <button class="slide-panel-btn">Check For Updates</button>
+        <div class="slide-panel-stat">Build Date: <span>{{ build_date }}1 Jan 2026</span></div>
+        <div class="slide-panel-stat">Build Hash: <span>{{ build_hash }}mws-dbe79b8c7f1</span></div>
+        <div class="slide-panel-stat">Build Profile: <span>{{ build_profile }}Field</span></div>
+        <div class="alerts-panel-btns">
+            <button class="slide-panel-btn">Check For Updates</button>
+        </div>
     </div>
     <div id="panel-cluster" class="slide-panel" data-footer-action="cluster">
         <div class="slide-panel-header">Cluster Stats</div>
-        <div class="slide-panel-stat">Connected Users: {{ connected_users }}</div>
-        <div class="slide-panel-stat">Average Latency: {{ average_latency }}</div>
-        <div class="slide-panel-stat">Operating Mode: {{ operating_mode }}</div>
+        <div class="slide-panel-stat">Connected Users: <span>{{ connected_users }}17</span></div>
+        <div class="slide-panel-stat">Average Latency: <span>{{ average_latency }}35 ms</span></div>
+        <div class="slide-panel-stat">Operating Mode: <span>{{ operating_mode }}Exercise</span></div>
+        <div class="slide-panel-stat">Throughput: <span>{{ data_throughput }}1.2mbps</span></div>
     </div>
     <div id="panel-session" class="slide-panel" data-footer-action="session">
         <div class="slide-panel-header">Current Session</div>
-        <div class="slide-panel-stat">Operator: {{ operator }}</div>
-        <button class="slide-panel-btn">Sign Off</button>
-        <button class="slide-panel-btn">Shut Down</button>
+        <div class="slide-panel-stat">Operator: <span>{{ operator }}Instructor_Hickman</span></div>
+        <div class="slide-panel-stat">Role: <span>{{ user_role }}SIGINT Operations</span></div>
+        <div class="slide-panel-stat">User Group: <span>{{ user_group }}admin</span></div>
+        <div class="alerts-panel-btns">
+            <button class="slide-panel-btn">Sign Off</button>
+            <button class="slide-panel-btn">Shut Down</button>
+        </div>
     </div>
     <div id="panel-uptime" class="slide-panel" data-footer-action="uptime">
         <div class="slide-panel-header">Uptime</div>
-        <div class="slide-panel-stat">Server Start: {{ SERVER_START_TIME }}</div>
-        <div class="slide-panel-stat">Power: <span>Onboard</span></div>
-        <div class="slide-panel-stat" style="text-align: center;"><span style="text-align: center;">~9hrs 30min Left</span></div>
-
-    </div>
-    <div id="panel-alerts" class="slide-panel" data-footer-action="alerts">
+            <div class="slide-panel-stat">Start Time:<span id="server-start">{{ server_start }} UTC</span></div>
+            <div class="slide-panel-stat">Power: <span>Onboard Battery</span></div>
+            <div class="slide-panel-stat">Power Savings Mode: <span>Enabled</span></div>            
+            <div class="alerts-panel-btns" id="battery-display">
+                <span id="battery-left">6h 40m Remaining @ <strong style="color:#00ff00;">92%</strong></span>
+                <span id="battery-charging"> <strong style="color:#00ff00;">1h 12m</strong> Until Fully Charged</span>
+            </div>
+        </div>
+        <div id="panel-alerts" class="slide-panel" data-footer-action="alerts">
         <div class="slide-panel-header">Active Alerts</div>
-        <div id="alertsLog" class="log" style="height:180px; overflow-y: auto; font-size:0.75rem;"></div>
+        <div id="alertsLog" class="log" style="height:200px; overflow-y:auto; font-size:0.75rem;"></div>
         <div class="alerts-panel-btns">
             <button class="slide-panel-btn">Acknowledge All</button>
-            <a class="slide-panel-btn" href="/#activity-log">View Logs</a>
+            <a class="slide-panel-btn" href="/#activity-log" id="view-logs-btn">View Logs</a>
         </div>
 </div>
 </section>
@@ -41,15 +52,15 @@
         </button>
         <span class="footer-separator">|</span>
         <button class="footer-btn" data-footer-action="cluster">
-            Cluster {{ cluster_id }}
+            Cluster id: {{ cluster_id }}
         </button>
         <span class="footer-separator">|</span>
         <button class="footer-btn" data-footer-action="session">
-            Session {{ session_id }}
+            Session id: {{ session_id }}
         </button>
         <span class="footer-separator">|</span>
         <button class="footer-btn" id="uptime-btn" data-footer-action="uptime">
-            Uptime <span id="uptime-display">--:--:--</span>
+            <span id="uptime-display" data-seconds="{{ uptime_seconds }}">Uptime: {{ uptime_hhmm }}hrs</span>
         </button>        
         <button class="footer-btn" id="alerts-btn" data-footer-action="alerts">
             <svg fill="#ffffff" width="14px" height="16px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M1298.824 1581.176c0 186.805-152.02 338.824-338.824 338.824-186.805 0-338.824-152.019-338.824-338.824h677.648ZM1016.47 0v115.765c378.465 29.026 677.647 345.6 677.647 731.294v282.353c0 124.574 101.308 225.882 225.882 225.882v112.941H0v-112.94c124.574 0 225.882-101.31 225.882-225.883V847.059c0-385.694 299.182-702.268 677.647-731.294V0h112.942Z" fill-rule="evenodd"></path> </g></svg>
