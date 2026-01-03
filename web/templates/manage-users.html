@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow">
-
-<title>Identity & Access Control – Tactical Dashboard</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">    
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='css/icons/favicon-96x96.png') }}" sizes="96x96">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='icons/favicon.svg') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='icons/favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='icons/site.webmanifest') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Identity & Access Control – Tactical Dashboard</title>
 <style>
 /* ===== CORE LAYOUT ===== */
 .iam-layout {
@@ -24,7 +28,6 @@
     height:70vh;
 }
 .panel h3,h4 { margin-top:0; }
-
 /* ===== USER LIST ===== */
 .user-list {position: relative;display:block;overflow:scroll; }
 .user-card {
@@ -47,14 +50,12 @@
     color:#8f8;
     margin-top:4px;
 }
-
 /* ===== STATUS BADGES ===== */
 .badge { font-size:0.7rem; padding:2px 6px; border-radius:4px; }
-.active { background:#0f0; color:#000; }
+.active { color:#000; }
 .suspended { background:#ffb300; color:#000; }
 .locked { background:#ff1744; color:#fff; }
 .pending { background:#00bcd4; color:#000; }
-
 /* ===== TOOLBAR ===== */
 .toolbar {
     display:flex;
@@ -69,14 +70,12 @@
     border-radius:4px;
     padding:6px;
 }
-
 /* ===== SECTIONS ===== */
 .section {
     border-top:1px dashed #033;
     margin-top:10px;
     padding-top:10px;
 }
-
 /* ===== TOGGLES ===== */
 .toggle-row {
     display:flex;
@@ -116,14 +115,12 @@ input:checked + .slider:before {
     transform:translateX(20px);
     background:#000;
 }
-
 /* ===== BUTTONS ===== */
-.btn { padding:6px 10px; border-radius:4px; cursor:pointer; border:none; }
+.btn { padding:6px 10px; border-radius:4px; cursor:pointer; border:1px groove #333;font-family: Georgia, 'Times New Roman', Times, serif;text-shadow:1px 1px 2px #333; box-shadow: 1px 2px 2px #111, 2px 3px 3px #252525;}
 .btn.primary { background:#0f0; color:#000; }
-.btn.warn { background:#ffb300; }
-.btn.danger { background:#ff1744; color:#fff; }
+.btn.warn { background:hsl(25, 100%, 50%); color:#000; text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);}
+.btn.danger { background:radial-gradient(circle at 50%, hsl(343, 100%, 40%), hsl(347, 100%, 35%)); color:#fff; }
 .btn.ghost { background:#000; color:#0f0; border:1px solid #0f0; }
-
 /* ===== LOG ===== */
 .log {
     background:#000;
@@ -135,7 +132,6 @@ input:checked + .slider:before {
 #audit {
     min-height:160px;
 }
-
 /* ===== MODALS ===== */
 .modal {
     display:none;
@@ -152,15 +148,13 @@ input:checked + .slider:before {
     margin:6% auto;
     padding:16px;
 }
-
 .activity-row {
     font-size:0.75rem;
     padding:4px 0;
     border-bottom:1px dashed #022;
 }
-.online { color:#0f0; }
-.offline { color:#777; }
-
+.Online { color:#0f0; }
+.Offline { color:red !important; }
 .tag {
     display:inline-block;
     background:#033;
@@ -172,7 +166,6 @@ input:checked + .slider:before {
 }
 </style>
 </head>
-
 <body data-page="manage-users">
 {% if demo_mode %}
     <div class="demo-mode">⚠ DEMO MODE - No Cluster Connected</div>
@@ -183,504 +176,489 @@ input:checked + .slider:before {
 <!-- Navbar -->
     <nav class="navbar" id="main-navbar"><div id="header-container"></div></nav>
 <main class="container">
-<div class="iam-layout">
-
+    <div class="iam-layout">
 <!-- ================= LEFT: USERS ================= -->
-<section class="panel">
-<h3>Users</h3>
-
-<div class="toolbar">
-<input id="search" placeholder="Search username / callsign">
-<select id="presenceFilter">
-    <option value="">Online & Offline</option>
-    <option>Online</option>
-    <option>Offline</option>
-</select>
-<select id="roleFilter">
-    <option value="">All Roles</option>
-    <option>Operator</option>
-    <option>Analyst</option>
-    <option>Net Control</option>
-</select>
-<select id="groupFilter">
-    <option value="">All User Groups</option>
-    <option>admin</option>
-    <option>dialout</option>
-    <option>user</option>
-    <option>readonly</option>
-</select>
-</div>
-<div class="user-list" id="userList"></div>
-<button class="btn ghost" onclick="openAddUser()">Add User</button>
-<button class="btn ghost" onclick="openImport()">Import</button>
-<button class="btn ghost" onclick="exportUsers()">Export</button>
-</section>
+        <section class="panel">
+            <div class="toolbar">
+                <input id="search" placeholder="Search..." style="width: 100%">
+                <br>
+                <label>Status:</label>
+                <select id="statusFilter">
+                    <option value="">All</option>
+                    <option>Online</option>
+                    <option>Offline</option>
+                </select>
+                <label>Role:</label>
+                <select id="roleFilter">
+                    <option value="">All</option>
+                    <option>Operator</option>
+                    <option>Analyst</option>
+                    <option>Net Control</option>
+                </select>
+            </div>
+            <div class="user-list" id="userList"></div>
+            <button class="btn ghost" onclick="openAddUser()">Add User</button>
+            <button class="btn ghost" onclick="openImport()">Import</button>
+            <button class="btn ghost" onclick="exportUsers()">Export</button>
+        </section>
 <!-- ================= RIGHT: CONTROL PLANE ================= -->
-<section class="panel">
-<h3>User Control Plane</h3>
-<div id="details"><em>Select a user to inspect</em></div>
-<div class="section">
-<div id="activityFeed"></div>
-</div>
-<div class="section">
-<h4>Audit Log</h4>
-<div class="log" id="audit"></div>
-</div>
-</section>
-</div>
+        <section class="panel">
+            <div id="details"><em>Select a user to inspect</em></div>
+            <div class="section">
+                <div id="activityFeed"></div>
+            </div>
+            <div class="section">
+                <h4>Audit Log</h4>
+                <div class="log" id="audit"></div>
+            </div>
+        </section>
+    </div>
 <!-- ================= TEAM / GROUP ADMINISTRATION ================= -->
-<section class="panel">
-  <h3>Team Administration</h3>
-
+    <section class="panel">
+        <h3>Team Administration</h3>
   <!-- Toolbar for filtering/searching -->
-  <div class="toolbar">
-    <input id="teamSearch" placeholder="Search team / group">
-    <select id="groupTypeFilter">
-      <option value="">All Types</option>
-      <option value="Command">Command</option>
-      <option value="ISR">ISR</option>
-      <option value="RF Ops">RF Ops</option>
-      <option value="Logistics">Logistics</option>
-    </select>
-  </div>
-
+        <div class="toolbar">
+            <input id="teamSearch" placeholder="Search team / group">
+            <select id="groupTypeFilter">
+                <option value="">All Types</option>
+                <option value="Command">Command</option>
+                <option value="ISR">ISR</option>
+                <option value="RF Ops">RF Ops</option>
+                <option value="Logistics">Logistics</option>
+            </select>
+        </div>
   <!-- Team List -->
-  <div class="team-list" id="teamList"></div>
-
+        <div class="team-list" id="teamList"></div>
   <!-- Buttons -->
-  <button class="btn ghost" onclick="openAddTeam()">Add Team</button>
-</section>
-
+        <button class="btn ghost" onclick="openAddTeam()">Add Team</button>
+    </section>
 <!-- ================= TEAM MODAL ================= -->
-<div class="modal" id="teamModal">
-  <div class="modal-content">
-    <h3>Team Details</h3>
-
-    <label>Team Name</label>
-    <input id="t_name" placeholder="Enter team name">
-
-    <label>Type</label>
-    <select id="t_type">
-      <option>Command</option>
-      <option>ISR</option>
-      <option>RF Ops</option>
-      <option>Logistics</option>
-    </select>
-
-    <label>Assigned Members</label>
-    <div id="t_memberContainer" style="display:flex; gap:8px; flex-wrap:wrap; max-height:120px; overflow-y:auto;"></div>
-
-    <div class="section">
-      <h4>Team Permissions</h4>
-      <div class="toggle-row">
-        <span>Access Mesh Network</span>
-        <label class="toggle">
-          <input type="checkbox" id="t_perm_mesh">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <span>RF Control</span>
-        <label class="toggle">
-          <input type="checkbox" id="t_perm_rf">
-          <span class="slider"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <span>SDR Access</span>
-        <label class="toggle">
-          <input type="checkbox" id="t_perm_sdr">
-          <span class="slider"></span>
-        </label>
-      </div>
+    <div class="modal" id="teamModal">
+        <div class="modal-content">
+            <h3>Team Details</h3>
+            <label>Team Name</label>
+            <input id="t_name" placeholder="Enter team name">
+            <br>
+            <label>Team Type</label>
+            <select id="t_type">
+                <option>SIGINT</option>
+                <option>Security</option>
+                <option>QRF</option>
+                <option>MedEvac</option>
+                <option>Logistics</option>
+                <option>Command & Control</option>
+            </select>
+            <label>Assigned Members</label>
+            <div id="t_memberContainer" style="display:flex; gap:8px; flex-wrap:wrap; max-height:120px; overflow-y:auto;"></div>
+            <div class="section">
+                <h4>Team Permissions</h4>
+                <div class="toggle-row">
+                    <span>Mesh Management</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="t_perm_mesh">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <span>Transmit</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="t_perm_rf">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <span>User Management</span>
+                    <label class="toggle">
+                        <input type="checkbox" id="t_perm_sdr">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="section">
+                <h4>Team Activity Log</h4>
+                <div id="teamActivity" class="log" style="min-height:120px;"></div>
+            </div>
+            <br>
+            <button class="btn primary" onclick="saveTeam()">Save</button>
+            <button class="btn ghost" onclick="closeTeamModal()">Cancel</button>
+        </div>
     </div>
-
-    <div class="section">
-      <h4>Team Activity Log</h4>
-      <div id="teamActivity" class="log" style="min-height:120px;"></div>
-    </div>
-
-    <br>
-    <button class="btn primary" onclick="saveTeam()">Save</button>
-    <button class="btn ghost" onclick="closeTeamModal()">Cancel</button>
-  </div>
-</div>
 </main>
 <!-- ================= ADD / EDIT USER MODAL ================= -->
 <div class="modal" id="userModal">
-<div class="modal-content">
-<h3>User Identity</h3>
-<label>Username</label>
-<input id="u_name">
-<label>Role</label>
-<select id="u_role">
-<option>Operator</option>
-<option>Analyst</option>
-<option>Net Control</option>
-</select>
-<label>Status</label>
-<select id="u_status">
-<option>active</option>
-<option>suspended</option>
-<option>locked</option>
-<option>pending</option>
-</select>
-<div class="section">
-<h4>Authentication</h4>
-<label>Password</label>
-<input type="password" id="u_password" placeholder="Set / Reset password">
-<label>Certificate Fingerprint</label>
-<input id="u_cert" placeholder="Optional X.509 fingerprint">
-<label>API Token</label>
-<select id="u_token">
-<option>None</option>
-<option>Provision New</option>
-<option>Rotate Existing</option>
-<option>Revoke</option>
-</select>
-<label>MFA Enforcement</label>
-<select id="u_mfa">
-<option>Required</option>
-<option>Optional</option>
-<option>Disabled</option>
-</select>
-</div>
-<div class="section">
-<h4>Groups</h4>
-<select multiple>
-<option>Command</option>
-<option>ISR</option>
-<option>RF Ops</option>
-<option>Logistics</option>
-</select>
-</div>
-<div class="section">
-<h4>Team / Unit Assignment</h4>
-<select multiple>
-<option>Alpha Team</option>
-<option>Bravo Team</option>
-<option>Red Cell</option>
-<option>Blue Cell</option>
-</select>
-</div>
-<br>
-<button class="btn primary" onclick="saveUser()">Save</button>
-<button class="btn ghost" onclick="closeUserModal()">Cancel</button>
-</div>
+    <div class="modal-content">
+        <h3>User Identity</h3>
+        <label>Username</label>
+        <input id="u_name">
+        <label>Role</label>
+        <select id="u_role">
+            <option>Operator</option>
+            <option>Analyst</option>
+            <option>Net Control</option>
+        </select>
+        <label>Status</label>
+        <select id="u_status">
+            <option>active</option>
+            <option>suspended</option>
+            <option>locked</option>
+            <option>pending</option>
+        </select>
+    <div class="section">
+        <h4>Authentication</h4>
+        <label>Password</label>
+        <input type="password" id="u_password" placeholder="Set / Reset password">
+        <label>Certificate Fingerprint</label>
+        <input id="u_cert" placeholder="Optional X.509 fingerprint">
+        <label>API Token</label>
+        <select id="u_token">
+            <option>None</option>
+            <option>Provision New</option>
+            <option>Rotate Existing</option>
+            <option>Revoke</option>
+        </select>
+        <label>MFA Enforcement</label>
+        <select id="u_mfa">
+            <option>Required</option>
+            <option>Optional</option>
+            <option>Disabled</option>
+        </select>
+    </div>
+    <div class="section">
+        <h4>Groups</h4>
+        <select multiple>
+            <option>Command</option>
+            <option>ISR</option>
+            <option>RF Ops</option>
+            <option>Logistics</option>
+        </select>
+    </div>
+    <div class="section">
+        <h4>Team / Unit Assignment</h4>
+        <select multiple>
+            <option>Alpha Team</option>
+            <option>Bravo Team</option>
+            <option>Red Cell</option>
+            <option>Blue Cell</option>
+        </select>
+    </div>
+    <br>
+    <button class="btn primary" onclick="saveUser()">Save</button>
+    <button class="btn ghost" onclick="closeUserModal()">Cancel</button>
+    </div>
 </div>
 <!-- ================= SECURITY CONFIRM MODAL (UNCHANGED) ================= -->
 <div class="modal" id="confirmModal">
-<div class="modal-content">
-<h3>Confirm Security Action</h3>
-<div class="warning-box" id="confirmText"></div>
-<textarea id="confirmReason" placeholder="Operator justification (required)"></textarea>
-<br>
-<button class="btn danger" onclick="confirmAction()">Confirm</button>
-<button class="btn ghost" onclick="closeConfirm()">Cancel</button>
-</div>
+    <div class="modal-content">
+        <h3>Confirm Security Action</h3>
+        <div class="warning-box" id="confirmText"></div>
+        <textarea id="confirmReason" placeholder="Operator justification (required)"></textarea>
+        <br>
+        <button class="btn danger" onclick="confirmAction()">Confirm</button>
+        <button class="btn ghost" onclick="closeConfirm()">Cancel</button>            
+    </div>
 </div>
 <!-- ================= IMPORT MODAL (UNCHANGED) ================= -->
 <div class="modal" id="importModal">
-<div class="modal-content">
-<h3>Bulk User Import</h3>
-<textarea rows="6" placeholder="Paste CSV or JSON"></textarea>
-<button class="btn primary" onclick="log('Bulk import queued')">Import</button>
-<button class="btn ghost" onclick="closeImport()">Cancel</button>
-</div>
+    <div class="modal-content">
+        <h3>Bulk User Import</h3>
+        <textarea rows="6" placeholder="Paste CSV or JSON"></textarea>
+        <button class="btn primary" onclick="log('Bulk import queued')">Import</button>
+        <button class="btn ghost" onclick="closeImport()">Cancel</button>
+    </div>
 </div>
 <footer id="footer-embed-container"></footer>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script>
 /* === DATA MODEL (EXTENDED) === */
-let users=[
-{
-id:1,
-name:"Instructor_Hickman",
-callsign:"vidivici98",
-role:"Net Control",
-presence:"Online",
-auth:"Authorized",
-groups:["admin","dialout"],
-teams:["SIGINT"],
-online:true,
-lastLogin:"2026-01-02 01:12Z",
-activity:["Logged in","Accessed Mesh","Started SDR session"],
-perms:{mesh:true,rf:true,sdr:true,root:true},
-sessions:2
-},
-{
-id:2,
-name:"John_Doe",
-callsign:"mws-bravo-1",
-role:"Operator",
-presence:"Offline",
-auth:"Suspended",
-groups:["readonly"],
-teams:["QRF"],
-online:false,
-lastLogin:"2026-01-01 18:44Z",
-activity:["No Activity Yet"],
-perms:{mesh:false,rf:false,sdr:false},
-sessions:0
-},
-{
-id:3,
-name:"Just_A_Test",
-callsign:"mws-delta-3",
-role:"Operator",
-presence:"Offline",
-auth:"Authorized",
-groups:["user", "dialout"],
-teams:["SAR"],
-online:false,
-lastLogin:"2026-01-01 18:44Z",
-activity:["Digital Data Sent on 146.152mHz"],
-perms:{mesh:true,rf:true,sdr:false},
-sessions:2
-},
-{
-id:4,
-name:"John_Doe",
-callsign:"mws-alpha-2",
-role:"Net Control",
-presence:"Online",
-auth:"Authorized",
-groups:["admin", "dialout"],
-teams:["MedEvac"],
-online:true,
-lastLogin:"2026-01-01 18:44Z",
-activity:[""],
-perms:{mesh:true,rf:true,sdr:false},
-sessions:0
-},
-{
-id:5,
-name:"John_Doe",
-callsign:"mws-bravo-3",
-role:"Operator",
-presence:"Online",
-auth:"Authorized",
-groups:["user", "dialout"],
-teams:["MedEvac"],
-online:true,
-lastLogin:"2026-01-01 18:44Z",
-activity:[""],
-perms:{mesh:true,rf:true,sdr:false},
-sessions:4
-}
-];
-let selected=null,pendingAction=null;
+    let users=[
+        {
+            id:1,
+            name:"Instructor_Hickman",
+            callsign:"vidivici98",
+            role:"Net Control",
+            status:"Online",
+            auth:"Authorized",
+            groups:["admin","dialout"],
+            teams:["SIGINT"],
+            online:true,
+            lastLogin:"2026-01-02 01:12Z",
+            activity:["Logged in","Accessed Mesh","Started SDR session"],
+            perms:{mesh:true,rf:true,sdr:true,root:true},
+            sessions:2
+        },
+        {
+            id:2,
+            name:"John_Doe",
+            callsign:"mws-bravo-1",
+            role:"Operator",
+            status:"Offline",
+            auth:"Suspended",
+            groups:["readonly"],
+            teams:["QRF"],
+            online:false,
+            lastLogin:"2026-01-01 18:44Z",
+            activity:["No Activity Yet"],
+            perms:{mesh:false,rf:false,sdr:false},
+            sessions:0
+        },
+        {
+            id:3,
+            name:"Just_A_Test",
+            callsign:"mws-delta-3",
+            role:"Operator",
+            status:"Offline",
+            auth:"Authorized",
+            groups:["user", "dialout"],
+            teams:["SAR"],
+            online:false,
+            lastLogin:"2026-01-01 18:44Z",
+            activity:["Digital Data Sent on 146.152mHz"],
+            perms:{mesh:true,rf:true,sdr:false},
+            sessions:2
+        },
+        {
+            id:4,
+            name:"Still_A_Test",
+            callsign:"mws-alpha-2",
+            role:"Net Control",
+            status:"Online",
+            auth:"Authorized",
+            groups:["admin", "dialout"],
+            teams:["MedEvac"],
+            online:true,
+            lastLogin:"2026-01-01 18:44Z",
+            activity:[""],
+            perms:{mesh:true,rf:true,sdr:false},
+            sessions:0
+        },
+        {
+            id:5,
+            name:"Another_Test",
+            callsign:"mws-bravo-3",
+            role:"Operator",
+            status:"Online",
+            auth:"Authorized",
+            groups:["user", "dialout"],
+            teams:["MedEvac"],
+            online:true,
+            lastLogin:"2026-01-01 18:44Z",
+            activity:[""],
+            perms:{mesh:true,rf:true,sdr:false},
+            sessions:4
+        }
+    ];
+    let selected=null,pendingAction=null;
 /* === RENDER USERS (FILTERS ADDITIVE) === */
-function render(){
-userList.innerHTML='';
-users.filter(u=>{
- return (!search.value || u.name.includes(search.value)) &&
- (!roleFilter.value || u.role===roleFilter.value) &&
- (!groupFilter.value || u.group===groupFilter.value) &&
- (!presenceFilter.value || u.presence===presenceFilter.value);
-}).forEach(u=>{
- userList.innerHTML+=`
- <div class="user-card" onclick="select(${u.id})">
-   <div class="user-header">
-     <strong>${u.name}</strong>
-     <span class="badge ${u.status}" data-tip="User is currently ${u.status}">${u.status}</span>
-   </div>
-   <div class="user-meta">
-     ${u.teams} ${u.role}<br>
-     <span class="${u.online?'active':'locked'}">
-       ${u.online?'ONLINE':'OFFLINE'}
-     </span>
-   </div>
- </div>`;
-});
-}
+    function render(){
+        userList.innerHTML='';
+        users.filter(u=>{
+            return (!search.value || u.name.includes(search.value)) &&
+                   (!roleFilter.value || u.role===roleFilter.value) &&
+                   (!statusFilter.value || u.status===statusFilter.value);
+            }).forEach(u=>{
+            userList.innerHTML+=`
+            <div class="user-card" onclick="select(${u.id})">
+                <div class="user-header">
+                    <strong>${u.name}</strong>
+                    <span class="badge ${u.status}" data-tip="User is currently ${u.status}">${u.status}</span>
+                </div>
+                <div class="user-meta">
+                    ${u.teams} ${u.role}<br>
+                </div>
+            </div>`;
+        });
+    }
+    const userModal    = document.getElementById('userModal');
+    const teamModal    = document.getElementById('teamModal');
+    const confirmModal = document.getElementById('confirmModal');
+    const importModal  = document.getElementById('importModal');
 /* === SELECT USER (EXTENDED VIEW) === */
-function select(id){
-selected=users.find(u=>u.id===id);
-details.innerHTML=`
-<strong>${selected.name}</strong> | ${selected.callsign} | <small>${selected.presence}<small><br>
-Role: ${selected.teams} ${selected.role}<br>
-Credentials: ${selected.auth}<br>
-Last Login: ${selected.lastLogin}
-<div class="section">
-<h4>User Groups</h4>
-${selected.groups.map(g=>`<span class="badge active">${g}</span>`).join(' ')}
-</div>
-<div class="section">
-<h4>System Authorizations</h4>
-${perm("Mesh Network","mesh")}
-${perm("RF Transmit","rf")}
-${perm("SDR Control","sdr")}
-</div>
-<div class="section">
-<h4>Security Actions</h4>
-<button class="btn warn" onclick="request('Revoke Sessions')">Revoke Sessions</button>
-<button class="btn danger" onclick="request('Lock Account')">Lock Account</button>
-<button class="btn danger" onclick="request('Delete User')">Delete User</button>
-</div>
-<div class="section">
-<h4>Recent Activity</h4>
-${selected.activity.map(a=>`<div class="log">${a}</div>`).join('')}
-</div>
-`;
-log(`Viewed ${selected.name}`);
-}
-/* === EXISTING FUNCTIONS PRESERVED === */
-function perm(label,key){ /* unchanged */ return `
-<div class="toggle-row">
-<span>${label}</span>
-<label class="toggle">
-<input type="checkbox" ${selected.perms[key]?'checked':''}
-onchange="request('Toggle '+label)">
-<span class="slider"></span>
-</label>
-</div>`;}
-function openAddUser(){ /* unchanged */ userModal.style.display='block'; }
-function saveUser(){
- selected.name=u_name.value;
- selected.role=u_role.value;
- selected.status=u_status.value;
- selected.auth=u_auth.value;
- selected.mfa=u_mfa.value!=="Disabled";
- selected.groups=[...u_groups.selectedOptions].map(o=>o.value);
- selected.teams=[...u_teams.selectedOptions].map(o=>o.value);
- selected.activity=["Account created"];
- selected.lastLogin="Never";
- selected.online=false;
- if(!users.find(u=>u.id===selected.id)) users.push(selected);
- closeUserModal();
- render();
- log(`User ${selected.name} saved`);
-}
-function closeUserModal(){ userModal.style.display='none'; }
-function request(action){ pendingAction=action; confirmModal.style.display='block'; }
-function confirmAction(){ log(`SECURITY ACTION: ${pendingAction}`); confirmModal.style.display='none'; }
-function closeConfirm(){ confirmModal.style.display='none'; }
-function openImport(){ importModal.style.display='block'; }
-function closeImport(){ importModal.style.display='none'; }
-function exportUsers(){ log("User export requested"); }
-function log(msg){
-audit.innerHTML=`<div>${new Date().toLocaleTimeString()} — ${msg}</div>`+audit.innerHTML;
-}/* === TEAM DATA MODEL === */
-let teams = [
-  { id:1, name:"Alpha Team", type:"Command", members:[1,2], perms:{mesh:true, rf:true, sdr:false}, activity:["Team created"] },
-  { id:2, name:"Bravo Team", type:"ISR", members:[3], perms:{mesh:true, rf:false, sdr:true}, activity:["Team created"] },
-];
-
-/* === RENDER TEAMS === */
-function renderTeams(){
-  teamList.innerHTML='';
-  teams.filter(t=>{
-    return (!teamSearch.value || t.name.toLowerCase().includes(teamSearch.value.toLowerCase())) &&
-           (!groupTypeFilter.value || t.type === groupTypeFilter.value);
-  }).forEach(t=>{
-    teamList.innerHTML+=`
-      <div class="user-card" onclick="selectTeam(${t.id})">
-        <div class="user-header">
-          <strong>${t.name}</strong>
-          <span class="badge active">${t.type}</span>
-        </div>
-        <div class="user-meta">
-          Members: ${t.members.length} <br>
-          Permissions: ${t.perms.mesh?'M':''}${t.perms.rf?'R':''}${t.perms.sdr?'S':''}
-        </div>
-      </div>
+    function select(id){
+        selected=users.find(u=>u.id===id);
+        details.innerHTML=`
+        <strong style="font-size:1.15rem;text-shadow:1px 1px 1px #151515, 2px 2px 2px #252525;">${selected.name}</strong> | ${selected.callsign} | <small class="${selected.status}">${selected.status}</small><br>
+        <span>Role:</span> ${selected.teams} ${selected.role}<br>
+        <span>Credentials:</span> ${selected.auth}<br>
+        <span>Last Login:</span> ${selected.lastLogin}
+    <div class="section">
+        ${selected.groups.map(g=>`<span class="badge active">${g}</span>`).join(' ')}
+    </div>
+    <div class="section">
+        <h4>System Authorizations</h4>
+        ${perm("Mesh Management","mesh")}
+        ${perm("Transmit","tx")}
+        ${perm("User Management","admin")}
+    </div>
+    <div class="section">
+        <h4>Security Actions</h4>
+        <button class="btn warn" id="revokeAuthBtn" onclick="request('Revoke Sessions')">Revoke Sessions</button>
+        <button class="btn danger" id="lockAccountBtn" onclick="request('Lock Account')">Lock Account</button>
+        <button class="btn danger" id="deleteUserBtn" onclick="request('Delete User')">Delete User</button>
+    </div>
+    <div class="section">
+        ${selected.activity.map(a=>`<div class="log">${a}</div>`).join('')}
+    </div>
     `;
-  });
-}
-
+    log(`Viewed ${selected.name}`);
+    }
+/* === EXISTING FUNCTIONS PRESERVED === */
+    function perm(label,key){ /* unchanged */ return `
+        <div class="toggle-row">
+            <span>${label}</span>
+            <label class="toggle">
+                <input type="checkbox" ${selected.perms[key]?'checked':''} onchange="request('Toggle '+label)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    `;}
+    function openAddUser(){ /* unchanged */ userModal.style.display='block'; }
+    function saveUser(){
+        if(!selected){
+            selected = { id: Date.now() };
+            users.push(selected);
+        }
+        selected.name   = u_name.value;
+        selected.role   = u_role.value;
+        selected.auth   = u_status.value;
+        selected.mfa    = u_mfa.value !== "Disabled";
+        selected.online = false;
+        selected.lastLogin = "Never";
+        selected.activity = ["Account created"];
+    closeUserModal();
+    render();
+    log(`User ${selected.name} saved`);
+    }
+    function closeUserModal(){ userModal.style.display='none'; }
+    function request(action){
+        pendingAction = action;
+        document.getElementById('confirmText').innerText = action;
+        confirmModal.style.display = 'block';
+    }
+    function confirmAction(){ log(`SECURITY ACTION: ${pendingAction}`); confirmModal.style.display='none'; }
+    function closeConfirm(){ confirmModal.style.display='none'; }
+    function openImport(){ importModal.style.display='block'; }
+    function closeImport(){ importModal.style.display='none'; }
+    function exportUsers(){ log("User export requested"); }
+    function log(msg){
+        audit.innerHTML=`<div>${new Date().toLocaleTimeString()} — ${msg}</div>`+audit.innerHTML;
+    }
+    /* === TEAM DATA MODEL === */
+    let teams = [
+        { id:1, name:"Alpha Team", type:"Command", members:[1,2], perms:{mesh:true, tx:true, monitor:false}, activity:["Team created"] },
+        { id:2, name:"Bravo Team", type:"ISR", members:[3], perms:{mesh:true, rf:false, sdr:true}, activity:["Team created"] },
+    ];
+/* === RENDER TEAMS === */
+    function renderTeams(){
+        teamList.innerHTML='';
+        teams.filter(t=>{
+            return (!teamSearch.value || t.name.toLowerCase().includes(teamSearch.value.toLowerCase())) &&
+                (!groupTypeFilter.value || t.type === groupTypeFilter.value);
+        }).forEach(t=>{
+            teamList.innerHTML+=`
+            <div class="user-card" onclick="selectTeam(${t.id})">
+                <div class="user-header">
+                <strong>${t.name}</strong>
+                <span class="badge active">${t.type}</span>
+                </div>
+                <div class="user-meta">
+                Members: ${t.members.length} <br>
+                Permissions: ${t.perms.mesh?'M':''}${t.perms.rf?'R':''}${t.perms.sdr?'S':''}
+                </div>
+            </div>
+            `;
+        });
+    }
 /* === SELECT TEAM === */
-let selectedTeam = null;
-
-function selectTeam(id){
-  selectedTeam = teams.find(t=>t.id===id);
-
-  t_name.value = selectedTeam.name;
-  t_type.value = selectedTeam.type;
-
-  renderMemberChips();
-  t_perm_mesh.checked = selectedTeam.perms.mesh;
-  t_perm_rf.checked = selectedTeam.perms.rf;
-  t_perm_sdr.checked = selectedTeam.perms.sdr;
-
+    let selectedTeam = null;
+    function selectTeam(id){
+        selectedTeam = teams.find(t=>t.id===id);
+        if(!selectedTeam) return;
+        t_name.value = selectedTeam.name;
+        t_type.value = selectedTeam.type;
+        renderMemberChips();
+        t_perm_mesh.checked = selectedTeam.perms.mesh;
+        t_perm_rf.checked = selectedTeam.perms.rf;
+        t_perm_sdr.checked = selectedTeam.perms.sdr;
   // Render team activity
-  renderTeamActivity();
-
-  teamModal.style.display='block';
-}
-
+        renderTeamActivity();
+        teamModal.style.display='block';
+    }
 /* === MEMBER CHIPS RENDERING (DRAG/SELECT STYLE) === */
-function renderMemberChips(){
-  t_memberContainer.innerHTML='';
-  users.forEach(u=>{
-    let active = selectedTeam.members.includes(u.id) ? 'active' : '';
-    let chip = document.createElement('div');
-    chip.className = `tag ${active}`;
-    chip.textContent = `${u.name} (${u.callsign})`;
-    chip.dataset.id = u.id;
-    chip.onclick = () => {
-      let uid = parseInt(chip.dataset.id);
-      if(selectedTeam.members.includes(uid)){
-        selectedTeam.members = selectedTeam.members.filter(id=>id!==uid);
-        chip.classList.remove('active');
-        addTeamActivity(`Removed ${u.name} from team`);
-      } else {
-        selectedTeam.members.push(uid);
-        chip.classList.add('active');
-        addTeamActivity(`Added ${u.name} to team`);
-      }
-      renderTeamActivity();
-    };
-    t_memberContainer.appendChild(chip);
-  });
-}
-
+    function renderMemberChips(){
+        t_memberContainer.innerHTML='';
+        users.forEach(u=>{
+            let active = selectedTeam.members.includes(u.id) ? 'active' : '';
+            let chip = document.createElement('div');
+            chip.className = `tag ${active}`;
+            chip.textContent = `${u.name} (${u.callsign})`;
+            chip.dataset.id = u.id;
+            chip.onclick = () => {
+                let uid = parseInt(chip.dataset.id);
+                if(selectedTeam.members.includes(uid)){
+                    selectedTeam.members = selectedTeam.members.filter(id=>id!==uid);
+                    chip.classList.remove('active');
+                    addTeamActivity(`Removed ${u.name} from team`);
+                } else {
+                    selectedTeam.members.push(uid);
+                    chip.classList.add('active');
+                    addTeamActivity(`Added ${u.name} to team`);
+                }
+            renderTeamActivity();
+            };
+        t_memberContainer.appendChild(chip);
+        });
+    }
 /* === TEAM ACTIVITY LOG === */
-function addTeamActivity(msg){
-  selectedTeam.activity.unshift(`${new Date().toLocaleTimeString()} — ${msg}`);
-  renderTeamActivity();
-}
-function renderTeamActivity(){
-  teamActivity.innerHTML = selectedTeam.activity.map(a=>`<div>${a}</div>`).join('');
-}
-
+    function addTeamActivity(msg){
+        selectedTeam.activity.unshift(`${new Date().toLocaleTimeString()} — ${msg}`);
+        renderTeamActivity();
+    }
+    function renderTeamActivity(){
+        teamActivity.innerHTML = selectedTeam.activity.map(a=>`<div>${a}</div>`).join('');
+    }
 /* === MODAL FUNCTIONS === */
-function openAddTeam(){
-  selectedTeam = { id: teams.length+1, name:"", type:"Command", members:[], perms:{mesh:false,rf:false,sdr:false}, activity:[] };
-  selectTeam(selectedTeam.id);
-}
-
-function closeTeamModal(){ teamModal.style.display='none'; }
-
-function saveTeam(){
-  selectedTeam.name = t_name.value;
-  selectedTeam.type = t_type.value;
-  selectedTeam.perms = {
-    mesh: t_perm_mesh.checked,
-    rf: t_perm_rf.checked,
-    sdr: t_perm_sdr.checked
-  };
-  addTeamActivity("Team saved");
-
-  if(!teams.find(t=>t.id===selectedTeam.id)) teams.push(selectedTeam);
-
-  closeTeamModal();
-  renderTeams();
-  log(`Team ${selectedTeam.name} saved`);
-}
-
+    function openAddTeam(){
+        selectedTeam = {
+            id: Date.now(),
+            name:"",
+            type:"Command",
+            members:[],
+            perms:{mesh:false,rf:false,sdr:false},
+            activity:["Team created"]
+        };
+        t_name.value = "";
+        t_type.value = "Command";
+        t_perm_mesh.checked = false;
+        t_perm_rf.checked = false;
+        t_perm_sdr.checked = false;
+        renderMemberChips();
+        renderTeamActivity();
+        teamModal.style.display = 'block';
+    }
+    function closeTeamModal(){ teamModal.style.display='none'; }
+    function saveTeam(){
+        selectedTeam.name = t_name.value;
+        selectedTeam.type = t_type.value;
+        selectedTeam.perms = {
+            mesh: t_perm_mesh.checked,
+            rf: t_perm_rf.checked,
+            sdr: t_perm_sdr.checked
+        };
+        addTeamActivity("Team saved");
+        if(!teams.find(t=>t.id===selectedTeam.id)) teams.push(selectedTeam);
+        closeTeamModal();
+        renderTeams();
+        log(`Team ${selectedTeam.name} saved`);
+    }
 /* === FILTER EVENTS === */
-teamSearch.oninput = renderTeams;
-groupTypeFilter.onchange = renderTeams;
-
+    teamSearch.oninput = renderTeams;
+    groupTypeFilter.onchange = renderTeams;
 /* INITIAL RENDER */
-renderTeams();
-
-search.oninput=render;
-groupFilter.onchange=render;
-roleFilter.onchange=render;
-presenceFilter.onchange=render;
-render();
+    renderTeams();
+    search.oninput=render;
+    roleFilter.onchange=render;
+    statusFilter.onchange=render;
+    render();
 </script>
 </body>
 </html>

@@ -16,7 +16,7 @@
     <link rel="manifest" href="{{ url_for('static', filename='icons/site.webmanifest') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <title>Airspace / RF Monitoring - Tactical Dashboard</title>
+    <title>Tactical SIGINT Dashboard</title>
 </head>
 <body data-page="sigint">
     {% if demo_mode %}
@@ -32,32 +32,8 @@
         <div id="header-container"></div>
 </nav>
     <main class="container">
-        <section class="panel" id="adsb-section">
-            <h2>📡 ADSB/UAT AIRCRAFT TRACKING</h2>
-            <p style="color: #AAA; margin: 0;">Airspace Monitoring Tools</p>
-        </section>
-        <!-- Statistics Panel -->
-        <div class="stats-panel">
-            <div class="stat-card">
-                <div class="stat-label">Aircraft Tracked</div>
-                <div class="stat-value" id="aircraftCount">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Messages/sec</div>
-                <div class="stat-value" id="messageRate">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Max Altitude</div>
-                <div class="stat-value" id="maxAltitude">0 ft</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Avg Speed</div>
-                <div class="stat-value" id="avgSpeed">0 kts</div>
-            </div>
-        </div>
         <!-- Map -->
         <div class="card" id="map-section">
-            <h2>LIVE AIRCRAFT MAP</h2>
             <div class="map-card">
                 <div class="map-guard">
                     <div id="map"></div>
@@ -65,7 +41,7 @@
                 </div>
                     <!-- Controls -->
         <div class="controls">
-            <h3 style="margin: 0 0 15px 0; color: #00FF00;">⚙️ TRACKING CONTROLS</h3>
+            <h3 style="margin: 0 0 15px 0; color: #00FF00;">Filters & Overlays</h3>
             <div class="control-group">
                 <label>Filter by Type:</label>
                 <select id="typeFilter">
@@ -77,8 +53,13 @@
                 </select>
             </div>
             <div class="control-group">
-                <label>Min Altitude (ft):</label>
-                <input type="number" id="minAltitude" value="0" min="0" step="1000">
+                <label>Altitude:</label>
+                <select id="altitudeFilter">
+                    <option value="">All Altitudes</option>
+                    <option value="low-altitude">Low Altitude</option>
+                    <option value="mid-altitude">Mid Altitude</option>
+                    <option value="high-altitude">High Altitude</option>
+                </select>
             </div>
             <div class="control-group">
                 <label>Auto-Refresh (sec):</label>
@@ -109,10 +90,6 @@
                 </div>
             </div>
         </div>
-        <section class="panel">
-            <h2>📻 VHF/SDR FREQUENCY CONTROL</h2>
-            <p style="color: #AAA; margin: 0;">SDR Spectrum Monitoring & RF Transciever Tools</p>
-        </section>
         <div class="sdr-container" id="reciever-control">
             <!-- Frequency Control Panel -->
             <div class="frequency-panel">
@@ -170,18 +147,16 @@
             <div>
                 <!-- Signal Strength Meter -->
                 <div class="spectrum-display" id="rf-waterfall">
-                    <h3 style="margin: 0 0 15px 0; color: #2196F3;">SIGNAL ANALYSIS</h3>
-                    
                     <div class="signal-meter">
-                        <div class="meter-label">S-Meter (Signal Strength)</div>
                         <div class="meter-bar">
                             <div class="meter-fill" id="sMeter" style="width: 65%;">S 8</div>
                         </div>
                     </div>
                     <!-- Spectrum Canvas -->
-                    <div class="meter-label">Frequency Spectrum</div>
                     <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
-                    <!-- Signal Stats -->
+                </div>
+                <!-- Receiver Info -->
+                <div class="spectrum-display" id="reciever-status">
                     <table class="info-table">
                         <tr>
                             <td>Signal Strength</td>
@@ -203,12 +178,6 @@
                             <td>Bandwidth</td>
                             <td id="bandwidth">12.5 kHz</td>
                         </tr>
-                    </table>
-                </div>
-                <!-- Receiver Info -->
-                <div class="spectrum-display" id="reciever-status">
-                    <h3 style="margin: 0 0 15px 0; color: #2196F3;">RECEIVER STATUS</h3>
-                    <table class="info-table">
                         <tr>
                             <td>Device</td>
                             <td>RTL-SDR (Generic)</td>
@@ -231,31 +200,14 @@
                         </tr>
                     </table>
                     <!-- Gain Control -->
-                    <div style="margin-top: 20px;">
-                        <label class="control-label">Gain Control</label>
-                        <input type="range" min="0" max="50" value="37" id="gainControl" 
-                               style="width: 100%; cursor: pointer;" onchange="adjustGain(this.value)">
-                        <div style="color: #AAA; font-size: 11px; margin-top: 5px; text-align: center;">
-                            <span id="gainDisplay">37 dB</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     <!-- SIGNAL TRIANGULATION / DIRECTION FINDING -->
-<section class="panel" id="triangulation-section">
-    <h2>📐 SIGNAL TRIANGULATION & ORIGIN ESTIMATION</h2>
-    <p style="color:#AAA;margin:0;">
-        Direction-of-arrival analysis, multi-receiver bearing correlation, and estimated emitter location
-    </p>
-</section>
-
 <div class="triangulation-grid" id="signal-triangulation">
     <!-- Compass / Bearing Visualization -->
     <div class="tri-card">
-        <h3>BEARING / CARDINAL ORIENTATION</h3>
         <canvas id="bearingCompass" width="270" height="270"></canvas>
-
         <div class="bearing-readout">
             <div><span>Primary Bearing:</span> <strong id="primaryBearing">072° (ENE)</strong></div>
             <div><span>Confidence:</span> <strong id="bearingConfidence">±6°</strong></div>

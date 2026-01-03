@@ -375,7 +375,7 @@ button:hover, .btn:hover {
     background: rgba(0, 255, 0, 0.2);
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1);
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
-    transform: scale(1.05);
+    transform: translateY(-2px);
 }
 button:active, .btn:active {
     transform: scale(0.98);
@@ -641,7 +641,7 @@ tbody tr:hover {
 .node-card::before {
     content: '';
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
     right: 0;
     height: 3px;
@@ -702,8 +702,8 @@ tbody tr:hover {
     h2 { font-size: 1.4em; }
 }
 #map {
-    width: 70vw;
-    height: 80vh;
+    width: 68vw;
+    height: 70vh;
     border: 2px solid #00FF00;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
     margin: 15px 0;
@@ -713,8 +713,8 @@ tbody tr:hover {
 }
 .map-guard {
     position: relative;
-    width:70vw;
-    height: 80vh; /* or whatever your map height is */
+    width:68vw;
+    height: 70vh; /* or whatever your map height is */
 }
 .map-overlay {
     position: absolute;
@@ -726,7 +726,6 @@ tbody tr:hover {
     transition: opacity 120ms ease;
     z-index: 500;
 }
-
 /* Active (blocking) state */
 .map-overlay.active {
     opacity: 1;
@@ -1080,108 +1079,108 @@ tbody tr:hover {
         grid-template-columns: 1fr;
     }
 }
-        .frequency-panel {
-            background: linear-gradient(135deg, #151515 0%, #252525 100%);
-            border: 2px solid #333;
-            border-radius: 4px;
-            padding: 20px;
-        }
-        .frequency-display {
-            background: #000;
-            border: 2px solid #333;
-            border-radius: 4px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: inset 0 0 10px rgba(33, 150, 243, 0.2);
-        }
-        .frequency-value {
-            font-size: 48px;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            color: #00ff00;
-            text-shadow: 0 0 8px #2196F3;
-            margin: 0;
-            line-height: 1.2;
-        }
-        .frequency-unit {
-            font-size: 18px;
-            color: #AAA;
-            margin-top: 5px;
-        }
-        .control-group {
-            margin: 15px 0;
-        }
-        .control-label {
-            display: block;
-            color: #2196F3;
-            font-size: 12px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-        .frequency-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(33, 150, 243, 0.1);
-            border: 2px solid #333;
-            color: #2196F3;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            border-radius: 3px;
-            box-sizing: border-box;
-        }
-        .frequency-input:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
-        }
-        .frequency-buttons {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin: 10px 0;
-        }
-        .freq-btn {
-            padding: 10px;
-            background: rgba(33, 150, 243, 0.2);
-            border: 1px solid #333;
-            color: #2196F3;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all 0.2s;
-        }
-        .freq-btn:hover {
-            background: rgba(33, 150, 243, 0.4);
-            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-        }
-        .mode-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            margin: 10px 0;
-        }
-        .mode-btn {
-            padding: 10px;
-            background: rgba(33, 150, 243, 0.1);
-            border: 2px solid #333;
-            color: #2196F3;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all 0.2s;
-        }
-        .mode-btn.active {
-            background: #2196F3;
-            color: #000;
-            box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
-        }
-        .mode-btn:hover {
-            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
-        }
+.frequency-panel {
+    background: linear-gradient(135deg, #151515 0%, #252525 100%);
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 20px;
+}
+.frequency-display {
+    background: #000;
+    border: 2px solid #333;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 10px rgba(33, 150, 243, 0.2);
+}
+.frequency-value {
+    font-size: 48px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+    text-shadow: 0 0 8px #2196F3;
+    margin: 0;
+    line-height: 1.2;
+}
+.frequency-unit {
+    font-size: 18px;
+    color: #AAA;
+    margin-top: 5px;
+}
+.control-group {
+    margin: 15px 0;
+}
+.control-label {
+    display: block;
+    color: #2196F3;
+    font-size: 12px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.frequency-input {
+    width: 100%;
+    padding: 10px;
+    background: rgba(33, 150, 243, 0.1);
+    border: 2px solid #333;
+    color: #2196F3;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+.frequency-input:focus {
+    outline: none;
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.5);
+}
+.frequency-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+}
+.freq-btn {
+    padding: 10px;
+    background: rgba(33, 150, 243, 0.2);
+    border: 1px solid #333;
+    color: #2196F3;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+.freq-btn:hover {
+    background: rgba(33, 150, 243, 0.4);
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
+.mode-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+}
+.mode-btn {
+    padding: 10px;
+    background: rgba(33, 150, 243, 0.1);
+    border: 2px solid #333;
+    color: #2196F3;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+}
+.mode-btn.active {
+    background: #2196F3;
+    color: #000;
+    box-shadow: 0 0 15px rgba(33, 150, 243, 0.6);
+}
+.mode-btn:hover {
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+}
 .spectrum-display {
     background: linear-gradient(135deg, #151515 0%, #252525 100%);
     border: 2px solid #333;
@@ -1736,7 +1735,7 @@ tbody tr:hover {
     border: 1px solid #0f0;
     border-radius: 6px;
     width: 60vw;
-    height: 80vh;
+    height: 70vh;
     overflow-y:auto;
 }
 .navbar a {
@@ -1837,7 +1836,6 @@ tbody tr:hover {
     font-style: italic;
     font-size: 0.7rem;
 }
-
 .slide-panel-btn:hover,
 .alerts-panel-btns #view-logs-btn:hover {
     color:#00ff00;
@@ -1892,8 +1890,6 @@ tbody tr:hover {
     transform: translateY(0);
     opacity: 1;
 }
-
-
 #battery-display span {
     opacity: 0;
     position: absolute;
@@ -1907,7 +1903,6 @@ tbody tr:hover {
     justify-self: center;
     white-space:nowrap;
 }
-
 #battery-display span.active {
     opacity: 1;
     transform: translateX(-100px);
@@ -1917,7 +1912,6 @@ tbody tr:hover {
   position: relative;
   cursor: help;
 }
-
 [data-tip]:hover::after {
   content: attr(data-tip);
   position: absolute;
@@ -1933,7 +1927,6 @@ tbody tr:hover {
   white-space: nowrap;
   z-index: 10000;
 }
-
 [data-tip]:hover::before {
   content: '';
   position: absolute;
@@ -1946,5 +1939,24 @@ tbody tr:hover {
   z-index: 10001;
 }
 select {
-    width: 200px;
+    width: fit-content;
+    margin-right: 100px;
+}
+label {
+    padding: 2px;
+    padding-top: 6px;
+}
+#details span {
+    color: #666;
+    font-family:Georgia, 'Times New Roman', Times, serif;
+    font-size: .8rem;
+}
+#revokeAuthBtn {
+    box-shadow: 1px 2px 2px #111, 2px 3px 3px #252525;
+    margin-top: 4px;
+}
+#lockAccountBtn,
+#deleteUserBtn {
+    box-shadow: 1px 2px 2px #111, 2px 3px 3px #252525;
+    margin-top: 4px;
 }

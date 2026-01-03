@@ -32,10 +32,6 @@
         <div id="header-container"></div>
 </nav>
     <main class="container">
-        <section class="panel">
-            <h2>📻 VHF/SDR FREQUENCY CONTROL</h2>
-            <p style="color: #AAA; margin: 0;">SDR Spectrum Monitoring & RF Transciever Tools</p>
-        </section>
         <div class="sdr-container">
             <!-- Frequency Control Panel -->
             <div class="frequency-panel" id="reciever-control">
@@ -113,6 +109,14 @@
                     <!-- Spectrum Canvas -->
                     <div class="meter-label">Frequency Spectrum</div>
                     <canvas id="spectrumCanvas" class="spectrum-canvas"></canvas>
+                    <div style="margin-top: 20px;">
+                        <label class="control-label">Gain Control</label>
+                        <input type="range" min="0" max="50" value="37" id="gainControl" 
+                               style="width: 100%; cursor: pointer;" onchange="adjustGain(this.value)">
+                        <div style="color: #AAA; font-size: 11px; margin-top: 5px; text-align: center;">
+                            <span id="gainDisplay">37 dB</span>
+                        </div>
+                    </div>
                     <!-- Signal Stats -->
                     <table class="info-table">
                         <tr>
@@ -135,12 +139,6 @@
                             <td>Bandwidth</td>
                             <td id="bandwidth">12.5 kHz</td>
                         </tr>
-                    </table>
-                </div>
-                <!-- Receiver Info -->
-                <div class="spectrum-display" id="reciever-status">
-                    <h3 style="margin: 0 0 15px 0; color: #2196F3;">RECEIVER STATUS</h3>
-                    <table class="info-table">
                         <tr>
                             <td>Device</td>
                             <td>RTL-SDR (Generic)</td>
@@ -162,23 +160,11 @@
                             <td style="color: #00FF00;">● ACTIVE</td>
                         </tr>
                     </table>
-                    <!-- Gain Control -->
-                    <div style="margin-top: 20px;">
-                        <label class="control-label">Gain Control</label>
-                        <input type="range" min="0" max="50" value="37" id="gainControl" 
-                               style="width: 100%; cursor: pointer;" onchange="adjustGain(this.value)">
-                        <div style="color: #AAA; font-size: 11px; margin-top: 5px; text-align: center;">
-                            <span id="gainDisplay">37 dB</span>
-                        </div>
-                    </div>
+                </div>
                 </div>
             </div>
         </div>
 <section class="panel" id="data-transfer">
-    <h2>📨 DIGITAL MESSAGE & DATA TRANSFER</h2>
-    <p style="color:#AAA; margin:0;">
-        Non-voice digital signaling over RF-linked transports (text-first, template-capable)
-    </p>
     <!-- Mode Tabs -->
     <div class="mode-selector" style="margin-top:15px;">
        <button class="mode-btn active" data-tab="text" onclick="setDataTab('text')">TEXT</button>
