@@ -2,19 +2,15 @@
 // Tactical Dashboard - main.js
 // ==========================
 document.addEventListener("DOMContentLoaded", function () {
-
     // ==========================
     // ACTIVITY LOG BUFFER
     // ==========================
     window.__activityBuffer = [];
-
     window.logActivity = function(message) {
         const time = new Date().toLocaleTimeString();
         const entryHTML = `<span style="color: var(--text-muted);">[${time}]</span> ${message}`;
         const payload = { entryHTML };
-
         let delivered = false;
-
         const activityLog = document.getElementById('activity-log');
         if (activityLog) {
             const placeholder = activityLog.querySelector('.no-activity');
@@ -25,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
             activityLog.insertBefore(entry, activityLog.firstChild);
             delivered = true;
         }
-
         const alertsLog = document.getElementById('alertsLog');
         if (alertsLog) {
             const alertEntry = document.createElement('div');
@@ -34,22 +29,17 @@ document.addEventListener("DOMContentLoaded", function () {
             alertsLog.prepend(alertEntry);
             delivered = true;
         }
-
         if (!delivered) window.__activityBuffer.push(payload);
     };
-
     function flushActivityBuffer() {
         if (!window.__activityBuffer.length) return;
-
         const tryFlush = () => {
             const activityLog = document.getElementById('activity-log');
             const alertsLog = document.getElementById('alertsLog');
-
             if (!activityLog && !alertsLog) {
                 requestAnimationFrame(tryFlush);
                 return;
             }
-
             window.__activityBuffer.forEach(({ entryHTML }) => {
                 if (activityLog) {
                     const entry = document.createElement('div');
@@ -67,10 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             window.__activityBuffer.length = 0;
         };
-
         tryFlush();
     }
-
     // ==========================
     // HEADER LOADING
     // ==========================
@@ -80,7 +68,6 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(html => {
                 const container = document.getElementById('header-container');
                 if (!container) return;
-
                 container.innerHTML = html;
                 requestAnimationFrame(() => {
                     initNavbarCollapse();
@@ -89,14 +76,12 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(err => console.error('Header load error:', err));
     }
-
     // ==========================
     // FOOTER LOADING + DYNAMIC
     // ==========================
     function loadFooter() {
         const container = document.getElementById('footer-embed-container');
         if (!container) return;
-
         fetch('/footer')
             .then(res => res.ok ? res.text() : Promise.reject(new Error('Footer fetch failed')))
             .then(html => {
@@ -113,14 +98,12 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(err => console.error('Footer load error:', err));
     }
-
 function initFooterDynamic() {
     updateFooterValues();
     initFooterButtons();
     initSlidePanelOutsideClose();
     flushActivityBuffer();
     trackPanels();
-
     // ==========================
     // BATTERY DISPLAY TOGGLE
     // ==========================
@@ -128,7 +111,6 @@ function initFooterDynamic() {
     if (batterySpans.length > 1) {
         let currentIndex = 0;
         batterySpans[currentIndex].classList.add('active');
-
         setInterval(() => {
             batterySpans[currentIndex].classList.remove('active');
             currentIndex = (currentIndex + 1) % batterySpans.length;
@@ -136,19 +118,15 @@ function initFooterDynamic() {
         }, 6000); // 5 seconds per display
     }
 }
-
-
     function updateFooterValues() {
         if (!window.CONFIG) return;
         const buildBtn = document.querySelector('.footer-btn[data-footer-action="build"]');
         const clusterBtn = document.querySelector('.footer-btn[data-footer-action="cluster"]');
         const sessionBtn = document.querySelector('.footer-btn[data-footer-action="session"]');
-
         if (buildBtn) buildBtn.textContent = window.CONFIG.dashboard_build || 'Dashboard Build';
         if (clusterBtn) clusterBtn.textContent = 'Cluster ' + (window.CONFIG.cluster_id || '--');
         if (sessionBtn) sessionBtn.textContent = 'Session ' + (window.CONFIG.session_id || '--');
     }
-
     // ==========================
     // UPTIME
     // ==========================
@@ -156,7 +134,6 @@ function initFooterDynamic() {
     function updateUptime() {
         const el = document.getElementById('uptime-display');
         if (!el) return;
-
         fetch('/api/uptime')
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -175,14 +152,12 @@ function initFooterDynamic() {
                 console.error('Uptime update failed:', err);
             });
     }
-
     function formatTime(seconds) {
         const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
         const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
         const secs = String(seconds % 60).padStart(2, '0');
         return `${hrs}:${mins}:${secs}`;
     }
-
     // ==========================
     // FOOTER SLIDE PANELS
     // ==========================
@@ -195,16 +170,13 @@ function initFooterDynamic() {
             });
         });
     }
-
     function toggleSlidePanel(action) {
         const panel = document.getElementById(`panel-${action}`);
         if (!panel) return;
-
         const isVisible = panel.classList.contains('visible');
         document.querySelectorAll('.slide-panel').forEach(p => p.classList.remove('visible'));
         if (!isVisible) panel.classList.add('visible');
     }
-
     function initSlidePanelOutsideClose() {
         document.addEventListener('click', e => {
             const openPanel = document.querySelector('.slide-panel.visible');
@@ -214,46 +186,36 @@ function initFooterDynamic() {
             document.querySelectorAll('.slide-panel.visible').forEach(p => p.classList.remove('visible'));
         });
     }
-
     function trackPanels() {
         const footer = document.getElementById('footer-embed-container');
         if (!footer) return requestAnimationFrame(trackPanels);
-
         const panels = document.querySelectorAll('.slide-panel.visible');
         if (!panels.length) return requestAnimationFrame(trackPanels);
-
         const rect = footer.getBoundingClientRect();
         const visibleTop = Math.max(rect.top, 0);
         const visibleHeight = Math.min(rect.bottom, window.innerHeight) - visibleTop;
-
         panels.forEach(panel => {
             panel.style.bottom = `${visibleHeight}px`;
         });
-
         requestAnimationFrame(trackPanels);
     }
-
     // ==========================
     // SIDEBAR
     // ==========================
     const sidebarToggleBtn = document.querySelector('.sidebar-toggle');
     if (sidebarToggleBtn) sidebarToggleBtn.addEventListener('click', toggleSidebar);
-
     function toggleSidebar() {
         const sidebar = document.getElementById('quick-sidebar');
         if (!sidebar) return;
         sidebar.classList.toggle('expanded');
         sidebar.classList.toggle('collapsed');
     }
-
     function populateSidebar(pageId) {
         const sidebarNav = document.querySelector('#quick-sidebar .sidebar-content');
         if (!sidebarNav) return;
-
         const header = sidebarNav.querySelector('h4');
         sidebarNav.innerHTML = '';
         if (header) sidebarNav.appendChild(header);
-
         let links = [];
         switch (pageId) {
             case 'sigint':
@@ -313,7 +275,6 @@ function initFooterDynamic() {
                     { text: 'Activity Log', href: '#activity-log' }
                 ]; break;
         }
-
         links.forEach(link => {
             const a = document.createElement('a');
             a.href = link.href;
@@ -321,23 +282,19 @@ function initFooterDynamic() {
             sidebarNav.appendChild(a);
         });
     }
-
     function initSidebar() {
         const pageId = document.body.dataset.page;
         if (!pageId) return;
         populateSidebar(pageId);
     }
-
     // ==========================
     // NAVBAR COLLAPSE
     // ==========================
     function initNavbarCollapse() {
         const navbar = document.querySelector('.navbar');
         if (!navbar) return;
-
         let isCollapsed = false;
         const COLLAPSE_THRESHOLD = 10;
-
         function checkCollapse() {
             const scrollTop = window.scrollY || document.documentElement.scrollTop;
             const shouldCollapse = scrollTop > COLLAPSE_THRESHOLD;
@@ -346,41 +303,32 @@ function initFooterDynamic() {
                 isCollapsed = shouldCollapse;
             }
         }
-
         window.addEventListener('scroll', checkCollapse);
         checkCollapse();
     }
-
     // ==========================
     // ACTIVE NAV PAGE
     // ==========================
     function highlightActiveNav() {
         const pageId = document.body.dataset.page;
         if (!pageId) return;
-
         const navbar = document.getElementById('main-navbar');
         if (!navbar) return;
-
         navbar.querySelectorAll('.active-page')
             .forEach(el => el.classList.remove('active-page'));
-
         const activeLink = navbar.querySelector(`[data-page="${pageId}"]`);
         if (activeLink) activeLink.classList.add('active-page');
     }
-
 // ==========================
 // NODE MONITORING
 // ==========================
 let nodesData = {};
-
 // Update node cards — must be defined BEFORE calling fetchNodes
 function updateNodeCards() {
     const container = document.getElementById('nodes-container');
     if (!container) return;
-
     container.innerHTML = '';
     if (!Array.isArray(nodesData)) return;
-
     nodesData.forEach(node => {
         const card = document.createElement('div');
         card.className = 'node-card';
@@ -393,7 +341,6 @@ function updateNodeCards() {
         container.appendChild(card);
     });
 }
-
 // Fetch nodes — logs only errors
 async function fetchNodes() {
     try {
@@ -408,11 +355,9 @@ async function fetchNodes() {
         logActivity('[Nodes] Fetch error: ' + msg);
     }
 }
-
 // Start fetching after everything is defined
 fetchNodes();
 setInterval(fetchNodes, 5000);
-
     // ==========================
     // TOOL ACTIONS
     // ==========================
@@ -431,7 +376,6 @@ setInterval(fetchNodes, 5000);
             logActivity(`[Tool] Failed action on ${toolName}: ${msg}`);
         }
     }
-
     document.querySelectorAll('.tool-action-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const nodeId = btn.dataset.node;
@@ -440,7 +384,6 @@ setInterval(fetchNodes, 5000);
             handleToolAction(nodeId, toolName, action);
         });
     });
-
     // ==========================
     // SIGNALS & MODULATION
     // ==========================
@@ -479,9 +422,7 @@ setInterval(fetchNodes, 5000);
             logActivity(`[Signals] Failed update for node ${nodeId}: ${msg}`);
         }
     }
-
     initSignalSelectors();
-
     // ==========================
     // PERFORMANCE SUMMARY
     // ==========================

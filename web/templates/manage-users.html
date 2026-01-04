@@ -222,9 +222,11 @@ input:checked + .slider:before {
             <select id="groupTypeFilter">
                 <option value="">All Types</option>
                 <option value="Command">Command</option>
-                <option value="ISR">ISR</option>
-                <option value="RF Ops">RF Ops</option>
+                <option value="MedEvac">MedEvac</option>
+                <option value="SIGINT">SIGINT</option>
                 <option value="Logistics">Logistics</option>
+                <option value="Logistics">Operations</option>
+                <option value="Logistics">Security</option>
             </select>
         </div>
   <!-- Team List -->
@@ -260,16 +262,16 @@ input:checked + .slider:before {
                     </label>
                 </div>
                 <div class="toggle-row">
-                    <span>Transmit</span>
+                    <span>RF Transmit</span>
                     <label class="toggle">
-                        <input type="checkbox" id="t_perm_rf">
+                        <input type="checkbox" id="t_perm_tx">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="toggle-row">
                     <span>User Management</span>
                     <label class="toggle">
-                        <input type="checkbox" id="t_perm_sdr">
+                        <input type="checkbox" id="t_perm_admin">
                         <span class="slider"></span>
                     </label>
                 </div>
@@ -295,8 +297,9 @@ input:checked + .slider:before {
             <option>Operator</option>
             <option>Analyst</option>
             <option>Net Control</option>
+            <option>Admin</option>
         </select>
-        <label>Status</label>
+        <label>Authorization</label>
         <select id="u_status">
             <option>active</option>
             <option>suspended</option>
@@ -324,12 +327,12 @@ input:checked + .slider:before {
         </select>
     </div>
     <div class="section">
-        <h4>Groups</h4>
+        <h4>User Groups</h4>
         <select multiple>
-            <option>Command</option>
-            <option>ISR</option>
-            <option>RF Ops</option>
-            <option>Logistics</option>
+            <option>readonly</option>
+            <option>user</option>
+            <option>admin</option>
+            <option>dialout</option>
         </select>
     </div>
     <div class="section">
@@ -383,7 +386,7 @@ input:checked + .slider:before {
             online:true,
             lastLogin:"2026-01-02 01:12Z",
             activity:["Logged in","Accessed Mesh","Started SDR session"],
-            perms:{mesh:true,rf:true,sdr:true,root:true},
+            perms:{mesh:true,tx:true,admin:true},
             sessions:2
         },
         {
@@ -398,7 +401,7 @@ input:checked + .slider:before {
             online:false,
             lastLogin:"2026-01-01 18:44Z",
             activity:["No Activity Yet"],
-            perms:{mesh:false,rf:false,sdr:false},
+            perms:{mesh:false,tx:false,admin:false},
             sessions:0
         },
         {
@@ -413,7 +416,7 @@ input:checked + .slider:before {
             online:false,
             lastLogin:"2026-01-01 18:44Z",
             activity:["Digital Data Sent on 146.152mHz"],
-            perms:{mesh:true,rf:true,sdr:false},
+            perms:{mesh:true,tx:true,admin:false},
             sessions:2
         },
         {
@@ -428,7 +431,7 @@ input:checked + .slider:before {
             online:true,
             lastLogin:"2026-01-01 18:44Z",
             activity:[""],
-            perms:{mesh:true,rf:true,sdr:false},
+            perms:{mesh:true,tx:true,admin:false},
             sessions:0
         },
         {
@@ -443,7 +446,7 @@ input:checked + .slider:before {
             online:true,
             lastLogin:"2026-01-01 18:44Z",
             activity:[""],
-            perms:{mesh:true,rf:true,sdr:false},
+            perms:{mesh:true,tx:true,admin:false},
             sessions:4
         }
     ];
@@ -481,17 +484,15 @@ input:checked + .slider:before {
         <span>Credentials:</span> ${selected.auth}<br>
         <span>Last Login:</span> ${selected.lastLogin}
     <div class="section">
+        <h4>System Authorizations</h4>
+        ${perm("Mesh Management","mesh")}
+        ${perm("RF Transmit","tx")}
+        ${perm("User Management","admin")}<br>
         ${selected.groups.map(g=>`<span class="badge active">${g}</span>`).join(' ')}
     </div>
     <div class="section">
-        <h4>System Authorizations</h4>
-        ${perm("Mesh Management","mesh")}
-        ${perm("Transmit","tx")}
-        ${perm("User Management","admin")}
-    </div>
-    <div class="section">
         <h4>Security Actions</h4>
-        <button class="btn warn" id="revokeAuthBtn" onclick="request('Revoke Sessions')">Revoke Sessions</button>
+        <button class="btn warn" id="revokeAuthBtn" onclick="request('Revoke Authorization')">Revoke Authorization</button>
         <button class="btn danger" id="lockAccountBtn" onclick="request('Lock Account')">Lock Account</button>
         <button class="btn danger" id="deleteUserBtn" onclick="request('Delete User')">Delete User</button>
     </div>
@@ -544,8 +545,28 @@ input:checked + .slider:before {
     }
     /* === TEAM DATA MODEL === */
     let teams = [
-        { id:1, name:"Alpha Team", type:"Command", members:[1,2], perms:{mesh:true, tx:true, monitor:false}, activity:["Team created"] },
-        { id:2, name:"Bravo Team", type:"ISR", members:[3], perms:{mesh:true, rf:false, sdr:true}, activity:["Team created"] },
+        { id:1, name:"Alpha Team",
+          type:"Command", 
+          members:[1,2], 
+          perms:{mesh:true, tx:true, admin:true}, 
+          activity:["Log: ICS Initiated", "Log: Established Local Network", "Log: Added SIGINT Team", "TX: Issued Warning Order Instructions To Quick Response Force", "TX: Placed MedEvac On Standby", "Loc: Sent Staging Location Coordinates To QRF"] },
+        { id:2, 
+          name:"Bravo Team", 
+          type:"QRF", 
+          members:[3], 
+          perms:{mesh:true, tx:true, admin:false}, 
+          activity:["TX: Recieved Warning Order Instructions", "Loc: Arrived At Staging Location"] },
+        { id:3, 
+          name:"Red Cell", 
+          type:"SIGINT", 
+          members:[3], 
+          perms:{mesh:true, tx:true, admin:true}, 
+          activity:["Log: Team created", "Log: Initiated Ad Hoc Mesh Network", "Log: Began RF Airspace Monitoring", "TX: Established Regional VHF Communication With MedEvav"] },
+        { id:4, 
+          name:"Blue Cell", 
+          type:"MedEvac", 
+          members:[3], perms:{mesh:true, tx:true, admin:false}, 
+          activity:["Log: Placed On Standby"] },
     ];
 /* === RENDER TEAMS === */
     function renderTeams(){
@@ -557,12 +578,11 @@ input:checked + .slider:before {
             teamList.innerHTML+=`
             <div class="user-card" onclick="selectTeam(${t.id})">
                 <div class="user-header">
-                <strong>${t.name}</strong>
-                <span class="badge active">${t.type}</span>
+                    <strong>${t.name}</strong>
+                    <span class="badge active" style="color:#00ff00; font-weight:bold; font-size:0.85rem;">${t.type}</span>
                 </div>
                 <div class="user-meta">
-                Members: ${t.members.length} <br>
-                Permissions: ${t.perms.mesh?'M':''}${t.perms.rf?'R':''}${t.perms.sdr?'S':''}
+                    Members: ${t.members.length} <br>
                 </div>
             </div>
             `;
@@ -577,8 +597,8 @@ input:checked + .slider:before {
         t_type.value = selectedTeam.type;
         renderMemberChips();
         t_perm_mesh.checked = selectedTeam.perms.mesh;
-        t_perm_rf.checked = selectedTeam.perms.rf;
-        t_perm_sdr.checked = selectedTeam.perms.sdr;
+        t_perm_tx.checked = selectedTeam.perms.tx;
+        t_perm_admin.checked = selectedTeam.perms.admin;
   // Render team activity
         renderTeamActivity();
         teamModal.style.display='block';
@@ -623,14 +643,14 @@ input:checked + .slider:before {
             name:"",
             type:"Command",
             members:[],
-            perms:{mesh:false,rf:false,sdr:false},
+            perms:{mesh:false,tx:false,admin:false},
             activity:["Team created"]
         };
         t_name.value = "";
         t_type.value = "Command";
         t_perm_mesh.checked = false;
-        t_perm_rf.checked = false;
-        t_perm_sdr.checked = false;
+        t_perm_tx.checked = false;
+        t_perm_admin.checked = false;
         renderMemberChips();
         renderTeamActivity();
         teamModal.style.display = 'block';
@@ -641,8 +661,8 @@ input:checked + .slider:before {
         selectedTeam.type = t_type.value;
         selectedTeam.perms = {
             mesh: t_perm_mesh.checked,
-            rf: t_perm_rf.checked,
-            sdr: t_perm_sdr.checked
+            tx: t_perm_tx.checked,
+            admin: t_perm_admin.checked
         };
         addTeamActivity("Team saved");
         if(!teams.find(t=>t.id===selectedTeam.id)) teams.push(selectedTeam);

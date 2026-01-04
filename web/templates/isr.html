@@ -351,225 +351,245 @@ function fitMapToPoints(map, points, options = {}) {
 
     <!--ADS-B / UAT Map Logic-->
 <script>
-    let map;
-    let aircraft = [];
-    let markers = {};
-    let selectedAircraftId = null;
-    let trackingEnabled = false;
-    let refreshInterval = 5;
-    let planeIcon; // initialized AFTER Leaflet exists
+/* ===============================
+   ADS-B / UAT MAP LOGIC (FIXED)
+   =============================== */
 
-    // Initialize map
-    function initMap() {
-        map = L.map('map').setView([37.7749, -122.4194], 8);
+let map;
+let aircraftRaw = [];
+let aircraft = [];
+let markers = {};
+let selectedAircraftId = null;
+let trackingEnabled = false;
+let refreshInterval = 5;
+let planeIcon;
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    subdomains: 'abcd',
-    maxZoom: 19
-}).addTo(map);
+/* ===== ALTITUDE BANDS ===== */
+const ALTITUDE_BANDS = {
+    "low-altitude":  { min: 0,     max: 10000 },
+    "mid-altitude":  { min: 10000, max: 25000 },
+    "high-altitude": { min: 25000, max: Infinity }
+};
 
+/* ===== MAP INIT ===== */
+function initMap() {
+    map = L.map('map').setView([37.7749, -122.4194], 8);
 
-        // Plane icon MUST be created after Leaflet loads
-        planeIcon = L.icon({
-            iconUrl: '/static/icons/plane-icon.svg',
-            iconSize: [40, 40],
-            iconAnchor: [20, 20] // center rotation
-        });
-    }
-
-    // Load aircraft data
-    async function loadAircraft() {
-        try {
-            const response = await fetch('/api/nodes/isr/adsb/aircraft');
-            const data = await response.json();
-
-            aircraft = data.aircraft || [];
-
-            updateAircraftDisplay();
-            updateStats();
-            updateMap();
-            updateAircraftList();
-        } catch (error) {
-            console.error('Error loading aircraft:', error);
+    L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        {
+            attribution: '© OpenStreetMap © CARTO',
+            subdomains: 'abcd',
+            maxZoom: 19
         }
-    }
+    ).addTo(map);
 
-    // Update aircraft display on map
-    function updateMap() {
-        const seen = new Set();
-
-        aircraft.forEach(ac => {
-            if (!ac.latitude || !ac.longitude || !ac.icao) return;
-
-            seen.add(ac.icao);
-
-            const heading =
-                typeof ac.heading === 'number' ? ac.heading : 0;
-
-            // EXISTING marker → move + rotate
-            if (markers[ac.icao]) {
-                markers[ac.icao]
-                    .setLatLng([ac.latitude, ac.longitude])
-                    .setRotationAngle(heading);
-                return;
-
-            }
-
-            // NEW marker → create once
-            const marker = L.marker(
-                [ac.latitude, ac.longitude],
-                {
-                    icon: planeIcon,
-                    rotationAngle: heading,
-                    rotationOrigin: 'center center'
-                }
-            )
-            .addTo(map)
-            .bindPopup(`
-                <strong>${ac.callsign || 'Unknown'}</strong><br>
-                ICAO: ${ac.icao}<br>
-                Alt: ${ac.altitude} ft<br>
-                Speed: ${ac.speed} kts<br>
-                Heading: ${ac.heading ?? 'N/A'}°
-            `)
-            .on('click', () => selectAircraft(ac));
-
-            markers[ac.icao] = marker;
-        });
-
-        // Remove stale aircraft markers
-        for (const icao in markers) {
-            if (!seen.has(icao)) {
-                map.removeLayer(markers[icao]);
-                delete markers[icao];
-            }
-        }
-            updateBearingRays(
-    selectedAircraftId
-        ? aircraft.filter(a => a.icao === selectedAircraftId)
-        : aircraft
-);
-
-/* Auto-frame ADS-B map */
-const framePoints = aircraft
-    .filter(a => a.latitude && a.longitude)
-    .map(a => [a.latitude, a.longitude]);
-
-if (window.nodes) {
-    Object.values(nodes).forEach(n => framePoints.push([n.lat, n.lon]));
+    planeIcon = L.icon({
+        iconUrl: '/static/icons/plane-icon.svg',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
 }
 
-fitMapToPoints(map, framePoints, { maxZoom: 12 });
+/* ===== DATA LOAD ===== */
+async function loadAircraft() {
+    try {
+        const response = await fetch('/api/nodes/isr/adsb/aircraft');
+        const data = await response.json();
 
+        aircraftRaw = Array.isArray(data.aircraft) ? data.aircraft : [];
+        updateAircraftDisplay();
+        updateStats();
+        updateMap();
+        updateAircraftList();
+
+    } catch (err) {
+        console.error('ADS-B load failed:', err);
     }
+}
 
-    // Update aircraft list
-    function updateAircraftList() {
-        const container = document.getElementById('aircraftListContainer');
+/* ===== FILTER PIPELINE ===== */
+function updateAircraftDisplay() {
+    const altitudeKey =
+        document.getElementById('altitudeFilter')?.value || '';
 
-        if (aircraft.length === 0) {
-            container.innerHTML =
-                '<div style="color: #AAA; text-align: center; padding: 20px;">No aircraft detected</div>';
+    aircraft = aircraftRaw.filter(ac => {
+        if (altitudeKey && ALTITUDE_BANDS[altitudeKey]) {
+            const alt = ac.altitude;
+            if (typeof alt !== 'number') return false;
+
+            const { min, max } = ALTITUDE_BANDS[altitudeKey];
+            if (alt < min || alt >= max) return false;
+        }
+        return true;
+    });
+}
+
+/* ===== MAP UPDATE ===== */
+function updateMap() {
+    const seen = new Set();
+
+    aircraft.forEach(ac => {
+        const lat  = ac.latitude ?? ac.lat;
+        const lon  = ac.longitude ?? ac.lon;
+        const icao = ac.icao ?? ac.hex;
+
+        if (lat == null || lon == null || !icao) return;
+        seen.add(icao);
+
+        const heading =
+            typeof ac.heading === 'number' ? ac.heading : 0;
+
+        if (markers[icao]) {
+            markers[icao].setLatLng([lat, lon]);
+            if (markers[icao].setRotationAngle) {
+                markers[icao].setRotationAngle(heading);
+            }
             return;
         }
 
-        container.innerHTML = aircraft.map(ac => `
-            <div class="aircraft-item ${ac.icao === selectedAircraftId ? 'selected' : ''}"
-                 onclick="selectAircraft(${JSON.stringify(ac).replace(/"/g, '&quot;')})">
+        const marker = L.marker([lat, lon], {
+            icon: planeIcon,
+            rotationAngle: heading,
+            rotationOrigin: 'center center'
+        })
+        .addTo(map)
+        .bindPopup(`
+            <strong>${ac.callsign || 'Unknown'}</strong><br>
+            ICAO: ${icao}<br>
+            Alt: ${ac.altitude ?? 'N/A'} ft<br>
+            Speed: ${ac.speed ?? 'N/A'} kts<br>
+            Heading: ${ac.heading ?? 'N/A'}°
+        `)
+        .on('click', () => selectAircraft(ac));
+
+        markers[icao] = marker;
+    });
+
+    /* Remove stale */
+    Object.keys(markers).forEach(icao => {
+        if (!seen.has(icao)) {
+            map.removeLayer(markers[icao]);
+            delete markers[icao];
+        }
+    });
+
+    updateBearingRays(
+        selectedAircraftId
+            ? aircraft.filter(a => (a.icao ?? a.hex) === selectedAircraftId)
+            : aircraft
+    );
+
+    /* Auto-frame */
+    const framePoints = aircraft
+        .map(a => [a.latitude ?? a.lat, a.longitude ?? a.lon])
+        .filter(p => p[0] != null && p[1] != null);
+
+    if (window.nodes) {
+        Object.values(nodes).forEach(n => framePoints.push([n.lat, n.lon]));
+    }
+
+    if (framePoints.length) {
+        fitMapToPoints(map, framePoints, { maxZoom: 12 });
+    }
+}
+
+/* ===== AIRCRAFT LIST ===== */
+function updateAircraftList() {
+    const container = document.getElementById('aircraftListContainer');
+
+    if (!aircraft.length) {
+        container.innerHTML =
+            '<div style="color:#AAA;text-align:center;padding:20px;">No aircraft detected</div>';
+        return;
+    }
+
+    container.innerHTML = aircraft.map(ac => {
+        const icao = ac.icao ?? ac.hex;
+        return `
+            <div class="aircraft-item ${icao === selectedAircraftId ? 'selected' : ''}"
+                 onclick="selectAircraft(${JSON.stringify(ac).replace(/"/g,'&quot;')})">
                 <div class="callsign">${ac.callsign || 'UNKNOWN'}</div>
-                <div class="icao">${ac.icao}</div>
+                <div class="icao">${icao}</div>
                 <div class="stats">
-                    <strong>${ac.altitude}</strong> ft<br>
-                    <strong>${ac.speed}</strong> kts<br>
+                    <strong>${ac.altitude ?? '—'}</strong> ft<br>
+                    <strong>${ac.speed ?? '—'}</strong> kts<br>
                     ${typeof ac.heading === 'number'
-                        ? `<strong>Hdg:</strong> ${ac.heading}°<br>`
+                        ? `<strong>Hdg:</strong> ${ac.heading}°`
                         : ''}
                 </div>
             </div>
-        `).join('');
-    }
-
-    // Select aircraft
-    function selectAircraft(ac) {
-        selectedAircraftId = ac.icao;
-
-        const details = document.getElementById('selectedAircraft');
-        details.innerHTML = `
-            <div style="text-align: left;">
-                <h4 style="color: #00FF00; margin: 0 0 10px 0;">
-                    ${ac.callsign || 'UNKNOWN'}
-                </h4>
-                <table style="width: 100%; font-size: 12px; color: #AAA;">
-                    <tr><td><strong>ICAO:</strong></td><td style="color:#00FF00">${ac.icao}</td></tr>
-                    <tr><td><strong>Altitude:</strong></td><td style="color:#00FF00">${ac.altitude} ft</td></tr>
-                    <tr><td><strong>Speed:</strong></td><td style="color:#00FF00">${ac.speed} kts</td></tr>
-                    <tr><td><strong>Heading:</strong></td><td style="color:#00FF00">${ac.heading ?? 'N/A'}°</td></tr>
-                    <tr>
-                        <td><strong>Position:</strong></td>
-                        <td style="color:#00FF00">
-                            ${ac.latitude?.toFixed(4)}, ${ac.longitude?.toFixed(4)}
-                        </td>
-                    </tr>
-                </table>
-            </div>
         `;
+    }).join('');
+}
 
-        updateAircraftList();
+/* ===== SELECT AIRCRAFT ===== */
+function selectAircraft(ac) {
+    selectedAircraftId = ac.icao ?? ac.hex;
+
+    document.getElementById('selectedAircraft').innerHTML = `
+        <h4 style="color:#00FF00">${ac.callsign || 'UNKNOWN'}</h4>
+        <table style="font-size:12px;color:#AAA">
+            <tr><td>ICAO:</td><td style="color:#00FF00">${selectedAircraftId}</td></tr>
+            <tr><td>Altitude:</td><td style="color:#00FF00">${ac.altitude ?? 'N/A'} ft</td></tr>
+            <tr><td>Speed:</td><td style="color:#00FF00">${ac.speed ?? 'N/A'} kts</td></tr>
+            <tr><td>Heading:</td><td style="color:#00FF00">${ac.heading ?? 'N/A'}°</td></tr>
+        </table>
+    `;
+
+    updateAircraftList();
+}
+
+/* ===== STATS ===== */
+function updateStats() {
+    const elCount = document.getElementById('aircraftCount');
+    const elRate  = document.getElementById('messageRate');
+    const elMax   = document.getElementById('maxAltitude');
+    const elAvg   = document.getElementById('avgSpeed');
+
+    if (elCount) elCount.textContent = aircraft.length;
+    if (elRate)  elRate.textContent = Math.floor(Math.random() * 100 + 50);
+
+    if (!aircraft.length) return;
+
+    const maxAlt = Math.max(...aircraft.map(a => a.altitude || 0));
+    const avgSpeed = Math.round(
+        aircraft.reduce((s, a) => s + (a.speed || 0), 0) / aircraft.length
+    );
+
+    if (elMax) elMax.textContent = `${maxAlt} ft`;
+    if (elAvg) elAvg.textContent = `${avgSpeed} kts`;
+}
+
+
+/* ===== TRACKING ===== */
+function toggleTracking(event) {
+    trackingEnabled = !trackingEnabled;
+    const btn = event.currentTarget;
+
+    btn.textContent = trackingEnabled ? '⏹ Stop Tracking' : '▶ Start Tracking';
+    btn.className = trackingEnabled ? 'btn btn-danger' : 'btn btn-primary';
+
+    if (trackingEnabled) {
+        startAutoRefresh();
     }
+}
 
-    // Update statistics
-    function updateStats() {
-        document.getElementById('aircraftCount').textContent = aircraft.length;
-        document.getElementById('messageRate').textContent =
-            Math.floor(Math.random() * 100 + 50);
+function startAutoRefresh() {
+    refreshInterval =
+        parseInt(document.getElementById('refreshInterval')?.value) || 5;
 
-        if (aircraft.length > 0) {
-            const maxAlt = Math.max(...aircraft.map(a => a.altitude || 0));
-            const avgSpeed = Math.round(
-                aircraft.reduce((sum, a) => sum + (a.speed || 0), 0) / aircraft.length
-            );
+    if (!trackingEnabled) return;
 
-            document.getElementById('maxAltitude').textContent = `${maxAlt} ft`;
-            document.getElementById('avgSpeed').textContent = `${avgSpeed} kts`;
-        }
-    }
-
-    // Placeholder for filters
-    function updateAircraftDisplay() {
-        const typeFilter = document.getElementById('typeFilter').value;
-        const minAlt = parseInt(document.getElementById('minAltitude').value) || 0;
-    }
-
-    // Toggle tracking
-    function toggleTracking() {
-        trackingEnabled = !trackingEnabled;
-
-        const btn = event.target;
-        btn.textContent = trackingEnabled ? '⏹ Stop Tracking' : '▶ Start Tracking';
-        btn.className = trackingEnabled ? 'btn btn-danger' : 'btn btn-primary';
-
-        if (trackingEnabled) {
-            loadAircraft();
-            startAutoRefresh();
-        }
-    }
-
-    // Auto-refresh
-    function startAutoRefresh() {
-        refreshInterval =
-            parseInt(document.getElementById('refreshInterval').value) || 5;
-
-        if (trackingEnabled) {
-            loadAircraft();
-            setTimeout(startAutoRefresh, refreshInterval * 1000);
-        }
-    }
-
-    // Initialize
-    initMap();
     loadAircraft();
+    setTimeout(startAutoRefresh, refreshInterval * 1000);
+}
+
+/* ===== INIT ===== */
+initMap();
+loadAircraft();
 </script>
+
 <script>
 /* ===== ADS-B BEARING RAYS ===== */
 

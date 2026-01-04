@@ -1960,3 +1960,6 @@ label {
     box-shadow: 1px 2px 2px #111, 2px 3px 3px #252525;
     margin-top: 4px;
 }
+#t_name, #t_type {
+    background: #050505;
+}

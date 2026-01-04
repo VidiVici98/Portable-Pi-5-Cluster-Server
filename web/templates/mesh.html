@@ -102,10 +102,10 @@
         <label>Target Nodes:</label>
         <select id="broadcast-target" multiple>
             <option value="all">All Nodes</option>
-            <option value="A">Team-ALPHA</option>
-            <option value="B">Team-BRAVO</option>
-            <option value="C">Team-CHARLIE</option>
-            <option value="D">Team-DELTA</option>
+            <option value="A">Alpha Team</option>
+            <option value="B">Bravo Team</option>
+            <option value="C">Red Cell</option>
+            <option value="D">Blue Cell</option>
         </select>
         <label>Message:</label>
         <textarea id="broadcast-message" rows="4"></textarea>
@@ -198,25 +198,189 @@
     // ================= DEMO DATA =================
     const DATA_MODE="demo";
     let meshNodes=[
-    {id:"A",uid:"MESH-A-03",callsign:"SAR-03",lat:37.7749,lon:-122.4194,status:"ok",role:"SAR",az:45},
-    {id:"B",uid:"MESH-B-02",callsign:"QRF-02",lat:37.7849,lon:-122.4094,status:"warn",role:"QRF",az:120},
-    {id:"C",uid:"MESH-C-01",callsign:"MED-01",lat:37.7649,lon:-122.4294,status:"ok",role:"MEDEVAC",az:270},
-    {id:"D",uid:"MESH-D-03",callsign:"SIGINT-03",lat:37.7700,lon:-122.4000,status:"ok",role:"SIGINT",az:330},
-    {id:"E",uid:"MESH-C-04",callsign:"TRANSIT-04",lat:37.7650,lon:-122.4100,status:"ok",role:"LOGISTICS",az:90},
-    {id:"F",uid:"MESH-D-02",callsign:"RELAY-02",lat:37.7800,lon:-122.4300,status:"ok",role:"RELAY",az:180},
-    {id:"G",uid:"MESH-A-02",callsign:"TRANSIT-02",lat:37.7800,lon:-122.4300,status:"ok",role:"LOGISTICS",az:180},
-    {id:"H",uid:"MESH-B-04",callsign:"SAR-04",lat:37.7800,lon:-122.4300,status:"ok",role:"SAR",az:180},
-    {id:"I",uid:"MESH-B-01",callsign:"SAR-01",lat:37.7800,lon:-122.4300,status:"ok",role:"SAR",az:180},
-    {id:"J",uid:"MESH-A-01",callsign:"QRF-01",lat:37.7800,lon:-122.4300,status:"ok",role:"QRF",az:180},
-    {id:"K",uid:"MESH-C-01",callsign:"SIGINT-01",lat:37.7800,lon:-122.4300,status:"ok",role:"SIGINT",az:180},
-    {id:"L",uid:"MESH-D-02",callsign:"MED-02",lat:37.7800,lon:-122.4300,status:"ok",role:"MEDEVAC",az:180},
-    {id:"M",uid:"MESH-C-03",callsign:"MED-03",lat:37.7800,lon:-122.4300,status:"ok",role:"MEDEVAC",az:180},
-    {id:"N",uid:"MESH-A-04",callsign:"SIGINT-04",lat:37.7800,lon:-122.4300,status:"ok",role:"SIGINT",az:180},
-    {id:"O",uid:"MESH-D-02",callsign:"SAR-02",lat:37.7800,lon:-122.4300,status:"ok",role:"SAR",az:180},
+    {
+        id:"A",
+        uid:"MESH-A-03",
+        callsign:"ICS-03",
+        lat:37.7749,
+        lon:-122.4194,
+        status:"ok",
+        role:"Command",
+        az:45
+    },
+    {
+        id:"B",
+        uid:"MESH-B-02",
+        callsign:"QRF-02",
+        lat:37.7849,
+        lon:-122.4094,
+        status:"warn",
+        role:"QRF",
+        az:120
+    },
+    {
+        id:"C",
+        uid:"MESH-C-01",
+        callsign:"SIGINT-01",
+        lat:37.7649,
+        lon:-122.4294,
+        status:"ok",
+        role:"SIGINT",
+        az:270
+    },
+    {
+        id:"D",
+        uid:"MESH-D-03",
+        callsign:"MED-03",
+        lat:37.7700,
+        lon:-122.4000,
+        status:"ok",
+        role:"MedEvac",
+        az:330
+    },
+    {
+        id:"E",
+        uid:"MESH-C-04",
+        callsign:"SIGINT-04",
+        lat:37.7650,
+        lon:-122.4100,
+        status:"ok",
+        role:"SIGINT",
+        az:90
+    },
+    {
+        id:"F",
+        uid:"MESH-D-02",
+        callsign:"MED-02",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"MedEvac",
+        az:180
+    },
+    {
+        id:"G",
+        uid:"MESH-A-02",
+        callsign:"ICS-02",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"Command",
+        az:180
+    },
+    {
+        id:"H",
+        uid:"MESH-B-04",
+        callsign:"QRF-04",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"QRF",
+        az:180
+    },
+    {
+        id:"I",
+        uid:"MESH-B-01",
+        callsign:"QRF-01",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"QRF",
+        az:180
+    },
+    {
+        id:"J",
+        uid:"MESH-A-01",
+        callsign:"ICS-01",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"Command",
+        az:180
+    },
+    {
+        id:"K",
+        uid:"MESH-C-02",
+        callsign:"SIGINT-02",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"SIGINT",
+        az:180
+    },
+    {
+        id:"L",
+        uid:"MESH-D-02",
+        callsign:"MED-02",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"MEDEVAC",
+        az:180
+    },
+    {
+        id:"M",
+        uid:"MESH-C-03",
+        callsign:"SIGINT-03",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"SIGINT",
+        az:180
+    },
+    {
+        id:"N",
+        uid:"MESH-A-04",
+        callsign:"ICS-04",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"Command",
+        az:180
+    },
+    {
+        id:"O",
+        uid:"MESH-D-02",
+        callsign:"MED-02",
+        lat:37.7800,
+        lon:-122.4300,
+        status:"ok",
+        role:"MedEvac",
+        az:180
+    },
     ];
-    let takEntities=[{uid:"TAK.BLUE.1",callsign:"ALPHA-1",lat:37.779,lon:-122.42},{uid:"TAK.BLUE.2",callsign:"BRAVO-2",lat:37.775,lon:-122.425}];
-    let hostileEntities=[{uid:"RED.1",callsign:"HOSTILE-1",lat:37.781,lon:-122.435},{uid:"RED.2",callsign:"HOSTILE-2",lat:37.768,lon:-122.418}];
-    let geofences=[L.circle([37.7749,-122.4194],{radius:800,color:"#ff8800",dashArray:"4"}),L.circle([37.7800,-122.4300],{radius:600,color:"#ff1744",dashArray:"4"})];
+    let takEntities=[
+        {
+            uid:"TAK.BLUE.1",
+            callsign:"ALPHA-1",
+            lat:37.779,
+            lon:-122.42
+        },{
+            uid:"TAK.BLUE.2",
+            callsign:"BRAVO-2",
+            lat:37.775,
+            lon:-122.425
+        }
+    ];
+    let hostileEntities=[
+        {
+            uid:"RED.1",
+            callsign:"HOSTILE-1",
+            lat:37.781,
+            lon:-122.435
+        },
+        {
+            uid:"RED.2",
+            callsign:"HOSTILE-2",
+            lat:37.768,
+            lon:-122.418
+        }
+    ];
+    let geofences=[
+        L.circle([37.7749,-122.4194],
+            {radius:800,color:"#ff8800",dashArray:"4"}),
+        L.circle([37.7800,-122.4300],
+            {radius:600,color:"#ff1744",dashArray:"4"})];
     let map,layers={
     mesh:L.layerGroup(),tak:L.layerGroup(),links:L.layerGroup(),
     geofences:L.layerGroup(),sensors:L.layerGroup(),hostiles:L.layerGroup(),
