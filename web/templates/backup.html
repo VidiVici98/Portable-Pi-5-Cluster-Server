@@ -54,7 +54,6 @@
     </div>
     <footer id="footer-embed-container"></footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
     <script>
         async function loadBackups() {
             const response = await fetch('/api/backup/list');
@@ -183,23 +182,17 @@ document.querySelectorAll('.alert-icon').forEach(icon => {
 (() => {
     const mapGuard = document.querySelector('.map-guard');
     const overlay  = document.querySelector('.map-overlay');
-
     if (!mapGuard || !overlay) return;
-
     let blockTimer = null;
-
     mapGuard.addEventListener('mouseenter', () => {
         overlay.classList.add('active');
-
         blockTimer = setTimeout(() => {
             overlay.classList.remove('active');
             blockTimer = null;
         }, 900);
     });
-
     mapGuard.addEventListener('mouseleave', () => {
         overlay.classList.remove('active');
-
         if (blockTimer) {
             clearTimeout(blockTimer);
             blockTimer = null;

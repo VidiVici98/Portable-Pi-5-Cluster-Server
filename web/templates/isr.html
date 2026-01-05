@@ -41,9 +41,9 @@
                 </div>
                     <!-- Controls -->
         <div class="controls">
-            <h3 style="margin: 0 0 15px 0; color: #00FF00;">Filters & Overlays</h3>
+            <h3 style="margin: 0 0 15px 0; color:rgba(255, 179, 0, 0.3);">Filters & Overlays</h3>
             <div class="control-group">
-                <label>Filter by Type:</label>
+                <label style="font-family: Georgia, 'Times New Roman', Times, serif;">Filter by Type:</label>
                 <select id="typeFilter">
                     <option value="">All Aircraft</option>
                     <option value="commercial">Commercial</option>
@@ -53,7 +53,7 @@
                 </select>
             </div>
             <div class="control-group">
-                <label>Altitude:</label>
+                <label style="font-family: Georgia, 'Times New Roman', Times, serif;">Altitude:</label>
                 <select id="altitudeFilter">
                     <option value="">All Altitudes</option>
                     <option value="low-altitude">Low Altitude</option>
@@ -62,10 +62,10 @@
                 </select>
             </div>
             <div class="control-group">
-                <label>Auto-Refresh (sec):</label>
+                <label style="font-family: Georgia, 'Times New Roman', Times, serif;">Auto-Refresh (sec):</label>
                 <input type="number" id="refreshInterval" value="5" min="1" max="60" step="1">
             </div>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="toggleTracking()">
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;font-family: Georgia, 'Times New Roman', Times, serif;" onclick="toggleTracking()">
                 ▶ Start Tracking
             </button>
             </div>
@@ -80,9 +80,6 @@
                 </div>
             </div>
             <div class="aircraft-list">
-                <h4 style="color: #00FF00; text-transform: uppercase; font-size: 11px;">
-                    Tracked Aircraft
-                </h4>
                 <div id="aircraftListContainer">
                     <div style="color: #AAA; text-align: center;">
                         Loading aircraft...
@@ -93,7 +90,7 @@
         <div class="sdr-container" id="reciever-control">
             <!-- Frequency Control Panel -->
             <div class="frequency-panel">
-                <h3 style="margin: 0 0 15px 0; color: #2196F3;">RECEIVER CONTROL</h3>
+                <h3 style="margin: 0 0 15px 0; color:rgba(255, 179, 0, 0.3);">RECEIVER CONTROL</h3>
                 <!-- Frequency Display -->
                 <div class="frequency-display">
                     <div class="frequency-value" id="frequencyDisplay">146.520</div>
@@ -101,7 +98,7 @@
                 </div>
                 <!-- Quick Frequency Input -->
                 <div class="control-group">
-                    <label class="control-label">Set Frequency</label>
+                    <label class="control-label" style="font-family: Georgia, 'Times New Roman', Times, serif;">Set Frequency</label>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" class="frequency-input" id="frequencyInput" value="146.520" 
                                placeholder="Enter frequency" style="flex: 1;">
@@ -112,34 +109,34 @@
                 </div>
                 <!-- Frequency Adjustment Buttons -->
                 <div class="control-group">
-                    <label class="control-label">Fine Tune</label>
+                    <label class="control-label" style="font-family: Georgia, 'Times New Roman', Times, serif;">Fine Tune</label>
                     <div class="frequency-buttons">
-                        <button class="freq-btn" onclick="adjustFrequency(-1)">-1 MHz</button>
-                        <button class="freq-btn" onclick="adjustFrequency(-0.1)">-0.1 MHz</button>
-                        <button class="freq-btn" onclick="adjustFrequency(0.1)">+0.1 MHz</button>
-                        <button class="freq-btn" onclick="adjustFrequency(-0.01)">-10 kHz</button>
-                        <button class="freq-btn" onclick="adjustFrequency(0.01)">+10 kHz</button>
-                        <button class="freq-btn" onclick="adjustFrequency(1)">+1 MHz</button>
+                        <button class="freq-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="adjustFrequency(-1)">-1 MHz</button>
+                        <button class="freq-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="adjustFrequency(-0.1)">-0.1 MHz</button>
+                        <button class="freq-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="adjustFrequency(0.1)">+0.1 MHz</button>
+                        <button class="freq-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="adjustFrequency(-0.01)">-10 kHz</button>
+                        <button class="freq-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="adjustFrequency(0.01)">+10 kHz</button>
+                        <button class="freq-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="adjustFrequency(1)">+1 MHz</button>
                     </div>
                 </div>
                 <!-- Mode Selection -->
                 <div class="control-group">
-                    <label class="control-label">Modulation</label>
+                    <label class="control-label" style="font-family: Georgia, 'Times New Roman', Times, serif;">Modulation</label>
                     <div class="mode-selector">
-                        <button class="mode-btn active" onclick="setMode(this, 'FM')">FM</button>
-                        <button class="mode-btn" onclick="setMode(this, 'AM')">AM</button>
-                        <button class="mode-btn" onclick="setMode(this, 'SSB')">SSB</button>
-                        <button class="mode-btn" onclick="setMode(this, 'CW')">CW</button>
+                        <button class="mode-btn active" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="setMode(this, 'FM')">FM</button>
+                        <button class="mode-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="setMode(this, 'AM')">AM</button>
+                        <button class="mode-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="setMode(this, 'SSB')">SSB</button>
+                        <button class="mode-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="setMode(this, 'CW')">CW</button>
                     </div>
                 </div>
                 <!-- Presets -->
                 <div class="control-group">
-                    <label class="control-label">Saved Frequencies</label>
+                    <label class="control-label" style="font-family: Georgia, 'Times New Roman', Times, serif;">Saved Frequencies</label>
                     <div class="preset-buttons">
-                        <button class="preset-btn" onclick="loadFrequency(146.52)">2M Simplex</button>
-                        <button class="preset-btn" onclick="loadFrequency(462.5625)">GMRS 462</button>
-                        <button class="preset-btn" onclick="loadFrequency(144.2)">2M Beacon</button>
-                        <button class="preset-btn" onclick="loadFrequency(121.5)">Emergency</button>
+                        <button class="preset-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="loadFrequency(146.52)">2M Simplex</button>
+                        <button class="preset-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="loadFrequency(462.5625)">GMRS 462</button>
+                        <button class="preset-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="loadFrequency(144.2)">2M Beacon</button>
+                        <button class="preset-btn" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111; border: 1px groove #333;" onclick="loadFrequency(121.5)">Emergency</button>
                     </div>
                 </div>
             </div>
@@ -159,43 +156,43 @@
                 <div class="spectrum-display" id="reciever-status">
                     <table class="info-table">
                         <tr>
-                            <td>Signal Strength</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Signal Strength</td>
                             <td id="signalStrength">-65 dBm</td>
                         </tr>
                         <tr>
-                            <td>Noise Level</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Noise Level</td>
                             <td id="noiseLevel">-90 dBm</td>
                         </tr>
                         <tr>
-                            <td>SNR</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">SNR</td>
                             <td id="snr">25 dB</td>
                         </tr>
                         <tr>
-                            <td>Modulation</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Modulation</td>
                             <td id="modulation">FM</td>
                         </tr>
                         <tr>
-                            <td>Bandwidth</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Bandwidth</td>
                             <td id="bandwidth">12.5 kHz</td>
                         </tr>
                         <tr>
-                            <td>Device</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Device</td>
                             <td>RTL-SDR (Generic)</td>
                         </tr>
                         <tr>
-                            <td>Tuner</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Tuner</td>
                             <td>Rafael Micro R820T</td>
                         </tr>
                         <tr>
-                            <td>Gain</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Gain</td>
                             <td id="gainValue">37 dB</td>
                         </tr>
                         <tr>
-                            <td>Sample Rate</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Sample Rate</td>
                             <td>2.048 MSPS</td>
                         </tr>
                         <tr>
-                            <td>Status</td>
+                            <td style="font-family: Georgia, 'Times New Roman', Times, serif;">Status</td>
                             <td style="color: #00FF00;">● ACTIVE</td>
                         </tr>
                     </table>
@@ -209,21 +206,20 @@
     <div class="tri-card">
         <canvas id="bearingCompass" width="270" height="270"></canvas>
         <div class="bearing-readout">
-            <div><span>Primary Bearing:</span> <strong id="primaryBearing">072° (ENE)</strong></div>
-            <div><span>Confidence:</span> <strong id="bearingConfidence">±6°</strong></div>
-            <div><span>Signal Class:</span> <strong>VHF FM</strong></div>
+            <div><span style="font-family: Georgia, 'Times New Roman', Times, serif;">Primary Bearing:</span> <strong id="primaryBearing">072° (ENE)</strong></div>
+            <div><span style="font-family: Georgia, 'Times New Roman', Times, serif;">Confidence:</span> <strong id="bearingConfidence">±6°</strong></div>
+            <div><span style="font-family: Georgia, 'Times New Roman', Times, serif;">Signal Class:</span> <strong>VHF FM</strong></div>
         </div>
     </div>
-
     <!-- Receiver Bearings -->
     <div class="tri-card">
-        <h3>RECEIVER BEARINGS</h3>
+        <h3 style="color:rgba(255, 179, 0, 0.3);font-size:1.25rem; text-shadow: 1px 2px 2px #111,2px 3px 2px #0b0b0b;">RECEIVER BEARINGS</h3>
         <table class="info-table">
             <tr>
-                <th>Receiver</th>
-                <th>Bearing</th>
-                <th>RSSI</th>
-                <th>Status</th>
+                <th style="font-family: Georgia, 'Times New Roman', Times, serif;">Receiver</th>
+                <th style="font-family: Georgia, 'Times New Roman', Times, serif;">Bearing</th>
+                <th style="font-family: Georgia, 'Times New Roman', Times, serif;">RSSI</th>
+                <th style="font-family: Georgia, 'Times New Roman', Times, serif;">Status</th>
             </tr>
             <tr>
                 <td>ADS-B Node</td>
@@ -247,15 +243,15 @@
     </div>
     <!-- Triangulation Map -->
     <div class="tri-card tri-map-card" id="triangulation-map">
-        <h3>ESTIMATED SIGNAL ORIGIN</h3>
+        <h3 style="color:rgba(255, 179, 0, 0.3);font-size:1.25rem; text-shadow: 1px 2px 2px #111,2px 3px 2px #0b0b0b;">ESTIMATED SIGNAL ORIGIN</h3>
         <div class="map-guard tri">
             <div id="triangulationMap"></div>
             <div class="map-overlay" aria-hidden="true"></div>
         </div>
         <div class="tri-meta">
-            <div><span>Estimated Error Radius:</span> <strong>±420 m</strong></div>
-            <div><span>Solution Quality:</span> <strong style="color:#00FF00;">HIGH</strong></div>
-            <div><span>Last Update:</span> <strong id="triUpdate">0.0s ago</strong></div>
+            <div><span style="font-family: Georgia, 'Times New Roman', Times, serif;">Estimated Error Radius:</span> <strong>±420 m</strong></div>
+            <div><span style="font-family: Georgia, 'Times New Roman', Times, serif;">Solution Quality:</span> <strong style="color:#00FF00;">HIGH</strong></div>
+            <div><span style="font-family: Georgia, 'Times New Roman', Times, serif;">Last Update:</span> <strong id="triUpdate">0.0s ago</strong></div>
         </div>
     </div>
 </div>
@@ -330,7 +326,6 @@
                 window.errorCircle.setRadius(errorRadiusMeters);
             }
     frameTriangulationMap(lat, lon);
-
         }
         setInterval(updateTriangulation, 3000);
     </script>
@@ -338,9 +333,7 @@
 /* ===== MAP FRAMING HELPER ===== */
 function fitMapToPoints(map, points, options = {}) {
     if (!map || !points || points.length === 0) return;
-
     const bounds = L.latLngBounds(points);
-
     map.fitBounds(bounds, {
         padding: options.padding || [40, 40],
         maxZoom: options.maxZoom || 15,
@@ -348,13 +341,10 @@ function fitMapToPoints(map, points, options = {}) {
     });
 }
 </script>
-
-    <!--ADS-B / UAT Map Logic-->
 <script>
 /* ===============================
-   ADS-B / UAT MAP LOGIC (FIXED)
+   ADS-B / UAT MAP LOGIC
    =============================== */
-
 let map;
 let aircraftRaw = [];
 let aircraft = [];
@@ -363,18 +353,15 @@ let selectedAircraftId = null;
 let trackingEnabled = false;
 let refreshInterval = 5;
 let planeIcon;
-
 /* ===== ALTITUDE BANDS ===== */
 const ALTITUDE_BANDS = {
     "low-altitude":  { min: 0,     max: 10000 },
     "mid-altitude":  { min: 10000, max: 25000 },
     "high-altitude": { min: 25000, max: Infinity }
 };
-
 /* ===== MAP INIT ===== */
 function initMap() {
     map = L.map('map').setView([37.7749, -122.4194], 8);
-
     L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
         {
@@ -383,63 +370,51 @@ function initMap() {
             maxZoom: 19
         }
     ).addTo(map);
-
     planeIcon = L.icon({
         iconUrl: '/static/icons/plane-icon.svg',
         iconSize: [40, 40],
         iconAnchor: [20, 20]
     });
 }
-
 /* ===== DATA LOAD ===== */
 async function loadAircraft() {
     try {
         const response = await fetch('/api/nodes/isr/adsb/aircraft');
         const data = await response.json();
-
         aircraftRaw = Array.isArray(data.aircraft) ? data.aircraft : [];
         updateAircraftDisplay();
         updateStats();
         updateMap();
         updateAircraftList();
-
     } catch (err) {
         console.error('ADS-B load failed:', err);
     }
 }
-
 /* ===== FILTER PIPELINE ===== */
 function updateAircraftDisplay() {
     const altitudeKey =
         document.getElementById('altitudeFilter')?.value || '';
-
     aircraft = aircraftRaw.filter(ac => {
         if (altitudeKey && ALTITUDE_BANDS[altitudeKey]) {
             const alt = ac.altitude;
             if (typeof alt !== 'number') return false;
-
             const { min, max } = ALTITUDE_BANDS[altitudeKey];
             if (alt < min || alt >= max) return false;
         }
         return true;
     });
 }
-
 /* ===== MAP UPDATE ===== */
 function updateMap() {
     const seen = new Set();
-
     aircraft.forEach(ac => {
         const lat  = ac.latitude ?? ac.lat;
         const lon  = ac.longitude ?? ac.lon;
         const icao = ac.icao ?? ac.hex;
-
         if (lat == null || lon == null || !icao) return;
         seen.add(icao);
-
         const heading =
             typeof ac.heading === 'number' ? ac.heading : 0;
-
         if (markers[icao]) {
             markers[icao].setLatLng([lat, lon]);
             if (markers[icao].setRotationAngle) {
@@ -447,7 +422,6 @@ function updateMap() {
             }
             return;
         }
-
         const marker = L.marker([lat, lon], {
             icon: planeIcon,
             rotationAngle: heading,
@@ -462,10 +436,8 @@ function updateMap() {
             Heading: ${ac.heading ?? 'N/A'}°
         `)
         .on('click', () => selectAircraft(ac));
-
         markers[icao] = marker;
     });
-
     /* Remove stale */
     Object.keys(markers).forEach(icao => {
         if (!seen.has(icao)) {
@@ -473,37 +445,30 @@ function updateMap() {
             delete markers[icao];
         }
     });
-
     updateBearingRays(
         selectedAircraftId
             ? aircraft.filter(a => (a.icao ?? a.hex) === selectedAircraftId)
             : aircraft
     );
-
     /* Auto-frame */
     const framePoints = aircraft
         .map(a => [a.latitude ?? a.lat, a.longitude ?? a.lon])
         .filter(p => p[0] != null && p[1] != null);
-
     if (window.nodes) {
         Object.values(nodes).forEach(n => framePoints.push([n.lat, n.lon]));
     }
-
     if (framePoints.length) {
         fitMapToPoints(map, framePoints, { maxZoom: 12 });
     }
 }
-
 /* ===== AIRCRAFT LIST ===== */
 function updateAircraftList() {
     const container = document.getElementById('aircraftListContainer');
-
     if (!aircraft.length) {
         container.innerHTML =
             '<div style="color:#AAA;text-align:center;padding:20px;">No aircraft detected</div>';
         return;
     }
-
     container.innerHTML = aircraft.map(ac => {
         const icao = ac.icao ?? ac.hex;
         return `
@@ -522,111 +487,85 @@ function updateAircraftList() {
         `;
     }).join('');
 }
-
 /* ===== SELECT AIRCRAFT ===== */
 function selectAircraft(ac) {
     selectedAircraftId = ac.icao ?? ac.hex;
-
     document.getElementById('selectedAircraft').innerHTML = `
         <h4 style="color:#00FF00">${ac.callsign || 'UNKNOWN'}</h4>
-        <table style="font-size:12px;color:#AAA">
-            <tr><td>ICAO:</td><td style="color:#00FF00">${selectedAircraftId}</td></tr>
-            <tr><td>Altitude:</td><td style="color:#00FF00">${ac.altitude ?? 'N/A'} ft</td></tr>
-            <tr><td>Speed:</td><td style="color:#00FF00">${ac.speed ?? 'N/A'} kts</td></tr>
-            <tr><td>Heading:</td><td style="color:#00FF00">${ac.heading ?? 'N/A'}°</td></tr>
+        <table style="font-size:0.8rem; font-weight:bold; color:#AAA">
+            <tr><td style="font-family: Georgia, 'Times New Roman', Times, serif;">ICAO:</td><td style="color:#00FF00">${selectedAircraftId}</td></tr>
+            <tr><td style="font-family: Georgia, 'Times New Roman', Times, serif;">Altitude:</td><td style="color:#00FF00">${ac.altitude ?? 'N/A'} ft</td></tr>
+            <tr><td style="font-family: Georgia, 'Times New Roman', Times, serif;">Speed:</td><td style="color:#00FF00">${ac.speed ?? 'N/A'} kts</td></tr>
+            <tr><td style="font-family: Georgia, 'Times New Roman', Times, serif;">Heading:</td><td style="color:#00FF00">${ac.heading ?? 'N/A'}°</td></tr>
         </table>
     `;
-
-    updateAircraftList();
+  updateAircraftList();
 }
-
 /* ===== STATS ===== */
 function updateStats() {
     const elCount = document.getElementById('aircraftCount');
     const elRate  = document.getElementById('messageRate');
     const elMax   = document.getElementById('maxAltitude');
     const elAvg   = document.getElementById('avgSpeed');
-
     if (elCount) elCount.textContent = aircraft.length;
     if (elRate)  elRate.textContent = Math.floor(Math.random() * 100 + 50);
-
     if (!aircraft.length) return;
-
     const maxAlt = Math.max(...aircraft.map(a => a.altitude || 0));
     const avgSpeed = Math.round(
         aircraft.reduce((s, a) => s + (a.speed || 0), 0) / aircraft.length
     );
-
     if (elMax) elMax.textContent = `${maxAlt} ft`;
     if (elAvg) elAvg.textContent = `${avgSpeed} kts`;
 }
-
-
 /* ===== TRACKING ===== */
 function toggleTracking(event) {
     trackingEnabled = !trackingEnabled;
     const btn = event.currentTarget;
-
     btn.textContent = trackingEnabled ? '⏹ Stop Tracking' : '▶ Start Tracking';
     btn.className = trackingEnabled ? 'btn btn-danger' : 'btn btn-primary';
-
     if (trackingEnabled) {
         startAutoRefresh();
     }
 }
-
 function startAutoRefresh() {
     refreshInterval =
         parseInt(document.getElementById('refreshInterval')?.value) || 5;
-
     if (!trackingEnabled) return;
-
     loadAircraft();
     setTimeout(startAutoRefresh, refreshInterval * 1000);
 }
-
 /* ===== INIT ===== */
 initMap();
 loadAircraft();
 </script>
-
 <script>
 /* ===== ADS-B BEARING RAYS ===== */
-
 const bearingRays = {};
-
 /* Simple geographic bearing ray */
 function bearingRay(lat, lon, bearingDeg, lengthKm = 80) {
     const rad = bearingDeg * Math.PI / 180;
     const dLat = (Math.cos(rad) * lengthKm) / 111;
     const dLon = (Math.sin(rad) * lengthKm) / (111 * Math.cos(lat * Math.PI / 180));
-
     return [
         [lat, lon],
         [lat + dLat, lon + dLon]
     ];
 }
-
 function updateBearingRays(aircraftList) {
     if (!map || !window.nodes) return;
-
     /* Clear old rays */
     Object.values(bearingRays).forEach(ray => map.removeLayer(ray));
     Object.keys(bearingRays).forEach(k => delete bearingRays[k]);
-
     aircraftList.forEach(ac => {
         if (!ac.heading || !ac.icao) return;
-
         Object.entries(nodes).forEach(([nodeName, node]) => {
             const key = `${nodeName}-${ac.icao}`;
-
             const path = bearingRay(
                 node.lat,
                 node.lon,
                 ac.heading,
                 80
             );
-
             bearingRays[key] = L.polyline(path, {
                 color: '#FFB300',
                 weight: 1.5,
@@ -637,7 +576,6 @@ function updateBearingRays(aircraftList) {
     });
 }
 </script>
-
 <!--Demo Waterfall Logic-->
     <script>
         (() => {
@@ -923,7 +861,6 @@ function updateBearingRays(aircraftList) {
     </script>
     <script>
     let triangulationMap;
-
     function initTriangulationMap() {
         triangulationMap = L.map('triangulationMap', {
             zoomControl: false,
@@ -941,15 +878,6 @@ function updateBearingRays(aircraftList) {
         // Global variables (declare once)
         window.triangulationMarker = null;
         window.errorCircle = null;
-        /**
-        * Update or create triangulation marker with optional error radius
-        * @param {number} lat - Latitude of estimated origin
-        * @param {number} lng - Longitude of estimated origin
-        * @param {object} options - Optional settings
-        *        options.errorRadius (m)
-        *        options.popupText (string)
-        *        options.pan (bool)
-        */
         function updateTriangulationMarker(lat, lng, options = {}) {
             if (!triangulationMap) return;
             // Create or move marker
@@ -1012,24 +940,19 @@ function updateBearingRays(aircraftList) {
             }, 5000);
         });
     </script>
-<!--Triangulation Node Positions-->
-
     <script>
 /* ===== TRIANGULATION MAP FRAMING ===== */
 function frameTriangulationMap(lat, lon) {
     if (!triangulationMap || !window.nodes) return;
-
     const points = [
         ...Object.values(nodes).map(n => [n.lat, n.lon]),
         [lat, lon]
     ];
-
     fitMapToPoints(triangulationMap, points, {
         maxZoom: 16
     });
 }
 </script>
-
 <!--Node Actions Modal-->
     <script>
         const modal = document.getElementById('node-modal');
@@ -1060,8 +983,6 @@ function frameTriangulationMap(lat, lon) {
           });
         });
     </script>
-<!--Toggle Sidebar Logic-->
-
 <!--Prevent Accidential Map Interactions-->
     <script>
         (() => {

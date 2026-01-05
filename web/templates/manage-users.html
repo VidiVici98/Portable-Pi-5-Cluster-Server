@@ -238,10 +238,10 @@ input:checked + .slider:before {
     <div class="modal" id="teamModal">
         <div class="modal-content">
             <h3>Team Details</h3>
-            <label>Team Name</label>
+            <label style="font-family: Georgia, 'Times New Roman', Times, serif;">Team Name</label>
             <input id="t_name" placeholder="Enter team name">
             <br>
-            <label>Team Type</label>
+            <label style="font-family: Georgia, 'Times New Roman', Times, serif;">Team Type</label>
             <select id="t_type">
                 <option>SIGINT</option>
                 <option>Security</option>
@@ -250,26 +250,26 @@ input:checked + .slider:before {
                 <option>Logistics</option>
                 <option>Command & Control</option>
             </select>
-            <label>Assigned Members</label>
+            <label style="font-family: Georgia, 'Times New Roman', Times, serif;">Assigned Members</label>
             <div id="t_memberContainer" style="display:flex; gap:8px; flex-wrap:wrap; max-height:120px; overflow-y:auto;"></div>
             <div class="section">
                 <h4>Team Permissions</h4>
                 <div class="toggle-row">
-                    <span>Mesh Management</span>
+                    <span style="font-family: Georgia, 'Times New Roman', Times, serif;">Mesh Management</span>
                     <label class="toggle">
                         <input type="checkbox" id="t_perm_mesh">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="toggle-row">
-                    <span>RF Transmit</span>
+                    <span style="font-family: Georgia, 'Times New Roman', Times, serif;">RF Transmit</span>
                     <label class="toggle">
                         <input type="checkbox" id="t_perm_tx">
                         <span class="slider"></span>
                     </label>
                 </div>
                 <div class="toggle-row">
-                    <span>User Management</span>
+                    <span style="font-family: Georgia, 'Times New Roman', Times, serif;">User Management</span>
                     <label class="toggle">
                         <input type="checkbox" id="t_perm_admin">
                         <span class="slider"></span>
@@ -582,7 +582,7 @@ input:checked + .slider:before {
                     <span class="badge active" style="color:#00ff00; font-weight:bold; font-size:0.85rem;">${t.type}</span>
                 </div>
                 <div class="user-meta">
-                    Members: ${t.members.length} <br>
+                    <span style="font-family:Georgia,Times,serif;">Members:</span> ${t.members.length} <br>
                 </div>
             </div>
             `;
