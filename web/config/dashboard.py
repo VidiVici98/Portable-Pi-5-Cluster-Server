@@ -2,7 +2,7 @@ from datetime import datetime
 # Single source of truth for dashboard metadata
 DASHBOARD_CONFIG = {
     "BUILD_VERSION": "v0.2.0",
-    "BUILD_DATE": "1 Jan 2026",
+    "BUILD_DATE": "6 Jan 2026",
     "BUILD_HASH": "mws-dbe79b8c7f1",
     "BUILD_PROFILE": "Field Portable",
     "CLUSTER_ID": "A9F3",

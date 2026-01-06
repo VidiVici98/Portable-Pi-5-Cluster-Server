@@ -16,6 +16,7 @@ import subprocess
 import socket
 import secrets
 import sqlite3
+import uuid
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from config.demo_seed import DEMO_USERS
@@ -151,20 +152,32 @@ def login_required(f):
     return decorated
 
 @app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
         user_id = authenticate(username, password)
+
         if user_id:
             session["user_id"] = user_id
+
+            # >>> STEP 5: CREATE AUDIT SESSION <<<
+            audit_session_id = create_user_session(user_id)
+            session["audit_session_id"] = audit_session_id
+
             return redirect(url_for("index"))
+
         return render_template('login.html', error='Invalid credentials')
+
     return render_template('login.html')
+
 @app.route('/logout')
 def logout():
+    close_user_session()
     session.clear()
     return redirect(url_for('login'))
+
 @app.before_request
 def require_login():
     allowed_paths = (
@@ -177,6 +190,103 @@ def require_login():
 
     if "user_id" not in session:
         return redirect(url_for("login"))
+def get_current_user():
+    user_id = session.get("user_id")
+    if not user_id:
+        return None
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Base user record
+    c.execute("""
+        SELECT id, username, callsign, role
+        FROM users
+        WHERE id=? AND active=1
+    """, (user_id,))
+    user = c.fetchone()
+
+    if not user:
+        conn.close()
+        return None
+
+    # Groups
+    c.execute("""
+        SELECT g.name
+        FROM groups g
+        JOIN user_groups ug ON ug.group_id = g.id
+        WHERE ug.user_id=?
+    """, (user_id,))
+    groups = [row["name"].strip() for row in c.fetchall() if row["name"].strip()]
+
+    # Teams
+    c.execute("""
+        SELECT t.name
+        FROM teams t
+        JOIN user_teams ut ON ut.team_id = t.id
+        WHERE ut.user_id=?
+    """, (user_id,))
+    teams = [row["name"].strip() for row in c.fetchall() if row["name"].strip()]
+
+    conn.close()
+
+    return {
+        "id": user["id"],
+        "username": user["username"],
+        "callsign": user["callsign"],
+        "role": user["role"],
+        "groups": groups,
+        "teams": teams,
+    }
+@app.context_processor
+def inject_current_user():
+    return {
+        "current_user": get_current_user()
+    }
+
+def create_user_session(user_id):
+    session_id = uuid.uuid4().hex[:12].upper()
+    now = datetime.utcnow().isoformat() + "Z"
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO user_sessions (
+            session_id,
+            user_id,
+            login_time,
+            ip_address,
+            user_agent
+        ) VALUES (?, ?, ?, ?, ?)
+    """, (
+        session_id,
+        user_id,
+        now,
+        request.remote_addr,
+        request.headers.get("User-Agent", "")
+    ))
+    conn.commit()
+    conn.close()
+
+    return session_id
+def close_user_session():
+    audit_id = session.get("audit_session_id")
+    if not audit_id:
+        return
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        UPDATE user_sessions
+        SET logout_time=?
+        WHERE session_id=?
+    """, (
+        datetime.utcnow().isoformat() + "Z",
+        audit_id
+    ))
+    conn.commit()
+    conn.close()
 
 @app.route('/header')
 def header():
@@ -187,8 +297,7 @@ def get_dashboard_build():
 def get_cluster_id():
     return DASHBOARD_CONFIG.get("CLUSTER_ID", "UNKNOWN")
 def get_session_id():
-    # Use Flask session if available
-    return session.get('session_id', 'N/A')    
+    return session.get('audit_session_id', 'N/A')   
 def get_uptime_seconds():
     try:
         start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())

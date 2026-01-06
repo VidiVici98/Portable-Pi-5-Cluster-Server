@@ -17,13 +17,13 @@
     </div>
     <div id="panel-session" class="slide-panel" data-footer-action="session">
         <div class="slide-panel-header">Current Session</div>
-        <div class="slide-panel-stat">Operator: <span>{{ operator }}Instructor_Hickman</span></div>
-        <div class="slide-panel-stat">Role: <span>{{ user_role }}SIGINT Operations</span></div>
-        <div class="slide-panel-stat">User Group: <span>{{ user_group }}admin | dialout</span></div>
+        <div class="slide-panel-stat">Operator: <span>{{ current_user.username }}</span></div>
+        <div class="slide-panel-stat">Role: <span>{{ current_user.teams | join(" ") }}  {{ current_user.role }}</span></div>
+        <div class="slide-panel-stat">User Group: <span>{{ current_user.groups | join(" | ") }}</span></div>
         <div class="slide-panel-stat">Mission Profile: <span>{{ security_profile }}Low Visibility</span></div>
         <div class="slide-panel-stat">Data Classification: <span>{{ data_classification }}Sensitive</span></div>
         <div class="alerts-panel-btns">
-            <button class="slide-panel-btn">Sign Off</button>
+            <a class="slide-panel-btn" href="{{ url_for('logout') }}">Sign Off</a>
             <button class="slide-panel-btn">Shut Down</button>
         </div>
     </div>

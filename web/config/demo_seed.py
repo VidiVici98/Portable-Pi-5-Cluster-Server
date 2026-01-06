@@ -7,7 +7,7 @@ DEMO_USERS = [
             "groups": [
                 "admin",
                 "dialout"],
-            "teams": ["SIGINT"],
+            "teams": "SIGINT",
         },
         {
             "username": "John_Doe",
@@ -16,7 +16,7 @@ DEMO_USERS = [
             "role": "Operator",
             "groups": [
                 "readonly"],
-            "teams": ["QRF"],
+            "teams": "QRF",
         },
         {
             "username":"Just_A_Test",
@@ -26,7 +26,7 @@ DEMO_USERS = [
             "groups":[
                 "user",
                 "dialout"],
-            "teams":["SAR"],
+            "teams":"SAR",
         },
         {
             "username": "Still_A_Test",
@@ -36,7 +36,7 @@ DEMO_USERS = [
             "groups": [
                 "admin",
                 "dialout"],
-            "teams": ["MedEvac"],
+            "teams": "MedEvac",
         },
         {
             "username": "Another_Test",
@@ -46,6 +46,6 @@ DEMO_USERS = [
             "groups": [
                 "user",
                 "dialout"],
-            "teams": ["MedEvac"],
+            "teams": "MedEvac",
         }
 ]
