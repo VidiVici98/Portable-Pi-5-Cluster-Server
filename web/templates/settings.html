@@ -48,9 +48,9 @@
   <!-- DEPLOYMENT PROFILE -->
   <section class="card settings-section" id="deployment-profile">
     <h2>DEPLOYMENT PROFILE</h2>
-    <p class="section-desc">Defines global behavior assumptions for this cluster deployment.</p>
+    <p class="section-desc" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Defines global behavior assumptions for this cluster deployment.</p>
     <div class="settings-grid">
-      <label>Deployment Mode
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Deployment Mode
           <span class="tooltip-icon" title="Select the cluster's operating mode: Training, Operational, Contested RF, or Stealth.">?</span>
         <select>
           <option>Training</option>
@@ -59,7 +59,7 @@
           <option>Stealth / Low Emissions</option>
         </select>
       </label>
-      <label>Power Environment
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Power Environment
           <span class="tooltip-icon" title="Select the cluster's power source: Stable Grid, Generator, DC Power.">?</span>
         <select>
           <option>Stable Grid</option>
@@ -67,7 +67,7 @@
           <option selected>DC Power</option>
         </select>
       </label>
-      <label>Ambient Temperature Expectation
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Ambient Temperature Expectation
           <span class="tooltip-icon" title="Select the operating tempurature range: Below 25°C, 25-40°C, or Over 40°C.">?</span>
         <select>
           <option>&lt; 25°C</option>
@@ -75,7 +75,7 @@
           <option>40–55°C</option>
         </select>
       </label>
-      <label>Operator Density
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Operator Density
           <span class="tooltip-icon" title="Select whether you are the sole console operator.">?</span>
         <select>
           <option>Single Operator</option>
@@ -88,14 +88,14 @@
   <section class="card settings-section" id="power-hardware">
     <h2>POWER & HARDWARE POLICY</h2>
     <div class="settings-grid">
-      <label>Node Power Budget Enforcement
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Node Power Budget Enforcement
           <span class="tooltip-icon" title="How do you want power budgeted for the node cluster: Per Node Power Budgets or Global Power Budget.">?</span>
         <select>
           <option disabled>Per-Node Caps (Future)</option>
           <option selected>Enabled (Global)</option>
         </select>
       </label>
-      <label>Thermal Throttling Policy
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Thermal Throttling Policy
           <span class="tooltip-icon" title="How should thermal throttling be handles: Soft Throttling, Aggressive Throttling, or Hard Shutdown.">?</span>
         <select>
           <option>Soft Throttle</option>
@@ -111,7 +111,7 @@
   <section class="card settings-section" id="failover">
     <h2>FAILOVER & AUTONOMY</h2>
     <div class="settings-grid">
-      <label>Autonomy Level
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Autonomy Level
           <span class="tooltip-icon" title="Select the cluster's operational autonomy: Manual, Assisted Recovery, Fully Autonomous.">?</span>
         <select>
           <option>Manual Only</option>
@@ -119,7 +119,7 @@
           <option>Fully Autonomous</option>
         </select>
       </label>
-      <label>Service Restart Policy
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Service Restart Policy
           <span class="tooltip-icon" title="When should the cluster auto-restart: Never, On Crash, or On Threshold Breach.">?</span>
         <select>
           <option>Never</option>
@@ -135,14 +135,14 @@
   <section class="card settings-section" id="mesh-network">
     <h2>NETWORK & MESH BEHAVIOR</h2>
     <div class="settings-grid">
-      <label>Preferred Backhaul Order
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Preferred Backhaul Order
           <span class="tooltip-icon" title="Select the cluster's preferred backhaul order: PoE → Cluster Mesh → External Mesh, or Cluster Mesh First.">?</span>
         <select>
           <option selected>PoE → Cluster Mesh → External Mesh</option>
           <option>Cluster Mesh First</option>
         </select>
       </label>
-      <label>Discovery Visibility
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Discovery Visibility
           <span class="tooltip-icon" title="Should the cluster be discoverable by remote nodes?">?</span>
         <select>
           <option>Silent</option>
@@ -150,7 +150,7 @@
           <option>Active Beaconing</option>
         </select>
       </label>
-      <label>Mesh Trust Model
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Mesh Trust Model
           <span class="tooltip-icon" title="Enable a warning modal before trusting remote nodes?">?</span>
         <select>
           <option selected>Known Clusters Only</option>
@@ -165,14 +165,14 @@
   <section class="card settings-section" id="access-control">
     <h2>SECURITY & ACCESS CONTROL</h2>
     <div class="settings-grid">
-      <label>Authentication Mode
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Authentication Mode
           <span class="tooltip-icon" title="How should nodes & operators be authenticated?">?</span>
         <select>
           <option selected>Local Credentials</option>
           <option>Local + Keyfile</option>
         </select>
       </label>
-      <label>Session Timeout
+      <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Session Timeout
           <span class="tooltip-icon" title="When should credentials need to be re-verified?">?</span>
         <select>
           <option>15 minutes</option>
@@ -187,7 +187,7 @@
 <!-- NETWORK FIREWALL / UFW -->
 <section class="card settings-section danger-zone" id="firewall-config">
   <h2>NETWORK FIREWALL (UFW)</h2>
-  <p class="section-desc">
+  <p class="section-desc" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
     Controls ingress and egress network exposure. Changes may immediately impact node reachability.
   </p>
   <div class="settings-grid firewall-header">
@@ -195,7 +195,7 @@
       <input type="checkbox" checked>
       Enable Host Firewall
     </label>
-    <label>
+    <label style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
       Default Inbound Policy
       <select>
         <option selected>Deny</option>
@@ -213,7 +213,7 @@
   <!-- RULE TABLE -->
   <div class="firewall-rules">
     <div class="rules-header">
-      <button class="btn btn-warning" onclick="openFirewallModal('add')">
+      <button class="btn btn-warning" onclick="openFirewallModal('add')" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
         + Add Rule
       </button>
     </div>
@@ -269,10 +269,10 @@
       </tbody>
     </table>
     <div class="rules-footer">
-      <span class="pending-warning">
+      <span class="pending-warning" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
         ⚠ Pending firewall changes require confirmation
       </span>
-      <button class="btn btn-danger" onclick="openFirewallApplyModal()">
+      <button class="btn btn-danger" onclick="openFirewallApplyModal()" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
         Apply Firewall Changes
       </button>
     </div>
@@ -305,7 +305,7 @@
 <!-- SECURE DATA DESTRUCTION POLICY -->
 <section class="card settings-section danger-zone" id="data-destruction">
   <h2>SECURE DATA DESTRUCTION</h2>
-  <p class="section-desc danger-text">
+  <p class="section-desc danger-text" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
     These actions permanently destroy locally stored data. They are irreversible and may
     render the system inoperable until re-provisioned.
   </p>
@@ -329,10 +329,10 @@
     </label>
   </div>
   <div class="destruction-actions">
-    <button class="btn btn-warning" onclick="openDestructionModal('manual')">
+    <button class="btn btn-warning" onclick="openDestructionModal('manual')" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
       Manual Secure Purge
     </button>
-    <button class="btn btn-danger" onclick="openDestructionModal('emergency')">
+    <button class="btn btn-danger" onclick="openDestructionModal('emergency')" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">
       EMERGENCY WIPE
     </button>
   </div>
@@ -383,7 +383,7 @@
           <option>External NTP</option>
         </select>
       </label>
-      <button class="btn btn-warning" onclick="alert('Exporting forensic bundle...')">Export forensic bundle</button>
+      <button class="btn btn-warning" onclick="alert('Exporting forensic bundle...')" style="font-family: Georgia, 'Times New Roman', Times, serif; font-size: 0.85rem; text-shadow: 1px 1px 1px #111;">Export forensic bundle</button>
     </div>
   </section>
 </main>

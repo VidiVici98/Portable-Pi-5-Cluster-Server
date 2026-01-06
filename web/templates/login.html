@@ -31,37 +31,113 @@
             <div class="login-info">
                 <h1 style="font-size:2rem;">Modern Warrior Systems</h1>
                 <h2 style="font-size: 1.5rem;">Command & Control Dashboard</h2>
-                <p>Monitor, manage, and control your nodes in real time. Enterprise-grade cluster operations with tactical insights.</p>
+                <p style="font-family: Georgia, 'Times New Roman', Times, serif; color:#666;">Monitor, manage, and control your nodes in real time. Enterprise-grade cluster operations with tactical insights.</p>
                 <div class="notification-panel">
-                    <h3>System Notifications</h3>
-                    <ul>
-                        <li><span class="status online"></span> Boot node online</li>
-                        <li><span class="status warning"></span> Mesh network latency high</li>
-                        <li><span class="status offline"></span> VHF node offline</li>
-                        <li><span class="status online"></span> ISR feed active</li>
-                    </ul>
+                    <h3 style="font-family: Georgia, 'Times New Roman', Times, serif;font-weight: bold; text-shadow:1px 2px 1px #000;">System Status:</h3>
+                    <div class="system-status" style="background-color: #050505;padding:8px;border: 1px groove #252525;height:200px;">
+                        <span>Cluster Status: OPERATIONAL</span><br>
+                        <span>State: READY</span><br>
+                        <span>Operational Mode: EXERCISE</span><br>
+                        <span>Data Classification: SENSITIVE</span>
+                    </div>
                 </div>
             </div>
         </div>
         <!-- RIGHT PANEL: Login form -->
         <div class="login-right">
-            <div class="login-card">
-                <h2>Sign in to Cluster Dashboard</h2>
-                <p>Enter your credentials to access tactical control and monitoring tools.</p>
-                {% if error %}
-                    <div class="login-error">{{ error }}</div>
-                {% endif %}
-                <form method="POST" action="{{ url_for('login') }}">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                    <button type="submit">Sign In</button>
-                </form>
-            </div>
+<div class="login-card">
+    {% if system_state == "UNINITIALIZED" %}
+        <!-- BOOTSTRAP ADMIN MODE -->
+        <h2>Initialize System Administrator</h2>
+        <p style="font-family: Georgia, 'Times New Roman', Times, serif; color:#666;">
+            This system has not been initialized. Create the primary administrator account to enable access.
+        </p>
+        {% if error %}
+            <div class="login-error">{{ error }}</div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('bootstrap_admin') }}">
+            <label for="admin_username"
+                   style="font-family: Georgia, 'Times New Roman', Times, serif;color:#bbb;font-weight:bold;">
+                Administrator Username
+            </label>
+            <input type="text"
+                   id="admin_username"
+                   name="admin_username"
+                   autocomplete="off"
+                   required>
+            <label for="admin_password"
+                   style="font-family: Georgia, 'Times New Roman', Times, serif;color:#bbb;font-weight:bold;">
+                Password
+            </label>
+            <input type="password"
+                   id="admin_password"
+                   name="admin_password"
+                   required>
+            <label for="admin_password_confirm"
+                   style="font-family: Georgia, 'Times New Roman', Times, serif;color:#bbb;font-weight:bold;">
+                Confirm Password
+            </label>
+            <input type="password"
+                   id="admin_password_confirm"
+                   name="admin_password_confirm"
+                   required>
+            <button type="submit"
+                    style="font-family: Georgia, 'Times New Roman', Times, serif;font-weight:bold;">
+                Initialize System
+            </button>
+        </form>
+        <div class="login-warning">
+            This action can only be performed once. All activity is logged.
+        </div>
+    {% else %}
+        <!-- NORMAL LOGIN MODE -->
+        <h2>Sign in to Cluster Dashboard</h2>
+        <p style="font-family: Georgia, 'Times New Roman', Times, serif;color:#666;">
+            Authorized personnel only. All access is monitored and logged.
+        </p>
+        {% if error %}
+            <div class="login-error">{{ error }}</div>
+        {% endif %}
+        <form method="POST" action="{{ url_for('login') }}">
+            <label for="username"
+                   style="font-family: Georgia, 'Times New Roman', Times, serif;color:#bbb;font-weight:bold;">
+                Username
+            </label>
+            <input type="text"
+                   id="username"
+                   name="username"
+                   autocomplete="username"
+                   required>
+            <label for="password"
+                   style="font-family: Georgia, 'Times New Roman', Times, serif;color:#bbb;font-weight:bold;">
+                Password
+            </label>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   autocomplete="current-password"
+                   required>
+            <button type="submit"
+                    style="font-family: Georgia, 'Times New Roman', Times, serif;font-weight:bold;">
+                Sign In
+            </button>
+        </form>
+    {% endif %}
+</div>
         </div>
     </div>
     <footer id="footer-embed-container" stlye="position:relative;"></footer>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+                function logActivity(message) {
+            const log = document.getElementById('activity-log');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.style.cssText = 'padding: 5px 0; border-bottom: 1px solid var(--border-color-dim);min-height:300px;';
+            entry.innerHTML = `<span style="color: var(--text-muted);">[${time}]</span> ${message}`;
+            log.insertBefore(entry, log.firstChild);
+        }
+                logActivity('Dashboard initialized');
+    </script>
 </body>
 </html>

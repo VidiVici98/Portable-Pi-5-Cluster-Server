@@ -7,22 +7,17 @@
     --secondary: rgba(255, 179, 0, 0.3);
     --danger: #ff1744;
     --warning: #ffb300;
-
     --bg-primary: #0a0a0a;
     --bg-secondary: #151515;
     --bg-tertiary: #252525;
-
     --text-primary: #00ff00;
     --text-secondary: #00cc00;
     --text-muted: #008800;
-
     --border-color: #00ff00;
     --border-color-dim: #008800;
-
     --font-mono: 'Courier New', monospace;
     --font-sans: 'Inter', sans-serif;
 }
-
 /* Global Reset */
 * {
     margin: 0;
@@ -135,7 +130,7 @@ html, body {
 .login-card {
     background: radial-gradient(circle at 50%, #0a0a0a, #151515);
     padding: 40px;
-    border: 2px groove #333;
+    border: 2px groove #000;
     border-radius: 12px;
     width: 100%;
     max-width: 400px;
@@ -178,7 +173,7 @@ html, body {
     width: 100%;
     padding: 12px;
     background: rgba(0,255,0,0.1);
-    border: 2px solid #333;
+    border: 2px solid #252525;
     border-radius: 8px;
     color: var(--text-primary);
     font-weight: bold;
@@ -221,4 +216,12 @@ html, body {
     .login-card {
         max-width: 100%;
     }
+}
+.login-warning {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #552222;
+    background-color: #140808;
+    color: #d88;
+    font-size: 0.85rem;
 }
