@@ -15,6 +15,10 @@ import json
 import subprocess
 import socket
 import secrets
+import sqlite3
+from werkzeug.security import generate_password_hash
+from werkzeug.security import check_password_hash
+from config.demo_seed import DEMO_USERS
 from flask import session
 from config.dashboard import DASHBOARD_CONFIG
 from datetime import datetime
@@ -26,6 +30,8 @@ from flask import Flask, render_template
 # Local configuration
 DEBUG = os.getenv('DEBUG', 'True').lower() == 'true'
 DEMO_MODE = os.getenv('DEMO_MODE', 'True').lower() == 'true'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "data", "dashboard.db")
 # Cluster node definitions with tool categories
 NODES = {
     'boot': {
@@ -73,39 +79,116 @@ CORS(app)
 ################################################################################
 # AUTHENTICATION AND BOOT LANDING PAGE
 ################################################################################
-USERS = {'admin': os.getenv('ADMIN_PASSWORD', 'admin123')}
+def seed_demo_users():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    # Abort if users already exist
+    c.execute("SELECT COUNT(*) FROM users")
+    if c.fetchone()[0] > 0:
+        conn.close()
+        return
+
+    for user in DEMO_USERS:
+        c.execute("""
+            INSERT INTO users (username, callsign, password_hash, role, active, created_at)
+            VALUES (?, ?, ?, ?, 1, ?)
+        """, (
+            user["username"],
+            user["callsign"],
+            generate_password_hash(user["password"]),
+            user["role"],
+            datetime.utcnow().isoformat()
+        ))
+
+        user_id = c.lastrowid
+
+        for group in user["groups"]:
+            c.execute("INSERT OR IGNORE INTO groups (name) VALUES (?)", (group,))
+            c.execute("SELECT id FROM groups WHERE name=?", (group,))
+            group_id = c.fetchone()[0]
+            c.execute(
+                "INSERT OR IGNORE INTO user_groups (user_id, group_id) VALUES (?, ?)",
+                (user_id, group_id)
+            )
+
+        for team in user["teams"]:
+            c.execute("INSERT OR IGNORE INTO teams (name) VALUES (?)", (team,))
+            c.execute("SELECT id FROM teams WHERE name=?", (team,))
+            team_id = c.fetchone()[0]
+            c.execute(
+                "INSERT OR IGNORE INTO user_teams (user_id, team_id) VALUES (?, ?)",
+                (user_id, team_id)
+            )
+
+    conn.commit()
+    conn.close()
+def authenticate(username, password):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("""
+        SELECT id, password_hash FROM users
+        WHERE username=? AND active=1
+    """, (username,))
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        return None
+
+    user_id, pw_hash = row
+    if check_password_hash(pw_hash, password):
+        return user_id
+
+    return None
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        if 'user' not in session:
-            return redirect(url_for('login', next=request.url))
+        if "user_id" not in session:
+            return redirect(url_for("login"))
         return f(*args, **kwargs)
     return decorated
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        if USERS.get(username) == password:
-            session['user'] = username
-            return redirect(request.args.get('next') or url_for('index'))
+        user_id = authenticate(username, password)
+        if user_id:
+            session["user_id"] = user_id
+            return redirect(url_for("index"))
         return render_template('login.html', error='Invalid credentials')
     return render_template('login.html')
 @app.route('/logout')
 def logout():
-    session.pop('user', None)
+    session.clear()
     return redirect(url_for('login'))
+@app.before_request
+def require_login():
+    allowed_paths = (
+        '/login',
+        '/static/',
+    )
+
+    if request.path.startswith(allowed_paths):
+        return
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
 @app.route('/header')
 def header():
     return render_template('components/header.html')
 # FOOTER - UPDATED TO INCLUDE DYNAMIC NODE STATUS
 def get_dashboard_build():
-    return DASHBOARD_CONFIG.get("BUILD_VERSION", "v0.2.0")
+    return DASHBOARD_CONFIG.get("BUILD_VERSION")
 def get_cluster_id():
     return DASHBOARD_CONFIG.get("CLUSTER_ID", "UNKNOWN")
 def get_session_id():
     # Use Flask session if available
-    return session.get('session_id', '7G5K2B1F')    
+    return session.get('session_id', 'N/A')    
 def get_uptime_seconds():
     try:
         start = DASHBOARD_CONFIG.get("SERVER_START_TIME", datetime.utcnow())
@@ -611,8 +694,12 @@ def server_error(e):
 # MAIN
 ################################################################################
 if __name__ == '__main__':
+    if DEMO_MODE:
+        seed_demo_users()
+
     port = int(os.getenv('PORT', 5000))
     host = os.getenv('HOST', '127.0.0.1')
+
     print(f"""
 ╔════════════════════════════════════════╗
 ║  Cluster Command & Control Dashboard   ║
@@ -627,4 +714,5 @@ Demo Mode: {DEMO_MODE}
 Access: http://{host}:{port}
 Press Ctrl+C to stop
     """)
+
     app.run(host=host, port=port, debug=DEBUG)
