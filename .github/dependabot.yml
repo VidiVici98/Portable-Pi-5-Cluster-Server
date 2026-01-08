@@ -1,0 +1,70 @@
+version: 2
+
+updates:
+  # ============================================================================
+  # Root Python dependencies
+  # ============================================================================
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    groups:
+      python-core:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+
+  # ============================================================================
+  # Web dashboard Python dependencies
+  # ============================================================================
+  - package-ecosystem: "pip"
+    directory: "/web"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:10"
+    open-pull-requests-limit: 10
+    rebase-strategy: "auto"
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+    groups:
+      web-dashboard:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "deps(web)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "dashboard"
+      - "python"
+
+  # ============================================================================
+  # GitHub Actions (CI / automation security)
+  # ============================================================================
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "04:20"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "ci"
